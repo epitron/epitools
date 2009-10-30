@@ -1,6 +1,7 @@
 = epitools
 
-Description goes here.
+There's some interesting stuff in here. Unfortunately, it's all gross and
+disorganized. This will change. :D
 
 == Note on Patches/Pull Requests
  

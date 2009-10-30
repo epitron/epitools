@@ -1,0 +1,1 @@
+raise "This gem is currently not for public consumption. Sorry! :D"

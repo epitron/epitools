@@ -21,6 +21,8 @@ class Object
   end
 end
 
-o = Object.new
-puts o
-puts o.metaclass
+if $0 == __FILE__
+  o = Object.new
+  p o
+  p o.metaclass
+end
