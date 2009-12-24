@@ -1,18 +1,83 @@
 require 'pp'
 
+
 class String
+  
   def integer?; self.strip.match(/^\d+$/) ? true : false; end
+    
+  #
+  # Like #lines, but skips empty lines and removes \n's.
+  #
   def nice_lines; self.split("\n").map(&:strip).select(&:any?); end
 end
+
 
 class Integer
   def integer?; true; end
   def to_hex; "%0.2x" % self; end
 end
 
+
 class NilClass
   def integer?; false; end
 end
+
+
+class Array
+  def squash
+    self.flatten.compact.uniq
+  end
+end
+
+
+module Enumerable
+
+  #
+  # Split this enumerable into an array of pieces given som 
+  # boundary condition.
+  #
+  # Examples: 
+  #   [1,2,3,4,5].split{ |e| e == 3 }                           #=> [ [1,2], [4,5] ] 
+  #   [1,2,3,4,5].split(:include_boundary=>true) { |e| e == 3 } #=> [ [1,2], [3,4,5] ] 
+  #   chapters = File.read("ebook.txt").split(/Chapter \d+/, :include_boundary=>true)
+  #
+  def split(matcher=nil, options={}, &block)
+    return self unless self.any?
+    
+    include_boundary = options[:include_boundary] || false
+
+    if matcher.nil?
+      boundary_test = block
+    else
+      if matcher.is_a? String or matcher.is_a? Regexp
+        boundary_test = proc { |e| e[matcher] }
+      else
+        raise "I don't know how to split with #{matcher}"
+      end
+    end
+
+    chunks = []
+    current_chunk = []
+
+    each do |e|
+
+      if boundary_test.call(e)
+        next                      if current_chunk.empty?
+        chunks << current_chunk
+        current_chunk = []
+        current_chunk << e        if include_boundary
+      else
+        current_chunk << e
+      end
+
+    end
+
+    chunks
+  end
+
+end
+
+
 
 class Object
 
@@ -83,8 +148,9 @@ class Hash
     dup.map_keys!(&block)
   end
 
-  alias_method :filter, :slice
-  alias_method :filter!, :slice!
+  # TODO: Where did slice come from?
+  #alias_method :filter, :slice
+  #alias_method :filter!, :slice!
   
 end
 
@@ -131,7 +197,9 @@ class It
 end
 
 
-
+class BlankSlate
+  instance_methods.each { |m| undef_method m unless m =~ /^__/ }
+end
 
 #
 # Funky #not method
