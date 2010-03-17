@@ -101,17 +101,18 @@ class Object
     send method if respond_to? method
   end
 
-  def meths
-    (methods - Object.new.methods).sort
+  def bench(message=nil)
+    start = Time.now
+    yield
+    elapsed = Time.now - start
+    
+    print "[#{message}] " if message
+    puts "elapsed time: %0.5fs" % elapsed 
   end
+  alias bench time
   
-  def pms
-    pp meths.map do |methname|
-      meth = method(methname)
-      "#{methname}" + (meth.arity > 0) ? "(#{meth.arity})" : ""
-    end
-  end
 end
+
 
 
 class Hash
