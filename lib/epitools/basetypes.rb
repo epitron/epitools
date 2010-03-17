@@ -109,7 +109,7 @@ class Object
     print "[#{message}] " if message
     puts "elapsed time: %0.5fs" % elapsed 
   end
-  alias bench time
+  alias time bench
   
 end
 
