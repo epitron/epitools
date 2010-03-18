@@ -1,47 +1,113 @@
 require 'pp'
 
+class Object
+  # Default "integer?" behaviour.
+  def integer?; false; end
+end
+
+class Float
+  def integer?; true; end
+end
 
 class String
   
-  def integer?; self.strip.match(/^\d+$/) ? true : false; end
+  #
+  # Could this string be cast to an integer?
+  #
+  def integer?
+    self.strip.match(/^\d+$/) ? true : false
+  end
     
   #
   # Like #lines, but skips empty lines and removes \n's.
   #
-  def nice_lines; self.split("\n").map(&:strip).select(&:any?); end
+  def nice_lines
+    self.split("\n").map(&:strip).select(&:any?)
+  end
+  
+  alias_method :clean_lines, :nice_lines
+  
 end
 
 
 class Integer
-  def integer?; true; end
-  def to_hex; "%0.2x" % self; end
-end
-
-
-class NilClass
-  def integer?; false; end
+  
+  def integer?
+    true
+  end
+    
+  def to_hex
+    "%0.2x" % self
+  end
+    
+  #
+  # Convert the number to an array of bits (least significant digit first).
+  #
+  def to_bits
+    ("%b" % self).reverse.chars.map(&:to_i)
+  end
+  
+  alias_method :bits, :to_bits
+  
 end
 
 
 class Array
+  
+  #
+  # flatten.compact.uniq
+  #
   def squash
-    self.flatten.compact.uniq
+    flatten.compact.uniq
   end
+  
+  #
+  # The same as "map", except that if an element is an Array or Enumerable, map is called
+  # recursively on that element.
+  #
+  # eg: [ [1,2], [3,4] ].map_recursive{|e| e ** 2 } #=> [ [1,4], [9,16] ] 
+  #
+  def recursive_map(*args, &block)
+    map(*args) do |e|
+      if e.is_a? Array or e.is_a? Enumerable
+        e.map(*args, &block)
+      else
+        block.call(e)
+      end
+    end
+  end
+  
+  alias_method :map_recursive,    :recursive_map 
+  alias_method :map_recursively,  :recursive_map
+  
 end
-
 
 module Enumerable
 
   #
-  # Split this enumerable into an array of pieces given som 
+  # Split this enumerable into an array of pieces given some 
   # boundary condition.
   #
-  # Examples: 
-  #   [1,2,3,4,5].split{ |e| e == 3 }                           #=> [ [1,2], [4,5] ] 
-  #   [1,2,3,4,5].split(:include_boundary=>true) { |e| e == 3 } #=> [ [1,2], [3,4,5] ] 
-  #   chapters = File.read("ebook.txt").split(/Chapter \d+/, :include_boundary=>true)
+  # Options:
+  #   :include_boundary => true  #=> include the element that you're splitting at in the results  
+  #                                  (default: false)
+  #   :after => true             #=> split after the matched element (only has an effect when used with :include_boundary)  
+  #                                  (default: false)
   #
-  def split(matcher=nil, options={}, &block)
+  # Examples: 
+  #   [1,2,3,4,5].split{ |e| e == 3 }                           
+  #   #=> [ [1,2], [4,5] ]
+  #
+  #   [1,2,3,4,5].split(:include_boundary=>true) { |e| e == 3 } 
+  #   #=> [ [1,2], [3,4,5] ] 
+  #
+  #   chapters = File.read("ebook.txt").split(/Chapter \d+/, :include_boundary=>true)
+  #   #=> [ ["Chapter 1", ...], ["Chapter 2", ...], etc. ]
+  #
+  # TODO:
+  #   - Ruby 1.9 returns Enumerators for everything now. Maybe do that?
+  #
+  def split_at(matcher=nil, options={}, &block)
     return self unless self.any?
     
     include_boundary = options[:include_boundary] || false
@@ -62,19 +128,57 @@ module Enumerable
     each do |e|
 
       if boundary_test.call(e)
-        next                      if current_chunk.empty?
-        chunks << current_chunk
-        current_chunk = []
-        current_chunk << e        if include_boundary
+        
+        if current_chunk.empty? and not include_boundary 
+          next # hit 2 boundaries in a row... just keep moving, people!
+        end
+        
+        if options[:after]
+          # split after boundary
+          current_chunk << e        if include_boundary   # include the boundary, if necessary
+          chunks << current_chunk                         # shift everything after the boundary into the resultset
+          current_chunk = []                              # start a new result
+        else
+          # split before boundary
+          chunks << current_chunk                         # shift before the boundary into the resultset
+          current_chunk = []                              # start a new result
+          current_chunk << e        if include_boundary   # include the boundary, if necessary
+        end
+        
       else
         current_chunk << e
       end
 
     end
+    
+    chunks << current_chunk if current_chunk.any?
 
-    chunks
+    chunks # resultset
   end
 
+  alias_method :split, :split_at
+  
+  #
+  # Split the array into chunks, with the boundaries being after the element to split on.
+  #
+  # eg: [1,2,3,4].split_after{|e| e == 3 } #=> [ [1,2,3], [4] ]
+  #
+  def split_after(matcher=nil, options={}, &block)
+    options[:after]             ||= true
+    options[:include_boundary]  ||= true
+    split(matcher, options, &block)
+  end
+
+  #
+  # Split the array into chunks. The boundaries will lie before the element to split on.
+  #
+  # eg: [1,2,3,4].split_before{|e| e == 3 } #=> [ [1,2], [3,4] ]
+  #
+  def split_before(matcher=nil, options={}, &block)
+    options[:include_boundary]  ||= true
+    split(matcher, options, &block)
+  end
+  
 end
 
 

@@ -18,8 +18,8 @@ def longest_common_subsequence(s1, s2)
   num = Array.new(s1.size) { Array.new(s2.size) }
   len, ans = 0
  
-  s1.scan(/./).each_with_index do |l1,i|
-    s2.scan(/./).each_with_index do |l2,j|
+  s1.chars.each_with_index do |l1, i|
+    s2.chars.each_with_index do |l2, j|
       unless l1==l2
         num[i][j]=0
       else
@@ -36,22 +36,4 @@ def longest_common_subsequence(s1, s2)
   ans
  
 end
-
-if $0 == __FILE__
-  prefix_strings = [
-   "shenanigans, gentlemen!",
-    "shenanigans has been called",
-    "shenanigans: a great restaurant."
-  ]
-  
-  subsequence_strings = [
-    "i call shenanigans on you!",
-    "shenanigans is a great restaurant.",
-    "you like this? shenanigans!"
-  ]
-
-  p longest_common_prefix(prefix_strings)
-  p longest_common_subsequence(*subsequence_strings[0..1])
-end
-
 
