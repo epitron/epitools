@@ -1,8 +1,9 @@
+require 'epitools/basetypes'
 require 'epitools/permutations'
 
 describe "Permutations" do
   
-  it "a * b" do
+  it "a*b" do
     ([1,2] * [3,4]).should == [ [1,3], [1,4], [2,3], [2,4] ]
   end    
 
@@ -11,4 +12,3 @@ describe "Permutations" do
   end    
   
 end
-

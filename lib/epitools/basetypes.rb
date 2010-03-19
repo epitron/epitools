@@ -5,9 +5,11 @@ class Object
   def integer?; false; end
 end
 
+
 class Float
   def integer?; true; end
 end
+
 
 class String
   
@@ -61,26 +63,8 @@ class Array
     flatten.compact.uniq
   end
   
-  #
-  # The same as "map", except that if an element is an Array or Enumerable, map is called
-  # recursively on that element.
-  #
-  # eg: [ [1,2], [3,4] ].map_recursive{|e| e ** 2 } #=> [ [1,4], [9,16] ] 
-  #
-  def recursive_map(*args, &block)
-    map(*args) do |e|
-      if e.is_a? Array or e.is_a? Enumerable
-        e.map(*args, &block)
-      else
-        block.call(e)
-      end
-    end
-  end
-  
-  alias_method :map_recursive,    :recursive_map 
-  alias_method :map_recursively,  :recursive_map
-  
 end
+
 
 module Enumerable
 
@@ -178,7 +162,82 @@ module Enumerable
     options[:include_boundary]  ||= true
     split(matcher, options, &block)
   end
+
+  #
+  # Sum the elements
+  #  
+  def sum
+    inject(0) { |total,n| total + n }
+  end
   
+  #
+  # Average the elements
+  #
+  def average
+    count = 0
+    sum = inject(0) { |total,n| count += 1; total + n }
+    sum / count.to_f
+  end
+
+  #
+  # The same as "map", except that if an element is an Array or Enumerable, map is called
+  # recursively on that element.
+  #
+  # eg: [ [1,2], [3,4] ].map_recursive{|e| e ** 2 } #=> [ [1,4], [9,16] ] 
+  #
+  def recursive_map(*args, &block)
+    map(*args) do |e|
+      if e.is_a? Array or e.is_a? Enumerable
+        e.map(*args, &block)
+      else
+        block.call(e)
+      end
+    end
+  end
+  
+  alias_method :map_recursive,    :recursive_map 
+  alias_method :map_recursively,  :recursive_map
+
+
+  #
+  # Identical to "reduce" in ruby1.9 (or foldl in haskell.)
+  #
+  # Example:
+  #   array.foldl{|a,b| a + b } == array[1..-1].inject(array[0]){|a,b| a + b }
+  #
+  def foldl(methodname=nil, &block)
+    result = nil
+
+    raise "Error: pass a parameter OR a block, not both!" if methodname and block
+      
+    if methodname
+      
+      each_with_index do |e,i|
+        if i == 0
+          result = e 
+          next
+        end
+        
+        result = result.send(methodname, e)      
+      end
+      
+    else
+      
+      each_with_index do |e,i|
+        if i == 0
+          result = e 
+          next
+        end
+        
+        result = block.call(result, e)      
+      end
+      
+    end
+    
+    result
+  end
+
+
 end
 
 
@@ -201,10 +260,13 @@ class Object
   # Now you can do:
   #   @person.try(:name)
   #
-  def try(method)
-    send method if respond_to? method
+  def try(method, *args, &block)
+    send(method, *args, &block) if respond_to? method
   end
 
+  #
+  # Benchmark a block!
+  #
   def bench(message=nil)
     start = Time.now
     yield
@@ -275,9 +337,14 @@ end
 #
 
 module Kernel
-  protected
-  def it() It.new end
+
+protected
+  def it() 
+    It.new 
+  end
+  
   alias its it
+  
 end
 
 class It

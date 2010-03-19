@@ -2,10 +2,10 @@ require 'epitools/metaclass'
 
 describe "Metaclass" do
   
-  it "works!" do
+  it "metaclass" do
     o = Object.new
-    metaclass = class << o; self; end
-    o.metaclass.should == metaclass
+    o_metaclass = class << o; self; end
+    o.metaclass.should == o_metaclass
   end    
   
 end

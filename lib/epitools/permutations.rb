@@ -1,14 +1,7 @@
+require 'epitools/basetypes'
 
 class Array
   
-  def sum
-    inject(0) { |total,n| total + n }
-  end
-  
-  def average
-    sum / size.to_f
-  end
-
   alias_method :"original_*_for_cartesian_*", :*
   def *(other)
     case other
@@ -31,27 +24,6 @@ class Array
   end
   
 end
-
-
-module Enumerable
-
-  def foldl(operation)
-    result = nil
-
-    each_with_index do |e,i|
-      if i == 0
-        result = e 
-        next
-      end
-      
-      result = result.send(operation, e)      
-    end
-    
-    result
-  end
-
-end
-
 
 def perms(total, n=0, stack=[], &block)
   ps = yield(n)
