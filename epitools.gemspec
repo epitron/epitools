@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{epitools}
-  s.version = "0.1.1"
+  s.version = "0.1.3"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["epitron"]
@@ -23,6 +23,7 @@ Gem::Specification.new do |s|
      "README.rdoc",
      "Rakefile",
      "VERSION",
+     "epitools.gemspec",
      "lib/epitools.rb",
      "lib/epitools/basetypes.rb",
      "lib/epitools/hexdump.rb",
@@ -34,10 +35,12 @@ Gem::Specification.new do |s|
      "lib/epitools/pretty_backtrace.rb",
      "lib/epitools/rails.rb",
      "lib/epitools/rash.rb",
+     "lib/epitools/string_to_proc.rb",
      "spec/basetypes_spec.rb",
      "spec/lcs_spec.rb",
      "spec/metaclass_spec.rb",
      "spec/permutations_spec.rb",
+     "spec/rash_spec.rb",
      "spec/spec.opts",
      "spec/spec_helper.rb"
   ]
@@ -47,12 +50,12 @@ Gem::Specification.new do |s|
   s.rubygems_version = %q{1.3.6}
   s.summary = %q{NOT UTILS... METILS!}
   s.test_files = [
-    "spec/lcs_spec.rb",
+    "spec/permutations_spec.rb",
      "spec/rash_spec.rb",
-     "spec/metaclass_spec.rb",
-     "spec/permutations_spec.rb",
      "spec/spec_helper.rb",
-     "spec/basetypes_spec.rb"
+     "spec/lcs_spec.rb",
+     "spec/basetypes_spec.rb",
+     "spec/metaclass_spec.rb"
   ]
 
   if s.respond_to? :specification_version then

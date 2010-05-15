@@ -104,6 +104,26 @@ describe Enumerable do
     "a\nb\n---\nc\nd\n".split_at(/---/).map_recursive(&:strip).should   == [ %w[a b], %w[c d] ]
   end
 
+  it "handles nested things" do
+    array = [ [],["a"],"a",[1,2,3] ]
+
+    lambda { 
+      array.split_at("a")
+    }.should_not raise_error
+    
+    array.split_at("a").should     == [ array[0..1], array[3..3] ] 
+    array.split_at([1,2,3]).should == [ array[0..2] ]
+  end
+  
+  it "handles arbitrary objects" do
+    arbitrary = Struct.new(:a, :b, :c)
+    
+    particular = arbitrary.new(1,2,3)
+    array = [ arbitrary.new, arbitrary.new, particular, arbitrary.new]
+    
+    array.split_at(particular).should == [ array[0..1], array[3..3] ]    
+  end
+  
   it "sums" do
     [1,2,3,4,5].sum.should == 15
   end

@@ -97,12 +97,13 @@ module Enumerable
     include_boundary = options[:include_boundary] || false
 
     if matcher.nil?
-      boundary_test = block
+      boundary_test_proc = block
     else
       if matcher.is_a? String or matcher.is_a? Regexp
-        boundary_test = proc { |e| e[matcher] }
+        boundary_test_proc = proc { |element| element[matcher] rescue nil }
       else
-        raise "I don't know how to split with #{matcher}"
+        boundary_test_proc = proc { |element| element == matcher }
+        #raise "I don't know how to split with #{matcher}"
       end
     end
 
@@ -111,7 +112,7 @@ module Enumerable
 
     each do |e|
 
-      if boundary_test.call(e)
+      if boundary_test_proc.call(e)
         
         if current_chunk.empty? and not include_boundary 
           next # hit 2 boundaries in a row... just keep moving, people!
@@ -140,8 +141,6 @@ module Enumerable
     chunks # resultset
   end
 
-  alias_method :split, :split_at
-  
   #
   # Split the array into chunks, with the boundaries being after the element to split on.
   #
@@ -150,7 +149,7 @@ module Enumerable
   def split_after(matcher=nil, options={}, &block)
     options[:after]             ||= true
     options[:include_boundary]  ||= true
-    split(matcher, options, &block)
+    split_at(matcher, options, &block)
   end
 
   #
@@ -160,7 +159,7 @@ module Enumerable
   #
   def split_before(matcher=nil, options={}, &block)
     options[:include_boundary]  ||= true
-    split(matcher, options, &block)
+    split_at(matcher, options, &block)
   end
 
   #
