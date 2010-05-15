@@ -5,11 +5,9 @@ class Object
   def integer?; false; end
 end
 
-
 class Float
   def integer?; true; end
 end
-
 
 class String
   
@@ -21,6 +19,27 @@ class String
   end
     
   #
+  # Convert \r\n to \n
+  #
+  def to_unix
+    gsub("\r\n", "\n")
+  end
+  
+  #
+  # Remove redundant whitespaces (not including newlines).
+  #
+  def tighten
+    gsub(/[\t ]+/,' ').strip
+  end
+  
+  #
+  # Remove redundant whitespace AND newlines.
+  #
+  def dewhitespace
+    gsub(/\s+/,' ').strip
+  end
+
+  #
   # Like #lines, but skips empty lines and removes \n's.
   #
   def nice_lines
@@ -30,7 +49,6 @@ class String
   alias_method :clean_lines, :nice_lines
   
 end
-
 
 class Integer
   
@@ -297,15 +315,26 @@ end
 
 
 class Hash
+
+  #
+  # Runs remove_blank_lines on self. 
+  #  
   def remove_blank_values!
     delete_if{|k,v| v.blank?}
     self
   end
   
+  #
+  # Returns a new Hash where all elements whose values are "blank?" (eg: "", [], nil)
+  # have been eliminated.
+  #
   def remove_blank_values
     dup.remove_blank_values!
   end
   
+  #
+  # Runs map_values on self. 
+  #  
   def map_values!(&block)
     keys.each do |key|
       value = self[key]
@@ -314,10 +343,16 @@ class Hash
     self
   end
   
+  #
+  # Returns a Hash whsoe values have been transformed by the block.
+  #
   def map_values(&block)
     dup.map_values!(&block)
   end
-  
+
+  #
+  # Runs map_keys on self.
+  #  
   def map_keys!(&block)
     keys.each do |key|
       value = delete(key)
@@ -326,13 +361,34 @@ class Hash
     self
   end
   
+  #
+  # Returns a new Hash whose keys have been transformed by the block.
+  #
   def map_keys(&block)
     dup.map_keys!(&block)
   end
 
-  # TODO: Where did slice come from?
-  #alias_method :filter, :slice
-  #alias_method :filter!, :slice!
+  #
+  # Creates an new Hash whose missing items default to [].
+  # Good for collecting things!
+  #
+  # eg:
+  #   Hash.of_arrays[:yays] << "YAY!"
+  #
+  def self.of_arrays
+    new {|h,k| h[k] = [] }
+  end
+
+  #
+  # Creates an new Hash whose missing items default to values of 0.
+  # Good for counting things!
+  #
+  # eg:
+  #   Hash.of_integers[:yays] += 1
+  #
+  def self.of_integers
+    new(0)
+  end
   
 end
 
