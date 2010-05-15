@@ -1,19 +1,23 @@
 = epitools
 
-There's some interesting stuff in here. Unfortunately, it's all gross and
-disorganized. This will change. :D
+Awesome collection of Ruby tools!
 
-== Note on Patches/Pull Requests
- 
-* Fork the project.
-* Make your feature addition or bug fix.
-* Add tests for it. This is important so I don't break it in a
-  future version unintentionally.
-* Commit, do not mess with rakefile, version, or history.
-  (if you want to have your own version, that is fine but
-   bump version in a commit by itself I can ignore when I pull)
-* Send me a pull request. Bonus points for topic branches.
+== Installing
+
+  gem install epitools
+
+== Usage
+
+This is basically a collection of enhancements to the ruby base types (Hash, Array,
+Enumerable, etc.). To learn how it works, read the specs in spec/*.rb,
+or check out the rdoc:
+
+  http://rdoc.info/projects/epitron/epitools
 
 == Copyright
 
-Copyright (c) 2009 epitron. See LICENSE for details.
+Copyright (c) 2009 epitron
+
+== License
+
+Licensed under the WTFPL2. (See LICENSE for details.)
