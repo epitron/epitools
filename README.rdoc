@@ -10,13 +10,11 @@ Awesome collection of Ruby tools!
 
 This is basically a collection of enhancements to the ruby base types (Hash, Array,
 Enumerable, etc.). To learn how it works, read the specs in spec/*.rb,
-or check out the rdoc:
-
-  http://rdoc.info/projects/epitron/epitools
+or check out the rdoc: http://rdoc.info/projects/epitron/epitools
 
 == Copyright
 
-Copyright (c) 2009 epitron
+Copyright (c) 2009-2010 epitron
 
 == License
 
