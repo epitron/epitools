@@ -35,12 +35,14 @@ Gem::Specification.new do |s|
      "lib/epitools/pretty_backtrace.rb",
      "lib/epitools/rails.rb",
      "lib/epitools/rash.rb",
+     "lib/epitools/ratio.rb",
      "lib/epitools/string_to_proc.rb",
      "spec/basetypes_spec.rb",
      "spec/lcs_spec.rb",
      "spec/metaclass_spec.rb",
      "spec/permutations_spec.rb",
      "spec/rash_spec.rb",
+     "spec/ratio_spec.rb",
      "spec/spec.opts",
      "spec/spec_helper.rb"
   ]
@@ -55,6 +57,7 @@ Gem::Specification.new do |s|
      "spec/spec_helper.rb",
      "spec/lcs_spec.rb",
      "spec/basetypes_spec.rb",
+     "spec/ratio_spec.rb",
      "spec/metaclass_spec.rb"
   ]
 
