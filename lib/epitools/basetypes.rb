@@ -277,18 +277,34 @@ class Object
   end
   alias time bench
   
+
+  #
+  # A decorator that makes any block-accepting method return an
+  # Enumerable::Enumerator whenever the method is called without a block.
+  #  
+  def self.enumerable *meths
+    meths.each do |meth|
+      alias_method "#{meth}_without_enumerator", meth
+      class_eval %{
+        def #{meth}(*args, &block)
+          return Enumerable::Enumerator.new(self, #{meth.inspect}, *args, &block) unless block_given?
+          #{meth}_without_enumerator(*args, &block)
+        end
+      }
+    end
+  end
+
 end
 
 
-
 class Hash
-  def nonblank!
+  def remove_blank_values!
     delete_if{|k,v| v.blank?}
     self
   end
   
-  def nonblank
-    dup.nonblank!
+  def remove_blank_values
+    dup.remove_blank_values!
   end
   
   def map_values!(&block)
@@ -320,6 +336,7 @@ class Hash
   #alias_method :filter!, :slice!
   
 end
+
 
 
 #

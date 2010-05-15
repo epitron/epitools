@@ -51,7 +51,7 @@ class Line
   end
 
   def gem?
-    @gem
+    @gem 
   end
 
   def codeline
@@ -69,11 +69,12 @@ def parse_lines(backtrace)
         Line.new($1, $2, $3)
       when /^\s+(.+):(\d+)/
         Line.new($1, $2, '')
+      when /^\s+$/
+        next
       else
-        "nuthin"
+        raise "huh?!"
     end
-    
-  end
+  end.compact
 end
 
 
@@ -140,6 +141,12 @@ def python_backtrace(lines)
   for line in lines
     puts %{  File "#{line.path}", line #{line.num}, in #{line.meth}}
     puts %{    #{line.codeline.strip}}
+  end
+end
+
+def debug_backtrace(lines)
+  lines.each do |line|
+    p line.path
   end
 end
 
@@ -274,8 +281,9 @@ if $0 == __FILE__
   }.split("\n").select{|line| line.any?}
   
   lines = parse_lines(backtrace)
+  #debug_backtrace(lines)
   #color_backtrace_1(lines)
   #python_backtrace(lines)
-  color_backtrace_2(lines, :no_gems=>true)
+  color_backtrace_2(lines)#, :no_gems=>true)
 end
 
