@@ -2,7 +2,14 @@ require 'zlib'
 
 #
 # A mutation of "open" that lets you read/write gzip files, as well as
-# regular files. (NOTE: gzip detection is purely based on filename.) 
+# regular files. (NOTE: gzip detection is purely based on filename.)
+#
+# It accepts a block just like open().
+#
+# Example:
+#    zopen("test.txt")    #=> #<File:test.txt>
+#    zopen("test.txt.gz") #=> #<Zlib::GzipReader:0xb6c79424>
+#    zopen("otherfile.gz", "w") #=> #<Zlib::GzipReader:0xb6c79424>
 #
 def zopen(filename, mode="r")
 
