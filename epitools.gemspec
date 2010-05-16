@@ -26,7 +26,6 @@ Gem::Specification.new do |s|
      "epitools.gemspec",
      "lib/epitools.rb",
      "lib/epitools/basetypes.rb",
-     "lib/epitools/general.rb",
      "lib/epitools/hexdump.rb",
      "lib/epitools/http.rb",
      "lib/epitools/lcs.rb",
@@ -38,6 +37,7 @@ Gem::Specification.new do |s|
      "lib/epitools/rash.rb",
      "lib/epitools/ratio.rb",
      "lib/epitools/string_to_proc.rb",
+     "lib/epitools/zopen.rb",
      "spec/basetypes_spec.rb",
      "spec/lcs_spec.rb",
      "spec/metaclass_spec.rb",
@@ -45,7 +45,8 @@ Gem::Specification.new do |s|
      "spec/rash_spec.rb",
      "spec/ratio_spec.rb",
      "spec/spec.opts",
-     "spec/spec_helper.rb"
+     "spec/spec_helper.rb",
+     "spec/zopen_spec.rb"
   ]
   s.homepage = %q{http://github.com/epitron/epitools}
   s.rdoc_options = ["--charset=UTF-8"]
@@ -53,7 +54,8 @@ Gem::Specification.new do |s|
   s.rubygems_version = %q{1.3.6}
   s.summary = %q{NOT UTILS... METILS!}
   s.test_files = [
-    "spec/lcs_spec.rb",
+    "spec/zopen_spec.rb",
+     "spec/lcs_spec.rb",
      "spec/rash_spec.rb",
      "spec/metaclass_spec.rb",
      "spec/ratio_spec.rb",
