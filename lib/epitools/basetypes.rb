@@ -1,5 +1,8 @@
 require 'pp'
 
+# Such a long cumbersome name!
+Enum = Enumerable::Enumerator
+
 class Object
   # Default "integer?" behaviour.
   def integer?; false; end
@@ -256,8 +259,6 @@ module Enumerable
 
 
 end
-
-
 
 class Object
 
