@@ -1,7 +1,7 @@
 require 'pp'
 
-# Such a long cumbersome name!
-Enum = Enumerable::Enumerator
+# Alias "Enumerable::Enumerator" to "Enum"
+Object.const_set(:Enum, Enumerable::Enumerator) rescue nil
 
 class Object
   # Default "integer?" behaviour.
@@ -257,6 +257,18 @@ module Enumerable
     result
   end
 
+  #
+  # Returns the powerset of the Enumerable
+  #
+  # Example:
+  #   [1,2].powerset #=> [[], [1], [2], [1, 2]]
+  #
+  def powerset
+    # the bit pattern of the numbers from 0..2^(elements)-1 can be used to select the elements of the set...
+    (0...2**size).map do |bitmask|
+      select.with_index{ |e, i| bitmask[i] == 1 }
+    end
+  end
 
 end
 
