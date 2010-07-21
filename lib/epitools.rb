@@ -8,7 +8,6 @@ __DIR__ = File.dirname(__FILE__)
   permutations
   ratio
   zopen
-  powerset
 ].each do |mod|
   require File.join(__DIR__, "epitools", mod) 
 end

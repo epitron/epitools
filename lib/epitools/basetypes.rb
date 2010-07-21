@@ -1,7 +1,7 @@
 require 'pp'
 
 # Alias "Enumerable::Enumerator" to "Enum"
-Object.const_set(:Enum, Enumerable::Enumerator) rescue nil
+Enum = Enumerable::Enumerator unless defined? Enum
 
 class Object
   # Default "integer?" behaviour.
