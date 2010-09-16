@@ -165,7 +165,8 @@ module Enumerable
   #
   # Split the array into chunks, with the boundaries being after the element to split on.
   #
-  # eg: [1,2,3,4].split_after{|e| e == 3 } #=> [ [1,2,3], [4] ]
+  # Example:
+  #   [1,2,3,4].split_after{|e| e == 3 } #=> [ [1,2,3], [4] ]
   #
   def split_after(matcher=nil, options={}, &block)
     options[:after]             ||= true
@@ -176,7 +177,8 @@ module Enumerable
   #
   # Split the array into chunks. The boundaries will lie before the element to split on.
   #
-  # eg: [1,2,3,4].split_before{|e| e == 3 } #=> [ [1,2], [3,4] ]
+  # Example:
+  #   [1,2,3,4].split_before{|e| e == 3 } #=> [ [1,2], [3,4] ]
   #
   def split_before(matcher=nil, options={}, &block)
     options[:include_boundary]  ||= true
@@ -203,7 +205,8 @@ module Enumerable
   # The same as "map", except that if an element is an Array or Enumerable, map is called
   # recursively on that element.
   #
-  # eg: [ [1,2], [3,4] ].map_recursively{|e| e ** 2 } #=> [ [1,4], [9,16] ] 
+  # Example:
+  #   [ [1,2], [3,4] ].map_recursively{|e| e ** 2 } #=> [ [1,4], [9,16] ] 
   #
   def recursive_map(*args, &block)
     map(*args) do |e|
@@ -481,8 +484,9 @@ end
 class Object
   
   #
-  # Negates a boolean, chained-method style:
+  # Negates a boolean, chained-method style.
   #
+  # Example:
   #   >> 10.even?
   #   => true
   #   >> 10.not.even?
