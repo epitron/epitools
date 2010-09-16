@@ -60,17 +60,10 @@ describe Integer do
   it "integer?" do
     
     {
-      nil => false,
-      "123" => true,
-      "000" => true,
-      123 => true,
-      123.45 => true,
-      "123asdf" => false,
-      "asdfasdf" => false,
-      Object.new => false,
-      
-    }.each do |object, expected_result|
-      object.integer?.should == expected_result
+      true  => [ "123", "000", 123, 123.45 ],
+      false => [ "123asdf", "asdfasdf", Object.new, nil ]
+    }.each do |expected_result, objects|
+      objects.each { |object| object.integer?.should == expected_result }
     end
     
   end
@@ -97,11 +90,11 @@ end
 describe Enumerable do
 
   it "splits" do
-    [1,2,3,4,5].split_at{|e| e == 3}.should          == [[1,2],[4,5]]
-    [1,2,3,4,5].split_after{|e| e == 3}.should    == [[1,2,3],[4,5]]
-    [1,2,3,4,5].split_before{|e| e == 3}.should   == [[1,2],[3,4,5]]
+    [1,2,3,4,5].split_at     {|e| e == 3}.should == [ [1,2], [4,5] ]
+    [1,2,3,4,5].split_after  {|e| e == 3}.should == [ [1,2,3], [4,5] ]
+    [1,2,3,4,5].split_before {|e| e == 3}.should == [ [1,2], [3,4,5] ]
 
-    "a\nb\n---\nc\nd\n".split_at(/---/).map_recursive(&:strip).should   == [ %w[a b], %w[c d] ]
+    "a\nb\n---\nc\nd\n".split_at(/---/).map_recursively(&:strip).should   == [ %w[a b], %w[c d] ]
   end
 
   it "handles nested things" do

@@ -203,7 +203,7 @@ module Enumerable
   # The same as "map", except that if an element is an Array or Enumerable, map is called
   # recursively on that element.
   #
-  # eg: [ [1,2], [3,4] ].map_recursive{|e| e ** 2 } #=> [ [1,4], [9,16] ] 
+  # eg: [ [1,2], [3,4] ].map_recursively{|e| e ** 2 } #=> [ [1,4], [9,16] ] 
   #
   def recursive_map(*args, &block)
     map(*args) do |e|
@@ -215,8 +215,8 @@ module Enumerable
     end
   end
   
-  alias_method :map_recursive,    :recursive_map 
   alias_method :map_recursively,  :recursive_map
+  alias_method :map_recursive,    :recursive_map 
 
 
   #
@@ -407,23 +407,23 @@ end
 
 
 
-#
-# Magic "its" Mapping
-# -------------------
-#
-# The pure-Ruby way:
-#   User.find(:all).map{|x| x.contacts.map{|y| y.last_name.capitalize }}
-#
-# With Symbol#to_proc:
-#   User.find(:all).map{|x|x.contacts.map(&:last_name).map(&:capitalize)}
-#
-# Magic "its" way:
-#   User.find(:all).map &its.contacts.map(&its.last_name.capitalize)
-#
-
 module Kernel
 
 protected
+
+  #
+  # Magic "its" Mapping
+  # -------------------
+  #
+  # The pure-Ruby way:
+  #   User.find(:all).map{|x| x.contacts.map{|y| y.last_name.capitalize }}
+  #
+  # With Symbol#to_proc:
+  #   User.find(:all).map{|x|x.contacts.map(&:last_name).map(&:capitalize)}
+  #
+  # Magic "its" way:
+  #   User.find(:all).map &its.contacts.map(&its.last_name.capitalize)
+  #
   def it() 
     It.new 
   end
@@ -458,16 +458,6 @@ class BlankSlate
   instance_methods.each { |m| undef_method m unless m =~ /^__/ }
 end
 
-#
-# Funky #not method
-# -----------------
-#
-# >> 10.even?
-# => true
-# >> 10.not.even?
-# => false
-#
-
 class NotWrapper < BlankSlate
   def initialize(orig)
     @orig = orig
@@ -489,9 +479,19 @@ end
 
 
 class Object
+  
+  #
+  # Negates a boolean, chained-method style:
+  #
+  #   >> 10.even?
+  #   => true
+  #   >> 10.not.even?
+  #   => false
+  #
   def not
     NotWrapper.new(self)
   end
+  
 end
 
 
