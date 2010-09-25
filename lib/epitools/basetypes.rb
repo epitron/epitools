@@ -1,7 +1,15 @@
 require 'pp'
 
 # Alias "Enumerable::Enumerator" to "Enum"
-Enum = Enumerable::Enumerator unless defined? Enum
+unless defined? Enum
+  if defined Enumerable::Enumerator
+    Enum = Enumerable::Enumerator 
+  elsif defined Enumerator
+    Enum = Enumerator 
+  else
+    $stderr.puts "WARNING: Couldn't find the Enumerator class. Enum will not be available."
+  end
+end
 
 class Object
   # Default "integer?" behaviour.

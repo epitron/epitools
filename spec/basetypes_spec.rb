@@ -2,6 +2,15 @@ require 'epitools/basetypes'
 
 
 describe Object do
+
+  it "has Enum" do
+    defined?(Enum).should_not == nil
+  end
+  
+  it "enums" do
+    generator = enum { |y| y.yield 1 }
+    generator.next.should == 1
+  end
   
   it "in?" do
     5.in?([1,2,3,4,5,6]).should == true
