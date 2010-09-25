@@ -2,9 +2,9 @@ require 'pp'
 
 # Alias "Enumerable::Enumerator" to "Enum"
 unless defined? Enum
-  if defined Enumerable::Enumerator
+  if defined? Enumerable::Enumerator
     Enum = Enumerable::Enumerator 
-  elsif defined Enumerator
+  elsif defined? Enumerator
     Enum = Enumerator 
   else
     $stderr.puts "WARNING: Couldn't find the Enumerator class. Enum will not be available."
