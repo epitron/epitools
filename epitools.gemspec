@@ -54,14 +54,14 @@ Gem::Specification.new do |s|
   s.rubygems_version = %q{1.3.7}
   s.summary = %q{NOT UTILS... METILS!}
   s.test_files = [
-    "spec/basetypes_spec.rb",
-     "spec/lcs_spec.rb",
-     "spec/metaclass_spec.rb",
-     "spec/permutations_spec.rb",
-     "spec/rash_spec.rb",
+    "spec/rash_spec.rb",
      "spec/ratio_spec.rb",
-     "spec/spec_helper.rb",
-     "spec/zopen_spec.rb"
+     "spec/metaclass_spec.rb",
+     "spec/basetypes_spec.rb",
+     "spec/lcs_spec.rb",
+     "spec/zopen_spec.rb",
+     "spec/permutations_spec.rb",
+     "spec/spec_helper.rb"
   ]
 
   if s.respond_to? :specification_version then
