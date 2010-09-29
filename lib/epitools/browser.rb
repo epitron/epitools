@@ -1,12 +1,11 @@
 require 'mechanize'
-require 'socksify'
 require 'uri'
 require 'fileutils'
 
-require 'progress_patch'
-require 'browser_cache'
+require 'epitools/browser/mechanize_progressbar'
 
-Time.zone = "UTC"
+# TODO: Make socksify optional (eg: if proxy is specified)
+#require 'socksify'
 
 $VERBOSE = nil
 
@@ -61,7 +60,7 @@ class String
   end
 
   def to_timestamp(fmt)
-    DateTime.strptime(self, fmt).to_i #+ Time.zone.utc_offset
+    DateTime.strptime(self, fmt).to_i
   end
 
 end
@@ -104,15 +103,14 @@ class Browser
   attr_accessor :agent, :cache, :use_cache, :delay, :delay_jitter
 
   def initialize(options={})
-    @last_get     = Time.zone.at(0)
+    @last_get     = Time.at(0)
     @delay        = options[:delay]         || 1
     @delay_jitter = options[:delay_jitter]  || 0.2
     @use_cache    = options[:cache]         || true
     @use_logs     = options[:logs]          || false
     @cookie_file  = options[:cookiefile]    || "cookies.txt"
     
-    # TODO: @progress, @user_agent, @logfile 
-
+    # TODO: @progress, @user_agent, @logfile, @cache_file (default location: ~/.epitools?) 
 
     if options[:proxy]
       host, port = options[:proxy].split(':')
@@ -138,7 +136,7 @@ class Browser
 
 
   def delay(override_delay=nil, override_jitter=nil)
-    elapsed   = Time.zone.now - @last_get
+    elapsed   = Time.now - @last_get
     jitter    = rand * (override_jitter || @delay_jitter)
     amount    = ( (override_delay || @delay) + jitter ) - elapsed
 
@@ -151,7 +149,7 @@ class Browser
 
   def init_cache!
     # TODO: Rescue "couldn't load" exception and disable caching
-    require 'browser_cache'    
+    require 'epitools/browser/browser_cache'
     @cache = CacheDB.new(agent) if @use_cache
   end
 
@@ -206,7 +204,7 @@ class Browser
         puts "  |_ cached (#{page.content_type})"
       else
         page = agent.get url
-        @last_get = Time.zone.now
+        @last_get = Time.now
       end
 
       cache_put(page, url) if write_cache and not read_cache
@@ -246,14 +244,12 @@ class Browser
 private
 
   def load_cookies!
-    agent.cookie_jar.load COOKIE_FILE if File.exists? COOKIE_FILE
+    agent.cookie_jar.load @cookie_file if File.exists? @cookie_file
   end
 
   def save_cookies!
-    agent.cookie_jar.save_as COOKIE_FILE
+    agent.cookie_jar.save_as @cookie_file
   end
 
 end
 
-
-$s = Scraper.new

@@ -7,7 +7,7 @@ class CacheDB
 
   attr_reader :db, :agent
 
-  def initialize(agent, filename="cache.db")
+  def initialize(agent, filename="browsercache.db")
     @agent    = agent
     @filename = filename
 
