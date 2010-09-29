@@ -92,16 +92,25 @@ module Sys
       Hash[ *members.zip(values).flatten(1) ]
     end
     
+    #
+    # Send the TERM signal to this process.
+    #
     def kill!(signal="TERM")
       puts "Killing #{pid} (#{signal})"
       Process.kill(signal, pid)
       # TODO: handle exception Errno::ESRCH (no such process)
     end
     
+    #
+    # Has this process been killed?
+    #
     def dead?
       @dead ||= Sys.pid(pid).empty?
     end
     
+    #
+    # Refresh this process' statistics.
+    #
     def refresh
       processes = Sys.ps(pid)
       

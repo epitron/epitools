@@ -7,65 +7,6 @@ require 'epitools/browser/mechanize_progressbar'
 # TODO: Make socksify optional (eg: if proxy is specified)
 #require 'socksify'
 
-$VERBOSE = nil
-
-class DateTime
-  def to_i
-    to_f.to_i
-  end
-end
-
-class String
-
-  #
-  # Remove redundant whitespace
-  #
-  def tighten
-    gsub(/[\t ]+/,' ').strip
-  end
-
-  #
-  # Remove redundant whitespace and newlines 
-  #
-  def dewhitespace
-    gsub(/\s+/,' ').strip
-  end
-
-  #
-  # Is this Unicodey?
-  #
-  def unicode?
-    unpack("U*").any? { |x| x > 127 }
-  rescue ArgumentError
-    false
-  end
-
-  #
-  # Replace all the "bad" unicode chars
-  #
-  def fix_unicode
-    begin
-      newstring = unpack("U*").map do |c|
-        case c
-          when 160 then 32
-          when 173 then ?-
-          else c
-        end
-      end
-    rescue ArgumentError
-      newstring = unpack("C*").map{|c| c > 127 ? ?* : c }
-    end
-
-    newstring.pack("U*")
-  end
-
-  def to_timestamp(fmt)
-    DateTime.strptime(self, fmt).to_i
-  end
-
-end
-
-
 # TODO: Put options here.
 =begin
 class BrowserOptions < OpenStruct
@@ -102,6 +43,14 @@ class Browser
 
   attr_accessor :agent, :cache, :use_cache, :delay, :delay_jitter
 
+  #
+  # Default options:
+  #  :delay => 1,                      # Sleep 1 second between gets
+  #  :delay_jitter => 0.2,             # Random deviation from delay
+  #  :use_cache => true,               # Cache all gets
+  #  :use_logs => false,               # Don't log the detailed transfer info
+  #  :cookie_file => "cookies.txt"     # Save cookies to file
+  #
   def initialize(options={})
     @last_get     = Time.at(0)
     @delay        = options[:delay]         || 1
@@ -166,6 +115,15 @@ class Browser
     end
   end
 
+  #
+  # Retrieve an URL, and return a Mechanize::Page instance (which acts a 
+  # bit like a Nokogiri::HTML::Document instance.)
+  #
+  # Options:
+  #   :use_cache => true/false   | read/write
+  #   :read_cache => true/false  | check cache before getting page
+  #   :write_cache => true/false | write gotten pages to cache
+  #
   def get(url, options={})
 
     # TODO: Have a base-URL option
