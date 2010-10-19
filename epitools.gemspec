@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{epitools}
-  s.version = "0.1.11"
+  s.version = "0.2.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["epitron"]
-  s.date = %q{2010-09-25}
+  s.date = %q{2010-09-28}
   s.description = %q{Miscellaneous utility libraries to make my life easier.}
   s.email = %q{chris@ill-logic.com}
   s.extra_rdoc_files = [
@@ -26,6 +26,9 @@ Gem::Specification.new do |s|
      "epitools.gemspec",
      "lib/epitools.rb",
      "lib/epitools/basetypes.rb",
+     "lib/epitools/browser.rb",
+     "lib/epitools/browser/browser_cache.rb",
+     "lib/epitools/browser/mechanize_progressbar.rb",
      "lib/epitools/hexdump.rb",
      "lib/epitools/http.rb",
      "lib/epitools/lcs.rb",
@@ -33,12 +36,15 @@ Gem::Specification.new do |s|
      "lib/epitools/niceprint.rb",
      "lib/epitools/permutations.rb",
      "lib/epitools/pretty_backtrace.rb",
+     "lib/epitools/progressbar.rb",
      "lib/epitools/rails.rb",
      "lib/epitools/rash.rb",
      "lib/epitools/ratio.rb",
      "lib/epitools/string_to_proc.rb",
+     "lib/epitools/sys.rb",
      "lib/epitools/zopen.rb",
      "spec/basetypes_spec.rb",
+     "spec/browser_spec.rb",
      "spec/lcs_spec.rb",
      "spec/metaclass_spec.rb",
      "spec/permutations_spec.rb",
@@ -46,6 +52,7 @@ Gem::Specification.new do |s|
      "spec/ratio_spec.rb",
      "spec/spec.opts",
      "spec/spec_helper.rb",
+     "spec/sys_spec.rb",
      "spec/zopen_spec.rb"
   ]
   s.homepage = %q{http://github.com/epitron/epitools}
@@ -54,14 +61,16 @@ Gem::Specification.new do |s|
   s.rubygems_version = %q{1.3.7}
   s.summary = %q{NOT UTILS... METILS!}
   s.test_files = [
-    "spec/basetypes_spec.rb",
-     "spec/lcs_spec.rb",
-     "spec/metaclass_spec.rb",
+    "spec/sys_spec.rb",
      "spec/permutations_spec.rb",
      "spec/rash_spec.rb",
-     "spec/ratio_spec.rb",
      "spec/spec_helper.rb",
-     "spec/zopen_spec.rb"
+     "spec/browser_spec.rb",
+     "spec/lcs_spec.rb",
+     "spec/basetypes_spec.rb",
+     "spec/ratio_spec.rb",
+     "spec/zopen_spec.rb",
+     "spec/metaclass_spec.rb"
   ]
 
   if s.respond_to? :specification_version then
