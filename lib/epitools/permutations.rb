@@ -3,6 +3,15 @@ require 'epitools/basetypes'
 class Array
   
   alias_method :"original_*_for_cartesian_*", :*
+  
+  #
+  # Overloaded * operator.
+  #
+  # Original behaviour:
+  #   array * number == <number> copies of array
+  # Extra behaviour:
+  #   array * array = Cartesian product of the two arrays
+  #
   def *(other)
     case other
       when Integer
@@ -19,20 +28,39 @@ class Array
     end
   end
   
+  #
+  # Multiply the array by itself 'exponent'-times.
+  #
   def **(exponent)
     ([self] * exponent).foldl(:*)
   end
   
 end
 
-def perms(total, n=0, stack=[], &block)
+
+#
+# Returns all the `size`-sized selections of the elements from an array.
+#
+# I can't remember why I wrote it like this, but the array you want to
+# permute is passed in as a block. For example:
+#
+#   >> perms(1) { [1,2,3,4] }
+#   => [[1], [2], [3], [4]] 
+#   >> perms(2) { [1,2,3,4] }
+#   => [[1, 1], [1, 2], [1, 3], [1, 4], [2, 1], [2, 2], [2, 3], [2, 4],
+#       [3, 1], [3, 2], [3, 3], [3, 4], [4, 1], [4, 2], [4, 3], [4, 4]]
+#
+# The block also gets passed a parameter: the depth of the recursion.
+# I can't remember why I did that either! :D
+#
+def perms(size, n=0, stack=[], &block)
   ps = yield(n)
   results = []
-  if n >= total
+  if n >= size
     results << stack
   else  
     ps.each do |p|
-      results += perms(total, n+1, stack + [p], &block)
+      results += perms(size, n+1, stack + [p], &block)
     end
   end
   results
