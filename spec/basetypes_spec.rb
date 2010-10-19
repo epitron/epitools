@@ -7,10 +7,10 @@ describe Object do
     defined?(Enum).should_not == nil
   end
   
-  it "enums" do
-    generator = enum { |y| y.yield 1 }
-    generator.next.should == 1
-  end
+  # it "enums" do
+  #   generator = enum { |y| y.yield 1 }
+  #   generator.next.should == 1
+  # end
   
   it "in?" do
     5.in?([1,2,3,4,5,6]).should == true
@@ -91,6 +91,15 @@ describe Array do
   
   it "squashes" do
     [1,2,[3,4,[5],[],[nil,nil],[6]]].squash.should == [1,2,3,4,5,6]
+  end
+  
+  it "remove_ifs" do
+    nums = [1,2,3,4,5,6,7,8,9,10,11,12]
+    even = nums.remove_if { |n| n.even? }   # remove all even numbers from the "nums" array and return them
+    odd = nums         
+    
+    even.should == [2,4,6,8,10,12]
+    odd.should == [1,3,5,7,9,11]
   end
   
 end

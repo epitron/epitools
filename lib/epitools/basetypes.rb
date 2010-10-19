@@ -92,6 +92,31 @@ class Array
     flatten.compact.uniq
   end
   
+  #
+  # Removes the elements from the array for which the block evaluates to true. 
+  # In addition, return the removed elements.
+  #
+  # For example, if you wanted to split an array into evens and odds:
+  #
+  #   nums = [1,2,3,4,5,6,7,8,9,10,11,12]
+  #   even = nums.remove_if { |n| n.even? }   # remove all even numbers from the "nums" array and return them
+  #   odd = nums                              # "nums" now only contains odd numbers
+  #
+  def remove_if(&block)
+    removed = []
+    
+    delete_if do |x|
+      if block.call(x)
+        removed << x
+        true
+      else
+        false
+      end
+    end
+    
+    removed
+  end
+  
 end
 
 
