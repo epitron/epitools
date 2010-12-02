@@ -112,7 +112,7 @@ describe Enumerable do
     [1,2,3,4,5].split_after  {|e| e == 3}.should == [ [1,2,3], [4,5] ]
     [1,2,3,4,5].split_before {|e| e == 3}.should == [ [1,2], [3,4,5] ]
 
-    "a\nb\n---\nc\nd\n".split_at(/---/).map_recursively(&:strip).should   == [ %w[a b], %w[c d] ]
+    "a\nb\n---\nc\nd\n".lines.split_at(/---/).map_recursively(&:strip).should   == [ %w[a b], %w[c d] ]
   end
 
   it "handles nested things" do

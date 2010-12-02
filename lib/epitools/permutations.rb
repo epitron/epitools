@@ -14,8 +14,6 @@ class Array
   #
   def *(other)
     case other
-      when Integer
-        send(:"original_*_for_cartesian_*", other)
       when Array
         # cross-product
         result = []
@@ -24,7 +22,9 @@ class Array
             result << [self[a], other[b]]
           end
         end
-        result        
+        result
+      else
+        send(:"original_*_for_cartesian_*", other)
     end
   end
   

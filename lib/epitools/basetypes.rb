@@ -442,6 +442,13 @@ class Hash
 end
 
 
+if defined?(BasicObject)
+  BlankSlate = BasicObject
+else
+  class BlankSlate
+    instance_methods.each { |m| undef_method m unless m =~ /^__/ }
+  end
+end
 
 module Kernel
 
@@ -460,16 +467,17 @@ protected
   # Magic "its" way:
   #   User.find(:all).map &its.contacts.map(&its.last_name.capitalize)
   #
-  def it() 
-    It.new 
+  def it()
+    It.new
   end
-  
+
   alias its it
-  
+
 end
 
-class It
-  undef_method( *(instance_methods - ["__id__", "__send__"]) )
+
+class It < BlankSlate
+  #undef_method( *(instance_methods - ["__id__", "__send__"]) )
 
   def initialize
     @methods = []
@@ -489,11 +497,6 @@ class It
   end
 end
 
-
-class BlankSlate
-  instance_methods.each { |m| undef_method m unless m =~ /^__/ }
-end
-
 class NotWrapper < BlankSlate
   def initialize(orig)
     @orig = orig
@@ -505,7 +508,7 @@ class NotWrapper < BlankSlate
   
   def method_missing(meth, *args, &block)
     result = @orig.send(meth, *args, &block)
-    if result.is_a? TrueClass or result.is_a? FalseClass
+    if result.is_a? ::TrueClass or result.is_a? ::FalseClass
       !result
     else
       raise "Sorry, I don't know how to invert #{result.inspect}"
