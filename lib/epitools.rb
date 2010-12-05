@@ -18,7 +18,7 @@ end
   ratio
   zopen
   colored
-  highlight
+  clitools
 
 ].each do |mod|
   require_wrapper.call mod

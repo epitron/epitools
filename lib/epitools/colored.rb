@@ -84,9 +84,15 @@ module Colored
 
     COLORS.each do |highlight, value|
       next if color == highlight
+
       define_method("#{color}_on_#{highlight}") do
         colorize(self, :foreground => color, :background => highlight)
       end
+
+      define_method("light_#{color}_on_#{highlight}") do
+        colorize(self, :foreground => color, :background => highlight, :extra => 'bold')
+      end
+
     end
   end
 
@@ -105,8 +111,17 @@ module Colored
     tmp
   end
 
-  ###########################################################################
-
+  #
+  # A class/instance method to colorize a string.
+  #
+  # Accepts options:
+  #   :foreground
+  #       The name of the foreground color as a string.
+  #   :background
+  #       The name of the background color as a string.
+  #   :extra
+  #       Extra styling, like 'bold', 'light', 'underline', 'reversed', or 'clear'.
+  #
   def colorize(string=nil, options = {})
     if string == nil
       return tagged_colors(self)
@@ -121,15 +136,24 @@ module Colored
     end
   end
 
+  #
+  # An array of all possible colors.
+  #
   def colors
     @@colors ||= COLORS.keys.sort
   end
 
+  #
+  # Returns the terminal code for one of the extra styling options.
+  #
   def extra(extra_name)
     extra_name = extra_name.to_s
     "\e[#{EXTRAS[extra_name]}m" if EXTRAS[extra_name]
   end
 
+  #
+  # Returns the terminal code for a specified color.
+  #
   def color(color_name)
     background = color_name.to_s =~ /on_/
     color_name = color_name.to_s.sub('on_', '')
@@ -137,22 +161,42 @@ module Colored
     "\e[#{COLORS[color_name] + (background ? 10 : 0)}m" 
   end
 
-  ###########################################################################
+  #
+  # Will color commands actually modify the strings?
+  #
+  def enabled?
+    @@is_tty
+  end
 
+  alias_method :is_tty?, :enabled? 
+
+  #
+  # Color commands will always produce colored strings.
+  #
   def enable!
     @@is_tty = true
   end
   
   alias_method :force!, :enable!
-  
+
+  #
+  # Enable Colored just for this block.
+  #
+  def enable_temporarily(&block)
+    last_state = @@is_tty
+
+    @@is_tty = true
+    block.call
+    @@is_tty = last_state
+  end
+
+  #
+  # Color commands will do nothing.
+  #
   def disable!
     @@is_tty = false
   end
 
-  def is_tty?
-    @@is_tty
-  end
-  
   #
   # Is this string legal?
   #     
@@ -170,10 +214,10 @@ module Colored
   # Examples:
   #
   # Colors as words:
-  #    puts "<light_yellow><light_white>*</light_white> Hey mom! I am <light_green>SO</light_green> colourized right now.</light_yellow>".colorize
+  #    puts "<light_green><magenta>*</magenta> Hey mom! I am <light_blue>SO</light_blue> colored right now.</light_green>".colorize
   #
   # Numeric ANSI colors (from the BBS days):
-  #    puts "<10><5>*</5> Hey mom! I am <9>SO</9> colourized right now.</10>".colorize
+  #    puts "<10><5>*</5> Hey mom! I am <9>SO</9> colored right now.</10>".colorize
   #
   def tagged_colors(string)
     stack = []

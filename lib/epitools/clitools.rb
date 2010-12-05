@@ -15,3 +15,19 @@ class String
 
 end
 
+#
+# Output to less.
+#
+def lesspipe(output=nil, options={})
+  params = []
+  params << "-R" unless options[:color] == false
+  params << "-S" unless options[:wrap] == true
+  params << "-X"
+  IO.popen("less #{params * ' '}", "w") do |less|
+    if output
+      less.puts output
+    else
+      yield less
+    end
+  end
+end

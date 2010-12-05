@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{epitools}
-  s.version = "0.3.0"
+  s.version = "0.3.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["epitron"]
@@ -28,6 +28,7 @@ Gem::Specification.new do |s|
     "lib/epitools/browser.rb",
     "lib/epitools/browser/browser_cache.rb",
     "lib/epitools/browser/mechanize_progressbar.rb",
+    "lib/epitools/colored.rb",
     "lib/epitools/hexdump.rb",
     "lib/epitools/highlight.rb",
     "lib/epitools/http.rb",
