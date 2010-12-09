@@ -1,4 +1,4 @@
-#require 'mechanize'
+require 'mechanize'
 require 'sqlite3'
 
 class CacheDB
@@ -28,9 +28,13 @@ class CacheDB
   alias_method :size, :count
 
   def put(page, original_url=nil, options={})
+    p [:put, original_url]
+
     raise "Invalid page" unless [:body, :content_type, :uri].all?{|m| page.respond_to? m }
 
     url = page.uri.to_s
+
+    p [:page_uri, url]
 
     if url != original_url
       # redirect original_url to url
@@ -69,7 +73,7 @@ class CacheDB
     else
       body = Zlib::Inflate.inflate(compressed_body)
 
-      WWW::Mechanize::Page.new(
+      Mechanize::Page.new(
         URI.parse(url),
         {'content-type'=>content_type},
         body,
@@ -80,6 +84,7 @@ class CacheDB
   end
 
   def pages_via_sql(*args, &block)
+    p [:pages_via_sql, args]
     if block_given?
       db.execute(*args) do |row|
         yield row_to_page(row)

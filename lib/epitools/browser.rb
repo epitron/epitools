@@ -2,10 +2,12 @@ require 'mechanize'
 require 'uri'
 require 'fileutils'
 
+require 'epitools/browser/browser_cache'
 require 'epitools/browser/mechanize_progressbar'
 
 # TODO: Make socksify optional (eg: if proxy is specified)
 #require 'socksify'
+class SOCKSError < Exception; end
 
 # TODO: Put options here.
 =begin
@@ -98,7 +100,6 @@ class Browser
 
   def init_cache!
     # TODO: Rescue "couldn't load" exception and disable caching
-    require 'epitools/browser/browser_cache'
     @cache = CacheDB.new(agent) if @use_cache
   end
 
@@ -133,27 +134,20 @@ class Browser
     #end
 
     # Determine the cache setting
-    options[:use_cache] ||= @use_cache
-    
-    if options[:use_cache] == false
-      options[:read_cache]  = false
-      options[:write_cache] = false
-    end
-    
-    options[:read_cache]  = true   if options[:read_cache].nil?
-    options[:write_cache] = true   if options[:write_cache].nil? 
 
-    read_cache  = options[:read_cache] && cache.include?(url) 
-    write_cache = options[:write_cache]
+
+    use_cache = options[:use_cache] || @use_cache
+
+    cached_already = cache.include?(url)
 
     puts
-    puts "[ #{url.inspect} (read_cache=#{options[:read_cache]}, write_cache=#{options[:write_cache]}) ]"
+    puts "[ #{url.inspect} (use_cache=#{use_cache}) ]"
     
-    delay unless read_cache
+    delay unless cached_already
 
     begin
       
-      if read_cache
+      if cached_already
         page = cache.get(url)
         if page.nil?
           puts "  |_ CACHE FAIL! Re-getting page."
@@ -165,7 +159,7 @@ class Browser
         @last_get = Time.now
       end
 
-      cache_put(page, url) if write_cache and not read_cache
+      cache_put(page, url) unless cached_already
 
       puts
 

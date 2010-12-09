@@ -63,6 +63,17 @@ describe Object do
   
 end
 
+describe Numeric do
+
+  it "commatizes" do
+    123.commatize.should == "123"
+    1234.commatize.should == "1,234"
+    12983287123.commatize.should == "12,983,287,123"
+    -12983287123.commatize.should == "-12,983,287,123"
+    -12983287123.4411.commatize.should == "-12,983,287,123.4411"
+  end
+
+end
 
 describe Integer do
   
