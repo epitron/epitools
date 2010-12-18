@@ -1,5 +1,13 @@
 __DIR__ = File.dirname(__FILE__)
 
+require_wrapper = proc do |mod|
+  begin
+    require File.join(__DIR__, "epitools", mod)
+  rescue LoadError => e
+    puts "* Error loading epitools/#{mod}: #{e}"
+  end
+end
+
 %w[
   metaclass 
   basetypes 
@@ -8,6 +16,8 @@ __DIR__ = File.dirname(__FILE__)
   permutations
   ratio
   zopen
+  colored
+  clitools
 ].each do |mod|
-  require File.join(__DIR__, "epitools", mod) 
+  require_wrapper.call mod
 end

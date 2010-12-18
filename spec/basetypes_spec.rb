@@ -63,6 +63,17 @@ describe Object do
   
 end
 
+describe Numeric do
+
+  it "commatizes" do
+    123.commatize.should == "123"
+    1234.commatize.should == "1,234"
+    12983287123.commatize.should == "12,983,287,123"
+    -12983287123.commatize.should == "-12,983,287,123"
+    -12983287123.4411.commatize.should == "-12,983,287,123.4411"
+  end
+
+end
 
 describe String do
   
@@ -122,7 +133,7 @@ describe Enumerable do
     [1,2,3,4,5].split_after  {|e| e == 3}.should == [ [1,2,3], [4,5] ]
     [1,2,3,4,5].split_before {|e| e == 3}.should == [ [1,2], [3,4,5] ]
 
-    "a\nb\n---\nc\nd\n".split_at(/---/).map_recursively(&:strip).should   == [ %w[a b], %w[c d] ]
+    "a\nb\n---\nc\nd\n".lines.split_at(/---/).map_recursively(&:strip).should   == [ %w[a b], %w[c d] ]
   end
 
   it "handles nested things" do

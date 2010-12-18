@@ -20,8 +20,20 @@ class Object
   def integer?; false; end
 end
 
-class Float
+class Numeric
   def integer?; true; end
+
+  def commatize  
+    to_s.gsub(/(\d)(?=\d{3}+(?:\.|$))(\d{3}\..*)?/,'\1,\2')
+  end
+end
+
+class Float
+  def blank?; self == 0.0; end
+end
+
+class NilClass
+  def blank?; true; end
 end
 
 class String
@@ -30,9 +42,13 @@ class String
   # Could this string be cast to an integer?
   #
   def integer?
-    self.strip.match(/^\d+$/) ? true : false
+    strip.match(/^\d+$/) ? true : false
   end
-    
+
+  def blank?
+    strip.size == 0
+  end
+
   #
   # Convert \r\n to \n
   #
@@ -58,7 +74,7 @@ class String
   # Like #lines, but skips empty lines and removes \n's.
   #
   def nice_lines
-    self.split("\n").map(&:strip).select(&:any?)
+    split("\n").select{|l| not l.blank? }
   end
   
   alias_method :clean_lines, :nice_lines
@@ -75,10 +91,8 @@ end
 
 class Integer
   
-  def integer?
-    true
-  end
-    
+  def blank?; self == 0; end
+
   def to_hex
     "%0.2x" % self
   end
@@ -96,7 +110,9 @@ end
 
 
 class Array
-  
+
+  def blank?; not self.any?; end
+
   #
   # flatten.compact.uniq
   #
@@ -133,6 +149,10 @@ end
 
 
 module Enumerable
+
+  def blank?
+    not self.any?
+  end
 
   #
   # Split this enumerable into an array of pieces given some 
@@ -377,6 +397,10 @@ end
 
 class Hash
 
+  def blank?
+    not self.any?
+  end
+
   #
   # Runs remove_blank_lines on self. 
   #  
@@ -454,6 +478,13 @@ class Hash
 end
 
 
+if defined?(BasicObject)
+  BlankSlate = BasicObject
+else
+  class BlankSlate
+    instance_methods.each { |m| undef_method m unless m =~ /^__/ }
+  end
+end
 
 module Kernel
 
@@ -472,16 +503,17 @@ protected
   # Magic "its" way:
   #   User.find(:all).map &its.contacts.map(&its.last_name.capitalize)
   #
-  def it() 
-    It.new 
+  def it()
+    It.new
   end
-  
+
   alias its it
-  
+
 end
 
-class It
-  undef_method( *(instance_methods - ["__id__", "__send__"]) )
+
+class It < BlankSlate
+  #undef_method( *(instance_methods - ["__id__", "__send__"]) )
 
   def initialize
     @methods = []
@@ -501,11 +533,6 @@ class It
   end
 end
 
-
-class BlankSlate
-  instance_methods.each { |m| undef_method m unless m =~ /^__/ }
-end
-
 class NotWrapper < BlankSlate
   def initialize(orig)
     @orig = orig
@@ -517,7 +544,7 @@ class NotWrapper < BlankSlate
   
   def method_missing(meth, *args, &block)
     result = @orig.send(meth, *args, &block)
-    if result.is_a? TrueClass or result.is_a? FalseClass
+    if result.is_a? ::TrueClass or result.is_a? ::FalseClass
       !result
     else
       raise "Sorry, I don't know how to invert #{result.inspect}"
