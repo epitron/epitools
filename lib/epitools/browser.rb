@@ -1,3 +1,4 @@
+require 'rubygems'
 require 'mechanize'
 require 'uri'
 require 'fileutils'
@@ -133,6 +134,8 @@ class Browser
     #end
 
     # Determine the cache setting
+    # ( The goal of these rules is to make various combinations of
+    # :read_cache, :write_cache, and :use_cache behave intuitively. )
     options[:use_cache] ||= @use_cache
     
     if options[:use_cache] == false
@@ -146,11 +149,14 @@ class Browser
     read_cache  = options[:read_cache] && cache.include?(url) 
     write_cache = options[:write_cache]
 
+    ## INFOLINE
     puts
     puts "[ #{url.inspect} (read_cache=#{options[:read_cache]}, write_cache=#{options[:write_cache]}) ]"
     
+    # Delay
     delay unless read_cache
 
+    # Actual HTTP/cache get block.
     begin
       
       if read_cache

@@ -1,8 +1,8 @@
 __DIR__ = File.dirname(__FILE__)
 
 %w[
-  basetypes 
   metaclass 
+  basetypes 
   niceprint
   string_to_proc
   permutations

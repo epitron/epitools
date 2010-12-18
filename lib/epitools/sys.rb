@@ -2,6 +2,8 @@
 # Cross-platform operating system functions.
 # Includes: process listing, platform detection, etc.
 #
+require 'metaclass'
+
 module Sys
   
   #-----------------------------------------------------------------------------
@@ -182,7 +184,7 @@ module Sys
         @os = "Darwin"
       when /linux/
         @os = "Linux"
-      when /mingw|mswin/
+      when /mingw|mswin|cygwin/
         @os = 'Windows'
     else
       raise "Unknown OS: #{host_os.inspect}"

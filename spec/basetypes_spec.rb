@@ -64,6 +64,16 @@ describe Object do
 end
 
 
+describe String do
+  
+  it "rot13s" do
+    message = "Unbreakable Code"
+    message.rot13.should.not == message
+    message.rot13.rot13.should == message
+  end
+  
+end
+
 describe Integer do
   
   it "integer?" do

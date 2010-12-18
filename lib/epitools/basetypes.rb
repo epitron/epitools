@@ -1,10 +1,14 @@
 require 'pp'
 
-# Alias "Enumerable::Enumerator" to "Enum"
+# Alias "Enumerator" to "Enum"
+
+if RUBY_VERSION["1.8"]
+  require 'enumerator' 
+  Enumerator = Enumerable::Enumerator
+end
+
 unless defined? Enum
-  if defined? Enumerable::Enumerator
-    Enum = Enumerable::Enumerator 
-  elsif defined? Enumerator
+  if defined? Enumerator
     Enum = Enumerator 
   else
     $stderr.puts "WARNING: Couldn't find the Enumerator class. Enum will not be available."
@@ -58,8 +62,16 @@ class String
   end
   
   alias_method :clean_lines, :nice_lines
+
+  #
+  # The Infamous Caesar-Cipher. Unbreakable to this day.
+  #
+  def rot13
+    tr('n-za-mN-ZA-M', 'a-zA-Z')
+  end
   
 end
+
 
 class Integer
   
@@ -75,7 +87,7 @@ class Integer
   # Convert the number to an array of bits (least significant digit first).
   #
   def to_bits
-    ("%b" % self).reverse.chars.map(&:to_i)
+    ("%b" % self).chars.reverse.map(&:to_i)
   end
   
   alias_method :bits, :to_bits
