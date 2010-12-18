@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{epitools}
-  s.version = "0.3.3"
+  s.version = "0.3.4"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["epitron"]
-  s.date = %q{2010-12-09}
+  s.date = %q{2010-12-18}
   s.description = %q{Miscellaneous utility libraries to make my life easier.}
   s.email = %q{chris@ill-logic.com}
   s.extra_rdoc_files = [
@@ -46,6 +46,7 @@ Gem::Specification.new do |s|
     "lib/epitools/zopen.rb",
     "spec/basetypes_spec.rb",
     "spec/browser_spec.rb",
+    "spec/clitools_spec.rb",
     "spec/lcs_spec.rb",
     "spec/metaclass_spec.rb",
     "spec/permutations_spec.rb",

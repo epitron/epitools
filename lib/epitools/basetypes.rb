@@ -4,7 +4,7 @@ require 'pp'
 
 if RUBY_VERSION["1.8"]
   require 'enumerator' 
-  Enumerator = Enumerable::Enumerator
+  Enumerator = Enumerable::Enumerator unless defined? Enumerator
 end
 
 unless defined? Enum
