@@ -18,11 +18,20 @@ end
 #
 # Output to less.
 #
-def lesspipe(output=nil, options={})
+def lesspipe(*args)
+  if args.any? and args.last.is_a?(Hash)
+    options = args.pop
+  else
+    options = {}
+  end
+  
+  output = args.first if args.any?
+  
   params = []
   params << "-R" unless options[:color] == false
   params << "-S" unless options[:wrap] == true
   params << "-X"
+  
   IO.popen("less #{params * ' '}", "w") do |less|
     if output
       less.puts output
