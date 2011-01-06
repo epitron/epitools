@@ -13,7 +13,6 @@ end
   basetypes 
   niceprint
   string_to_proc
-  permutations
   ratio
   path
   zopen
