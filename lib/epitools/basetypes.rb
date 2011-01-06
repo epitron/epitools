@@ -101,7 +101,7 @@ class Integer
   # Convert the number to an array of bits (least significant digit first).
   #
   def to_bits
-    ("%b" % self).chars.reverse.map(&:to_i)
+    ("%b" % self).chars.to_a.reverse.map(&:to_i)
   end
   
   alias_method :bits, :to_bits
@@ -144,6 +144,18 @@ class Array
     
     removed
   end
+  
+  #
+  # zip from the right (or reversed zip.)
+  #
+  # eg:
+  #   >> [5,39].rzip([:hours, :mins, :secs]) 
+  #   => [ [:mins, 5], [:secs, 39] ]
+  #
+  def rzip(other)
+    # That's a lotta reverses!
+    reverse.zip(other.reverse).reverse
+  end  
   
 end
 

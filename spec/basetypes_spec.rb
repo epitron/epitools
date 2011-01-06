@@ -18,7 +18,7 @@ describe Object do
     5.in?(20..30).should == false
     "butt".in?("butts!!!").should == true
   end
-  
+ 
   it "benches" do
     lambda { 
       bench("benchmark test") { x = 10 }
@@ -121,6 +121,10 @@ describe Array do
     
     even.should == [2,4,6,8,10,12]
     odd.should == [1,3,5,7,9,11]
+  end
+  
+  it "rzips" do
+    [5,39].rzip([:hours, :mins, :secs]).should == [ [5, :mins], [39, :secs] ]
   end
   
 end

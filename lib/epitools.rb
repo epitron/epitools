@@ -15,6 +15,7 @@ end
   string_to_proc
   permutations
   ratio
+  path
   zopen
   colored
   clitools
