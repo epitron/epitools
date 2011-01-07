@@ -50,7 +50,7 @@ class Path
   end
    
   def dir=(newdir)
-    @dirs = File.absolute_path(newdir).split(File::SEPARATOR)[1..-1]
+    @dirs = File.expand_path(newdir).split(File::SEPARATOR)[1..-1]
   end
   
   def ext=(newext)
