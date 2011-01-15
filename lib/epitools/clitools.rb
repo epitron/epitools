@@ -30,6 +30,7 @@ def lesspipe(*args)
   params = []
   params << "-R" unless options[:color] == false
   params << "-S" unless options[:wrap] == true
+  params << "-F" unless options[:always] == true
   params << "-X"
   
   IO.popen("less #{params * ' '}", "w") do |less|
