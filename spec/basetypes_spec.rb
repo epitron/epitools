@@ -61,6 +61,10 @@ describe Object do
     10.not.even?.should == false
   end
   
+  it "__DIR__s" do
+    __DIR__.should == File.dirname(File.expand_path(__FILE__))
+  end
+  
 end
 
 describe Numeric do
@@ -79,7 +83,7 @@ describe String do
   
   it "rot13s" do
     message = "Unbreakable Code"
-    message.rot13.should.not == message
+    message.rot13.should_not == message
     message.rot13.rot13.should == message
   end
   
