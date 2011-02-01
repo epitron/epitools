@@ -141,6 +141,7 @@ class Path
   alias_method :extname,    :ext
   alias_method :dirname,    :dir
   alias_method :pathname,   :path
+  alias_method :to_str,     :path
   alias_method :to_s,       :path
   alias_method :directory?, :dir?
 

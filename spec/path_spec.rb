@@ -78,4 +78,10 @@ describe Path do
     __FILE__.to_path.should == Path.new(__FILE__)
   end
   
+  it "to_strs" do
+    path = Path.new(__FILE__)
+    data = File.read(path)
+    data.any?.should == true
+  end
+  
 end
