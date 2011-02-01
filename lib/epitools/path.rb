@@ -1,15 +1,30 @@
 require 'epitools/basetypes'
 
+class String
+  def to_path
+    Path.new(self)
+  end
+end
+
 class Path
+
   
   ## initializers
   
   def initialize(newpath)
     self.path = newpath
   end
+
+  def self.glob(str)
+    Dir[str].map { |entry| new(entry) }
+  end
   
-  def self.[](newpath)
-    new(newpath)
+  def self.[](str)
+    if str =~ /[\?\*]/ and not str =~ /\\[\?\*]/  # contains glob chars? (unescaped) 
+      glob(str)
+    else
+      new(str)
+    end      
   end
 
   
@@ -61,6 +76,7 @@ class Path
     end
   end
 
+  
   ## readers
 
   attr_reader :dirs, :base, :ext
@@ -127,5 +143,14 @@ class Path
   alias_method :pathname,   :path
   alias_method :to_s,       :path
   alias_method :directory?, :dir?
+
+
+  ## comparisons
+
+  include Comparable
+  
+  def <=>(other)
+    self.path <=> other.path
+  end
   
 end

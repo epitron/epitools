@@ -18,7 +18,7 @@ describe Path do
     path.filename.should == "blah"
     path.ext.should == nil
     
-    abs_path = File.join(File.absolute_path(".."), "hello.mp3")
+    abs_path = File.join(File.expand_path(".."), "hello.mp3")
     path.dir.should == abs_path 
   end
   
@@ -56,6 +56,26 @@ describe Path do
     path.file?.should == true
     path.symlink?.should == false
     path.mtime.class.should == Time
+  end
+  
+  it "globs" do
+    path = Path.new(__FILE__)
+    glob = path.dir + "/*spec.rb"
+    specs = Path.glob(glob)
+    path.in?(specs).should == true
+  end
+  
+  it "Path[file] and Path[glob]s" do
+    path = Path.new(__FILE__)
+    path.should == Path[__FILE__]
+
+    glob = path.dir + "/*spec.rb"
+    specs = Path.glob(glob)
+    Path[glob].should == specs
+  end
+
+  it "String#to_paths" do
+    __FILE__.to_path.should == Path.new(__FILE__)
   end
   
 end
