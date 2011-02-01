@@ -353,6 +353,25 @@ module Enumerable
 end
 
 class Object
+  
+  #
+  # Gives you a copy of the object with its attributes changed to whatever was
+  # passed in the options hash.
+  #
+  # Example:
+  #   >> cookie = Cookie.new(:size=>10, :chips=>200)
+  #   => #<Cookie:0xffffffe @size=10, @chips=200>
+  #   >> cookie.with(:chips=>50)
+  #   => #<Cookie:0xfffffff @size=10, @chips=50>
+  #
+  # (All this method does is dup the object, then call "key=(value)" for each
+  # key/value in the options hash.)
+  #  
+  def with(options={})
+    obj = dup
+    options.each { |key, value| obj.send "#{key}=", value }
+    obj
+  end
 
   #
   # Instead of:

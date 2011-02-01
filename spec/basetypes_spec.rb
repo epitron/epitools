@@ -1,4 +1,4 @@
-rrequire 'epitools/basetypes'
+require 'epitools/basetypes'
 
 describe Object do
 
@@ -10,6 +10,17 @@ describe Object do
   #  generator = enum { |y| y.yield 1 }
   #  generator.next.should == 1
   #end
+
+  it "withs" do
+    class Cookie; attr_accessor :size, :chips; end
+    
+    c = Cookie.new; c.size = 10; c.chips = 200
+    w = c.with(:chips=>50)
+    
+    w.size.should == c.size
+    w.chips.should_not == c.chips
+    w.should_not === c
+  end
   
   it "in?" do
     5.in?([1,2,3,4,5,6]).should == true
@@ -58,10 +69,6 @@ describe Object do
   it "nots" do
     10.even?.should == true
     10.not.even?.should == false
-  end
-  
-  it "__DIR__s" do
-    __DIR__.should == File.dirname(File.expand_path(__FILE__))
   end
   
 end
@@ -223,4 +230,4 @@ describe BlankSlate do
   end
   
 end
-  
+
