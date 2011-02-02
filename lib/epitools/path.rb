@@ -1,14 +1,7 @@
 require 'epitools/basetypes'
 
-class String
-  def to_path
-    Path.new(self)
-  end
-end
-
 class Path
 
-  
   ## initializers
   
   def initialize(newpath)
@@ -29,6 +22,8 @@ class Path
 
   
   ## setters
+  
+  attr_writer :base
   
   def path=(newpath)
     if File.exists? newpath
@@ -77,7 +72,7 @@ class Path
   end
 
   
-  ## readers
+  ## getters
 
   attr_reader :dirs, :base, :ext
   
@@ -137,14 +132,24 @@ class Path
   
   ## aliases
   
-  alias_method :basename,   :base
-  alias_method :extname,    :ext
-  alias_method :dirname,    :dir
-  alias_method :pathname,   :path
+  alias_method :to_path,    :path
   alias_method :to_str,     :path
   alias_method :to_s,       :path
-  alias_method :directory?, :dir?
 
+  alias_method :pathname,   :path
+  alias_method :basename,   :base
+  alias_method :basename=,  :base=
+  alias_method :extname,    :ext
+  alias_method :extname=,   :ext=
+  alias_method :dirname,    :dir
+  alias_method :dirname=,   :dir=
+  alias_method :extension,  :ext
+  alias_method :extension=, :ext=
+  alias_method :directory,  :dir
+  alias_method :directory=, :dir=
+
+  alias_method :directory?, :dir?
+  
 
   ## comparisons
 
