@@ -1,5 +1,10 @@
 require 'epitools/progressbar'
 
+#
+# Mechanize Progress Bar extension
+#
+# (Displays a progress bar whenever an url is retrieved.)
+#
 class Mechanize
   class Chain
     class ResponseReader

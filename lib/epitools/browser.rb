@@ -1,8 +1,9 @@
+
 require 'mechanize'
 require 'uri'
 require 'fileutils'
 
-require 'epitools/browser/browser_cache'
+require 'epitools/browser/cache'
 require 'epitools/browser/mechanize_progressbar'
 
 # TODO: Make socksify optional (eg: if proxy is specified)
@@ -100,12 +101,12 @@ class Browser
 
   def init_cache!
     # TODO: Rescue "couldn't load" exception and disable caching
-    @cache = CacheDB.new(agent) if @use_cache
+    @cache = Cache.new(agent) if @use_cache
   end
 
 
   def relative?(url)
-    not url =~ %r{^https?://}
+    not url[ %r{^https?://} ]
   end
 
 
@@ -141,7 +142,7 @@ class Browser
     cached_already = cache.include?(url)
 
     puts
-    puts "[ #{url.inspect} (use_cache=#{use_cache}) ]"
+    puts "[ GET #{url} (using cache: #{use_cache}) ]"
     
     delay unless cached_already
 
