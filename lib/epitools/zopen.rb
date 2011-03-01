@@ -20,9 +20,9 @@ def zopen(filename, mode="r")
   
   if filename =~ /\.gz$/
     case mode
-    when "r"
+    when "r", "rb"
       file = Zlib::GzipReader.new(file) 
-    when "w"
+    when "w", "wb"
       file = Zlib::GzipWriter.new(file) 
     else
       raise "Unknown mode: #{mode.inspect}. zopen only supports 'r' and 'w'."

@@ -54,6 +54,10 @@ def lesspipe(*args)
   params << "-R" unless options[:color] == false
   params << "-S" unless options[:wrap] == true
   params << "-F" unless options[:always] == true
+  if options[:tail] == true
+    params << "+\\>"
+    $stderr.puts "Seeking to end of stream..."
+  end
   params << "-X"
   
   IO.popen("less #{params * ' '}", "w") do |less|
