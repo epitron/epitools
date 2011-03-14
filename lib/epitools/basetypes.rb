@@ -119,11 +119,18 @@ end
   
   klass.class_eval do
     
+    alias_method :bit, :[]
+    
     #
     # Extends [] so that Integers can be sliced as if they were arrays.
     #
-    def [](*args)
-      bits[*args]
+    def [](arg)
+      case arg
+      when Integer
+        bit(arg)
+      when Range
+        bits[arg]
+      end
     end
     
   end
