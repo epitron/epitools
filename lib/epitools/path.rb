@@ -158,5 +158,19 @@ class Path
   def <=>(other)
     self.path <=> other.path
   end
+
+  ## opening/reading
+  
+  def open(mode="rb", &block)
+    if block_given?
+      File.open(path, mode, &block)
+    else
+      File.open(path, mode)
+    end
+  end
+  
+  def read(length=nil, offset=nil)
+    File.read(path, length, offset)
+  end
   
 end

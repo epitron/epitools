@@ -74,14 +74,31 @@ describe Path do
     Path[glob].should == specs
   end
 
-  it "String#to_paths" do
-    __FILE__.to_path.should == Path.new(__FILE__)
-  end
-  
-  it "to_strs" do
+  it "paths can be passed to ruby File methods" do
     path = Path.new(__FILE__)
     data = File.read(path)
-    data.any?.should == true
+    data.size.should > 0
+  end
+  
+  it "opens & read files" do
+    path = Path.new(__FILE__)
+    
+    path.open do |f|
+      f.read.size.should > 0
+    end
+    
+    path.read.size.should > 0
+  end
+  
+  it "reads with length and offset" do
+    path = Path.new(__FILE__)
+
+    path.read(25).size.should == 25
+    
+    s1 = path.read(25,15)
+    s2 = path.read(40)
+    
+    s2[15..-1].should == s1    
   end
   
 end

@@ -115,6 +115,17 @@ describe Integer do
     42.to_bits.should == [0,1,0,1,0,1]
   end
   
+  it "slices into bits" do
+    i = "111011".to_i(2) 
+    # Note: to_i(2) accepts big-endian, while the Fixnum#[] slicing will return little endian. 
+    #       So make sure to reverse the bit string for the specs.
+
+    i[0..2].should == [1,1,0]
+    i[-3..-1].should == [1,1,1]
+    i[0..-1].should == [1,1,0,1,1,1]
+    i[0,0].should == []
+  end
+  
 end
 
 

@@ -98,13 +98,35 @@ class Integer
   end
     
   #
-  # Convert the number to an array of bits (least significant digit first).
+  # Convert the number to an array of bits (least significant digit first, or little-endian).
   #
   def to_bits
     ("%b" % self).chars.to_a.reverse.map(&:to_i)
   end
   
   alias_method :bits, :to_bits
+  
+end
+
+
+#
+# Monkeypatch [] into Bignum and Fixnum using class_eval.
+#
+# (This is necessary because [] is defined directly on the classes, and a mixin
+#  module will still be overridden by Big/Fixnum's native [] method.)
+#
+[Bignum, Fixnum].each do |klass|
+  
+  klass.class_eval do
+    
+    #
+    # Extends [] so that Integers can be sliced as if they were arrays.
+    #
+    def [](*args)
+      bits[*args]
+    end
+    
+  end
   
 end
 
