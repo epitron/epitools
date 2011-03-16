@@ -392,8 +392,9 @@ module Enumerable
   #
   def powerset
     # the bit pattern of the numbers from 0..2^(elements)-1 can be used to select the elements of the set...
-    (0...2**size).map do |bitmask|
-      select.with_index{ |e, i| bitmask[i] == 1 }
+    a = to_a
+    (0...2**a.size).map do |bitmask|
+      a.select.with_index{ |e, i| bitmask[i] == 1 }
     end
   end
   

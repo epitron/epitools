@@ -206,7 +206,8 @@ describe Enumerable do
   end
   
   it "powersets" do
-   [1,2,3].powerset.should == [[], [1], [2], [1, 2], [3], [1, 3], [2, 3], [1, 2, 3]]   
+    [1,2,3].powerset.should == [[], [1], [2], [1, 2], [3], [1, 3], [2, 3], [1, 2, 3]]
+    Enum.new([1,2], :each).powerset.should == [[], [1], [2], [1, 2]]
   end    
   
 end
