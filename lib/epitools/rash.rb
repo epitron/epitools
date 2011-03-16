@@ -23,7 +23,7 @@ class Rash
 
   def []=(key, value)
     if key.is_a? Regexp
-      key = normalize_regex(key)
+      #key = normalize_regex(key)  # this used to just do: /#{regexp}/
       @regexes << key
     end
     @hash[key] = value

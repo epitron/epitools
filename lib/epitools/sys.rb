@@ -2,7 +2,7 @@
 # Cross-platform operating system functions.
 # Includes: process listing, platform detection, etc.
 #
-require 'metaclass'
+require 'epitools/metaclass'
 
 module Sys
   
