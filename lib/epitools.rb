@@ -15,6 +15,7 @@ class Object
 end
 
 require_wrapper = proc do |mod|
+  #p [:loading, mod]
   begin
     require File.join(__DIR__, "epitools", mod)
   rescue LoadError => e

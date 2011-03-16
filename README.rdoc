@@ -8,7 +8,7 @@ Base classess have been enhanced: {Enumerable}[http://rdoc.info/gems/epitools/En
 Extras:
 
 * {Colored}[http://rdoc.info/gems/epitools/Colored] (enhanced version of defunkt's colored -- adds ANSI colouring methods to String, eg: #red, #green, #light_blue, etc.)
-* {Path}[http://rdoc.info/gems/epitools/Path]. (a better Pathname)
+* {Path}[http://rdoc.info/gems/epitools/Path] (a better Pathname)
 * {Rash}[http://rdoc.info/gems/epitools/Rash] (a hash which can have Regexps as keys, allowing a single (key,value) pair to match many keys.)
 * {Progressbar}[http://rdoc.info/gems/epitools/Progressbar] (better than the progressbar gem)
 * {Browser}[http://rdoc.info/gems/epitools/Browser] (a fake browser, using mechanize, Progressbar, and CacheDB)

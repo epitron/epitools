@@ -166,6 +166,17 @@ class Path
     self.path <=> other.path
   end
 
+  
+  ## appending
+  
+  #
+  # Path["/etc"]/"passwd" == Path["/etc/passwd"]
+  #
+  def /(other)
+    Path.new( File.join(self, other) )
+  end  
+  
+  
   ## opening/reading files
   
   def open(mode="rb", &block)

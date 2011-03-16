@@ -112,4 +112,9 @@ describe Path do
     end
   end
   
+  it "appending to paths with /" do
+    ( Path['/etc']/'passwd' ).should == Path['/etc/passwd']
+    ( Path['/etc']/Path['passwd'] ).should_not == Path['/etc/passwd']
+  end
+  
 end
