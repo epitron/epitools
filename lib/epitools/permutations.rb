@@ -2,7 +2,7 @@ require 'epitools/basetypes'
 
 class Array
   
-  alias_method :"original_*_for_cartesian_*", :*
+  alias_method :"*_without_permutations", :*
   
   #
   # Overloaded * operator.
@@ -24,7 +24,7 @@ class Array
         end
         result
       else
-        send(:"original_*_for_cartesian_*", other)
+        send(:"*_without_permutations", other)
     end
   end
   
@@ -34,6 +34,17 @@ class Array
   def **(exponent)
     ([self] * exponent).foldl(:*)
   end
+  
+  def all_pairs(reflexive=false)
+    (0...size).each do |a|
+      start = reflexive ? a : a+1
+      (start...size).each do |b|
+        yield self[a], self[b]
+      end
+    end
+  end
+  
+  enumerable :all_pairs
   
 end
 

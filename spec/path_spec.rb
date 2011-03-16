@@ -1,3 +1,4 @@
+require 'epitools/permutations'
 require 'epitools/path'
 
 describe Path do
@@ -99,6 +100,16 @@ describe Path do
     s2 = path.read(40)
     
     s2[15..-1].should == s1    
+  end
+  
+  it "makes paths THREE WAYS!" do
+    [
+      Path(__FILE__),
+      Path[__FILE__],
+      Path.new(__FILE__),
+    ].all_pairs do |p1, p2|
+      p1.path.should == p2.path
+    end
   end
   
 end

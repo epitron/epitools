@@ -208,7 +208,7 @@ describe Enumerable do
   it "powersets" do
    [1,2,3].powerset.should == [[], [1], [2], [1, 2], [3], [1, 3], [2, 3], [1, 2, 3]]   
   end    
-
+  
 end
 
 describe Hash do

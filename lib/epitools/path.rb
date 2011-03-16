@@ -73,19 +73,26 @@ class Path
 
   
   ## getters
-
-  attr_reader :dirs, :base, :ext
+   
+  # The path's directories as an array. (eg: ['usr', 'src', 'linux'])
+  attr_reader :dirs   
   
+  # The filename without an extension 
+  attr_reader :base
+  
+  # The file extension, including the . (eg: ".mp3") 
+  attr_reader :ext
+
+  # Joins and returns the full path  
   def path
-    d = dir
-    f = filename
-    if d
-      File.join(d, (f || "") )
+    if d = dir
+      File.join(d, (filename || "") )
     else
       ""
     end
   end
   
+  # The current directory (with a trailing /)
   def dir
     if dirs 
       File::SEPARATOR + File.join(*dirs)
@@ -159,7 +166,7 @@ class Path
     self.path <=> other.path
   end
 
-  ## opening/reading
+  ## opening/reading files
   
   def open(mode="rb", &block)
     if block_given?
@@ -173,4 +180,11 @@ class Path
     File.read(path, length, offset)
   end
   
+end
+
+#
+# Path("/some/path") is the same as Path["/some/path"]
+#
+def Path(*args)
+  Path[*args]
 end

@@ -8,7 +8,7 @@ require 'epitools/browser/mechanize_progressbar'
 
 # TODO: Make socksify optional (eg: if proxy is specified)
 #require 'socksify'
-class SOCKSError < Exception; end
+class SOCKSError < Exception; end # :nodoc:
 
 # TODO: Put options here.
 =begin

@@ -1,23 +1,31 @@
 require 'Win32/Console/ANSI' if RUBY_PLATFORM =~ /win32/
 require 'set'
 
-##
-# cute.
-# 
-#   >> "this is red".red
+#
+# ANSI Colour-coding for terminals that support it.
+# Originally by defunkt (Chris Wanstrath)
+#
+# It extends String with methods that insert terminal codes.
+#
+# Examples:
+#
+#    >> "this is red".red
 #  
-#   >> "this is red with a blue background (read: ugly)".red_on_blue
+#    >> "this is red with a blue background (read: ugly)".red_on_blue
 #
-#   >> "this is red with an underline".red.underline
+#    >> "this is light blue".light_blue
 #
-#   >> "this is really bold and really blue".bold.blue
+#    >> "<yellow>This is using <green>tags</green> to colorize.".colorize
 #
-#   >> Colored.red "This is red" # but this part is mostly untested
+#    >> "this is red with an underline".red.underline
+#
+#    >> "this is really bold and really blue".bold.blue
+#
+#    >> Colored.red "This is red" # but this part is mostly untested
+#
 module Colored
   extend self
 
-  ###########################################################################
-  
   @@is_tty = STDOUT.isatty
 
   COLORS = { 
@@ -67,8 +75,6 @@ module Colored
     COLORS.map { |k,v| "bold_#{k}"  }
   )
   
-  ###########################################################################
-
   COLORS.each do |color, value|
     define_method(color) do 
       colorize(self, :foreground => color)
@@ -171,7 +177,8 @@ module Colored
   alias_method :is_tty?, :enabled? 
 
   #
-  # Color commands will always produce colored strings.
+  # Color commands will always produce colored strings, regardless
+  # of whether the script is being run in a terminal.
   #
   def enable!
     @@is_tty = true
@@ -261,7 +268,6 @@ module Colored
     
     result
   end  
-
 
 end unless Object.const_defined? :Colored
 

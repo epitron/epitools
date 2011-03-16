@@ -1,6 +1,9 @@
 require 'mechanize'
 require 'sqlite3'
 
+#
+# Emit a quick debug message (only if $DEBUG is true)
+#
 def dmsg(msg)
   
   if $DEBUG

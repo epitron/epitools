@@ -32,6 +32,7 @@ end
   zopen
   colored
   clitools
+  permutations
 ].each do |mod|
   require_wrapper.call mod
 end

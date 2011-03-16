@@ -3,15 +3,15 @@
 Useful miscellaneous improvements for base Ruby objects, plus some extra
 data structures and handy wrappers.
 
-Base classess: Object, Enumerable, Hash, String, Array, Integer, etc.
+Base classess have been enhanced: {Enumerable}[http://rdoc.info/gems/epitools/Enumerable], {Hash}[http://rdoc.info/gems/epitools/Hash], {String}[http://rdoc.info/gems/epitools/String], {Array}[http://rdoc.info/gems/epitools/Array], {Object}[http://rdoc.info/gems/epitools/Object], {Integer}[http://rdoc.info/gems/epitools/Integer], etc.
 
 Extras:
 
-* Path (a better Pathname)
-* Rash (a hash which can have Regexps as keys, allowing a single (key,value) pair to match many keys.)
-* Progressbar (better than the progressbar gem)
-* Colored (enhanced version of defunkt's colored -- adds ANSI colouring methods to String, eg: #red, #green, #light_blue, etc.)
-* Browser (a fake browser, using mechanize, Progressbar, and CacheDB)
+* {Colored}[http://rdoc.info/gems/epitools/Colored] (enhanced version of defunkt's colored -- adds ANSI colouring methods to String, eg: #red, #green, #light_blue, etc.)
+* {Path}[http://rdoc.info/gems/epitools/Path]. (a better Pathname)
+* {Rash}[http://rdoc.info/gems/epitools/Rash] (a hash which can have Regexps as keys, allowing a single (key,value) pair to match many keys.)
+* {Progressbar}[http://rdoc.info/gems/epitools/Progressbar] (better than the progressbar gem)
+* {Browser}[http://rdoc.info/gems/epitools/Browser] (a fake browser, using mechanize, Progressbar, and CacheDB)
   
 == Installing
 

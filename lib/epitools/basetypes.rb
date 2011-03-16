@@ -29,10 +29,16 @@ class Numeric
 end
 
 class Float
+  #
+  # 'true' if the float is 0.0
+  #
   def blank?; self == 0.0; end
 end
 
 class NilClass
+  #
+  # Always 'true'; nil is considered blank.
+  #
   def blank?; true; end
 end
 
@@ -45,6 +51,9 @@ class String
     strip.match(/^\d+$/) ? true : false
   end
 
+  #
+  # 'true' if the string's length is 0 (after whitespace has been stripped from the ends)
+  #
   def blank?
     strip.size == 0
   end
@@ -91,6 +100,9 @@ end
 
 class Integer
   
+  #
+  # 'true' if the integer is 0
+  #
   def blank?; self == 0; end
 
   def to_hex
@@ -140,6 +152,9 @@ end
 
 class Array
 
+  #
+  # 'true' if the Array is empty
+  #
   def blank?; not self.any?; end
 
   #
@@ -191,6 +206,9 @@ end
 
 module Enumerable
 
+  #
+  # 'true' if the Enumerable has no elements
+  #
   def blank?
     not self.any?
   end
@@ -378,8 +396,9 @@ module Enumerable
       select.with_index{ |e, i| bitmask[i] == 1 }
     end
   end
-
+  
 end
+
 
 class Object
   
@@ -438,14 +457,14 @@ class Object
 
   #
   # A decorator that makes any block-accepting method return an
-  # Enumerable::Enumerator whenever the method is called without a block.
+  # Enumerator whenever the method is called without a block.
   #  
   def self.enumerable *meths
     meths.each do |meth|
       alias_method "#{meth}_without_enumerator", meth
       class_eval %{
         def #{meth}(*args, &block)
-          return Enumerable::Enumerator.new(self, #{meth.inspect}, *args, &block) unless block_given?
+          return Enum.new(self, #{meth.inspect}, *args, &block) unless block_given?
           #{meth}_without_enumerator(*args, &block)
         end
       }
@@ -457,12 +476,15 @@ end
 
 class Hash
 
+  #
+  # 'true' if the Hash has no entries
+  #
   def blank?
     not self.any?
   end
 
   #
-  # Runs remove_blank_lines on self. 
+  # Runs "remove_blank_values" on self.
   #  
   def remove_blank_values!
     delete_if{|k,v| v.blank?}
@@ -470,8 +492,8 @@ class Hash
   end
   
   #
-  # Returns a new Hash where all elements whose values are "blank?" (eg: "", [], nil)
-  # have been eliminated.
+  # Returns a new Hash where blank values have been removed.
+  # (It checks if the value is blank by calling #blank? on it)
   #
   def remove_blank_values
     dup.remove_blank_values!
@@ -489,7 +511,8 @@ class Hash
   end
   
   #
-  # Returns a Hash whsoe values have been transformed by the block.
+  # Transforms the values of the hash by passing them into the supplied
+  # block, and then using the block's result as the new value.
   #
   def map_values(&block)
     dup.map_values!(&block)
@@ -507,15 +530,15 @@ class Hash
   end
   
   #
-  # Returns a new Hash whose keys have been transformed by the block.
+  # Transforms the keys of the hash by passing them into the supplied block,
+  # and then using the blocks result as the new key.
   #
   def map_keys(&block)
     dup.map_keys!(&block)
   end
 
   #
-  # Creates an new Hash whose missing items default to [].
-  # Good for collecting things!
+  # Returns a new Hash whose values default to empty arrays. (Good for collecting things!)
   #
   # eg:
   #   Hash.of_arrays[:yays] << "YAY!"
@@ -525,8 +548,7 @@ class Hash
   end
 
   #
-  # Creates an new Hash whose missing items default to values of 0.
-  # Good for counting things!
+  # Returns a new Hash whose values default to 0. (Good for counting things!)
   #
   # eg:
   #   Hash.of_integers[:yays] += 1
@@ -572,7 +594,7 @@ protected
 end
 
 
-class It < BlankSlate
+class It < BlankSlate # :nodoc:
   #undef_method( *(instance_methods - ["__id__", "__send__"]) )
 
   def initialize
@@ -593,7 +615,7 @@ class It < BlankSlate
   end
 end
 
-class NotWrapper < BlankSlate
+class NotWrapper < BlankSlate # :nodoc:
   def initialize(orig)
     @orig = orig
   end

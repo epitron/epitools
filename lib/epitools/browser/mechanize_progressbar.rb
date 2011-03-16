@@ -5,7 +5,7 @@ require 'epitools/progressbar'
 #
 # (Displays a progress bar whenever an url is retrieved.)
 #
-class Mechanize
+class Mechanize # :nodoc: all
   class Chain
     class ResponseReader
       include Mechanize::Handler

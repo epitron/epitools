@@ -1,4 +1,4 @@
-%w[rubygems colorize].each{|r| require r}
+require 'colored'
 
 ASCII_PRINTABLE = (33..126)
 

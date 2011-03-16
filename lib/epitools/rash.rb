@@ -1,5 +1,11 @@
 #
-# A Regex-queryable Hash
+# A Regex-queryable Hash.
+#
+# Usage:
+#
+#     greeting = Rash.new( /^Mr./ => "Hello sir!", /^Mrs./ => "Evening, madame." )
+#     greeting["Mr. Steve Austin"] #=> "Hello sir!"
+#     greeting["Mrs. Steve Austin"] #=> "Evening, madame."
 #
 class Rash
   
@@ -83,10 +89,5 @@ private
     end
   end
 
-  def normalize_regex(regex)
-    #/^#{regex}$/
-    regex
-  end
-  
 end
 

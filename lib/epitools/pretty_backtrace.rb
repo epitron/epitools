@@ -5,32 +5,7 @@ require 'colorize'
 # TODO: Pick a backtrace format. (Also, add a method to replace default backtracer.)
 # TODO: This chould be in a class.
 
-class Array
-
-  def split_when(&block)
-
-    chunks = []
-    start = 0
-
-    for i in 0...self.size-1
-
-      split_here = yield(self[i], self[i+1])
-      if split_here
-        chunks << self[start..i]
-        start = i+1
-      end
-
-    end
-
-    chunks << self[start..-1]
-    chunks
-
-  end
-
-end
-
-
-class Line
+class Line # :nodoc:
 
   attr_accessor :path, :num, :meth, :dir, :filename
 
@@ -79,7 +54,7 @@ end
 
 
 def color_backtrace_1(lines)
-  groups = lines.split_when { |line,nextline| line.path != nextline.path }
+  groups = lines.split_before { |line,nextline| line.path != nextline.path }
   for group in groups
     dir, filename = File.split(group.first.path)
     puts "#{filename.green} (#{dir.light_white})"
