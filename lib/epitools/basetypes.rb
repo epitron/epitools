@@ -16,8 +16,23 @@ unless defined? Enum
 end
 
 class Object
+  #
   # Default "integer?" behaviour.
+  #
   def integer?; false; end
+   
+  #
+  # `truthy?` means `not blank?`
+  #
+  def truthy?; not blank?; end
+end
+
+class TrueClass
+  def truthy?; true; end
+end
+
+class FalseClass
+  def truthy?; false; end
 end
 
 class Numeric
@@ -40,6 +55,13 @@ class NilClass
   # Always 'true'; nil is considered blank.
   #
   def blank?; true; end
+end
+
+class Symbol
+  #
+  # Symbols are never blank.
+  #
+  def blank?; false; end
 end
 
 class String
@@ -105,6 +127,9 @@ class Integer
   #
   def blank?; self == 0; end
 
+  #
+  # Convert the number into a hexadecimal string representation.
+  #
   def to_hex
     "%0.2x" % self
   end
@@ -151,11 +176,6 @@ end
 
 
 class Array
-
-  #
-  # 'true' if the Array is empty
-  #
-  def blank?; not self.any?; end
 
   #
   # flatten.compact.uniq
@@ -210,9 +230,9 @@ module Enumerable
   # 'true' if the Enumerable has no elements
   #
   def blank?
-    not self.any?
+    not any?
   end
-
+  
   #
   # Split this enumerable into an array of pieces given some 
   # boundary condition.
@@ -481,9 +501,9 @@ class Hash
   # 'true' if the Hash has no entries
   #
   def blank?
-    not self.any?
+    not any?
   end
-
+  
   #
   # Runs "remove_blank_values" on self.
   #  
@@ -634,7 +654,6 @@ class NotWrapper < BlankSlate # :nodoc:
     end
   end
 end
-
 
 class Object
   
