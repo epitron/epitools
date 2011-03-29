@@ -3,15 +3,15 @@
 Useful miscellaneous improvements for base Ruby objects, plus some extra
 data structures and handy wrappers.
 
-Base classess have been enhanced: {Enumerable}[http://rdoc.info/gems/epitools/Enumerable], {Hash}[http://rdoc.info/gems/epitools/Hash], {String}[http://rdoc.info/gems/epitools/String], {Array}[http://rdoc.info/gems/epitools/Array], {Object}[http://rdoc.info/gems/epitools/Object], {Integer}[http://rdoc.info/gems/epitools/Integer], etc.
+Base classess have been enhanced: {Enumerable}[http://rdoc.info/github/epitron/epitools/master/Enumerable], {Hash}[http://rdoc.info/github/epitron/epitools/master/Hash], {String}[http://rdoc.info/github/epitron/epitools/master/String], {Array}[http://rdoc.info/github/epitron/epitools/master/Array], {Object}[http://rdoc.info/github/epitron/epitools/master/Object], {Integer}[http://rdoc.info/github/epitron/epitools/master/Integer], etc.
 
 Extras:
 
-* {Colored}[http://rdoc.info/gems/epitools/Colored] (enhanced version of defunkt's colored -- adds ANSI colouring methods to String, eg: #red, #green, #light_blue, etc.)
-* {Path}[http://rdoc.info/gems/epitools/Path] (a better Pathname)
-* {Rash}[http://rdoc.info/gems/epitools/Rash] (a hash which can have Regexps as keys, allowing a single (key,value) pair to match many keys.)
-* {Progressbar}[http://rdoc.info/gems/epitools/Progressbar] (better than the progressbar gem)
-* {Browser}[http://rdoc.info/gems/epitools/Browser] (a fake browser, using mechanize, Progressbar, and CacheDB)
+* {Colored}[http://rdoc.info/github/epitron/epitools/master/Colored] (enhanced version of defunkt's colored -- adds ANSI colouring methods to String, eg: #red, #green, #light_blue, etc.)
+* {Path}[http://rdoc.info/github/epitron/epitools/master/Path] (a better Pathname)
+* {Rash}[http://rdoc.info/github/epitron/epitools/master/Rash] (a hash which can have Regexps as keys, allowing a single (key,value) pair to match many keys.)
+* {Progressbar}[http://rdoc.info/github/epitron/epitools/master/Progressbar] (better than the progressbar gem)
+* {Browser}[http://rdoc.info/github/epitron/epitools/master/Browser] (a fake browser, using mechanize, Progressbar, and CacheDB)
   
 == Installing
 
@@ -21,7 +21,7 @@ Extras:
 
 This is basically a collection of enhancements to the ruby base types (Hash, Array,
 Enumerable, etc.). To learn how it works, read the specs in spec/*.rb,
-or check out the rdoc: http://rdoc.info/gems/epitools/frames
+or check out the rdoc: http://rdoc.info/github/epitron/epitools/master/frames
 
 == Copyright
 
