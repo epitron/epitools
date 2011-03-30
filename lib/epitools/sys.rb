@@ -8,6 +8,56 @@ module Sys
   
   #-----------------------------------------------------------------------------
 
+  #
+  # Return the current operating system: Darwin, Linux, or Windows. 
+  #
+  def self.os
+    return @os if @os
+
+    require 'rbconfig'
+    host_os = Config::CONFIG['host_os']
+    case host_os
+      when /darwin/
+        @os = "Darwin"
+      when /linux/
+        @os = "Linux"
+      when /mingw|mswin|cygwin/
+        @os = 'Windows'
+    else
+      raise "Unknown OS: #{host_os.inspect}"
+    end
+
+    @os
+  end
+  
+  #
+  # Is this Linux?
+  #
+  def self.linux?
+    os == "Linux"
+  end
+
+  #
+  # Is this Windows?
+  #
+  def self.windows?
+    os == "Windows"
+  end
+
+  #
+  # Is this Darwin?
+  #
+  def self.darwin?
+    os == "Darwin"
+  end
+
+  #
+  # Is this a Mac? (aka. Darwin?)
+  #
+  def self.mac?; darwin?; end
+
+  #-----------------------------------------------------------------------------
+
   PS_FIELD_TABLE = [
     [:pid,    :to_i],
     [:pcpu,   :to_f],
@@ -33,6 +83,8 @@ module Sys
   # The following attribute accessor methods are available:
   #
   #    pid     (integer)
+  #    command (string -- the 'ps' name)
+  #    name    (alias for 'command')
   #    pcpu    (float)
   #    pmem    (float)
   #    stat    (string)
@@ -41,8 +93,11 @@ module Sys
   #    user    (string)
   #    majflt  (integer)
   #    minflt  (integer)
-  #    command (string)
   #    state   (array of symbols; see DARWIN_STATES or LINUX_STATES)
+  #
+  # Only on linux:
+  #    exename (string -- path to the binary)
+  #    fds     (array -- list of open file descriptors)
   #
   class ProcessInfo < Struct.new(*PS_FIELDS+[:state])
 
@@ -125,7 +180,23 @@ module Sys
       members.each { |member| self[member] = updated_process[member] }
       self
     end
+    
+    alias_method :name, :command
 
+    # Linux-specific methods    
+    if Sys.linux?
+      
+      def exename
+        @exename ||= File.readlink("/proc/#{pid}/exe") rescue :unknown
+        @exename == :unknown ? nil : @exename
+      end
+      
+      def fds
+        Dir["/proc/#{pid}/fd/*"].map { |fd| File.readlink(fd) rescue nil }
+      end
+      
+    end
+    
     private 
     
     def stat_to_state(str)
@@ -137,7 +208,6 @@ module Sys
       
       str.scan(/./).map { |char| states[char] }.compact
     end
-    
   end
 
   #-----------------------------------------------------------------------------
@@ -150,12 +220,12 @@ module Sys
     options = PS_FIELDS.join(',')
     
     if pids.any?
-      command = "ps -p #{pids.join(',')} -o #{options}"
+      command = "ps -p #{pids.map(&:to_i).join(',')} -o #{options}"
     else
       command = "ps ax -o #{options}"
     end
 
-    lines = `#{command}`.to_a        
+    lines = `#{command}`.lines.to_a        
 
     lines[1..-1].map do |line|
       fields = line.split
@@ -168,56 +238,6 @@ module Sys
       ProcessInfo.new(*fields)
     end
   end
-  
-  #-----------------------------------------------------------------------------
-
-  #
-  # Return the current operating system: Darwin, Linux, or Windows. 
-  #
-  def self.os
-    return @os if @os
-
-    require 'rbconfig'
-    host_os = Config::CONFIG['host_os']
-    case host_os
-      when /darwin/
-        @os = "Darwin"
-      when /linux/
-        @os = "Linux"
-      when /mingw|mswin|cygwin/
-        @os = 'Windows'
-    else
-      raise "Unknown OS: #{host_os.inspect}"
-    end
-
-    @os
-  end
-  
-  #
-  # Is this Linux?
-  #
-  def self.linux?
-    os == "Linux"
-  end
-
-  #
-  # Is this Windows?
-  #
-  def self.windows?
-    os == "Windows"
-  end
-
-  #
-  # Is this Darwin?
-  #
-  def self.darwin?
-    os == "Darwin"
-  end
-
-  #
-  # Is this a Mac? (aka. Darwin?)
-  #
-  def self.mac?; darwin?; end
   
   #-----------------------------------------------------------------------------
 
