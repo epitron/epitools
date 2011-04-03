@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{epitools}
-  s.version = "0.4.19"
+  s.version = "0.4.20"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["epitron"]
-  s.date = %q{2011-03-30}
+  s.date = %q{2011-04-02}
   s.description = %q{Miscellaneous utility libraries to make my life easier.}
   s.email = %q{chris@ill-logic.com}
   s.extra_rdoc_files = [
@@ -34,6 +34,7 @@ Gem::Specification.new do |s|
     "lib/epitools/lcs.rb",
     "lib/epitools/metaclass.rb",
     "lib/epitools/niceprint.rb",
+    "lib/epitools/numwords.rb",
     "lib/epitools/path.rb",
     "lib/epitools/permutations.rb",
     "lib/epitools/pretty_backtrace.rb",
@@ -49,6 +50,7 @@ Gem::Specification.new do |s|
     "spec/clitools_spec.rb",
     "spec/lcs_spec.rb",
     "spec/metaclass_spec.rb",
+    "spec/numwords_spec.rb",
     "spec/path_spec.rb",
     "spec/permutations_spec.rb",
     "spec/rash_spec.rb",
@@ -69,6 +71,7 @@ Gem::Specification.new do |s|
     "spec/clitools_spec.rb",
     "spec/lcs_spec.rb",
     "spec/metaclass_spec.rb",
+    "spec/numwords_spec.rb",
     "spec/path_spec.rb",
     "spec/permutations_spec.rb",
     "spec/rash_spec.rb",

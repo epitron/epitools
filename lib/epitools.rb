@@ -34,6 +34,7 @@ end
   colored
   clitools
   permutations
+  numwords
 ].each do |mod|
   require_wrapper.call mod
 end

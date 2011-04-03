@@ -12,7 +12,7 @@ Extras:
 * {Rash}[http://rdoc.info/github/epitron/epitools/master/Rash] (a hash which can have Regexps as keys, allowing a single (key,value) pair to match many keys.)
 * {Progressbar}[http://rdoc.info/github/epitron/epitools/master/Progressbar] (better than the progressbar gem)
 * {Browser}[http://rdoc.info/github/epitron/epitools/master/Browser] (a fake browser, using mechanize, Progressbar, and CacheDB)
-  
+
 == Installing
 
   gem install epitools
