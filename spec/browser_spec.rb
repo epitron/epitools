@@ -24,7 +24,13 @@ describe Browser do
   end
   
   it "googles (cached)" do
-    @browser.get("http://google.com").body
+    lambda{ @browser.get("http://google.com").body }.should_not raise_error
+  end
+  
+  it "delegates" do
+    lambda{ @browser.head("http://google.com").body }.should_not raise_error
+    @browser.respond_to?(:post).should == true
+    @browser.respond_to?(:put).should == true
   end
 
 end

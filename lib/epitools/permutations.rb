@@ -2,7 +2,7 @@ require 'epitools/basetypes'
 
 class Array
   
-  alias_method :"*_without_permutations", :*
+  alias_method :multiply_without_permutations, :*
   
   #
   # Overloaded * operator.
@@ -13,18 +13,17 @@ class Array
   #   array * array = Cartesian product of the two arrays
   #
   def *(other)
-    case other
-      when Array
-        # cross-product
-        result = []
-        (0...self.size).each do |a|
-          (0...other.size).each do |b|
-            result << [self[a], other[b]]
-          end
+    if other.is_a? Array
+      # cross-product
+      result = []
+      (0...self.size).each do |a|
+        (0...other.size).each do |b|
+          result << [self[a], other[b]]
         end
-        result
-      else
-        send(:"*_without_permutations", other)
+      end
+      result
+    else
+      send(:multiply_without_permutations, other)
     end
   end
   

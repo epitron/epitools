@@ -16,6 +16,8 @@ describe Numeric do
     }.each do |num, result|
       num.to_words.should == result
     end
+    
+    lambda{ 1.523.million.billion.to_words }.should_not raise_error
   end
 
   it "has .thousand, .million, etc." do

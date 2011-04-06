@@ -1,4 +1,5 @@
 require 'epitools/basetypes'
+require 'bigdecimal'
 
 class Numeric
   
@@ -27,13 +28,13 @@ class Numeric
       num = self.to_i
     end
     
-    if (n = to_s.size) > 102
+    if (n = num.to_s.size) > 102
       return "more than a googol! (#{n} digits)"
     end
     
     whole_thing = []
     
-    triplets = commatize.split(',')
+    triplets = num.commatize.split(',')
     num_triplets = triplets.size
     
     triplets.each_with_index do |triplet, i|
@@ -97,12 +98,24 @@ class Numeric
   # eg: 10.million #=> 10_000_000
   #
   def method_missing(meth, &block)
+    
     if magnitude = NAMES_LARGE.index(meth.to_s)
-      pow = (magnitude+1) * 3
-      self * 10**pow
+      
+      pow     = (magnitude+1) * 3
+      factor  = 10**pow
+      
+      if is_a?(Float) 
+        (BigDecimal(to_s) * factor).to_i
+      else
+        self * factor
+      end
+      
     else
+      
       super
+      
     end
+    
   end
   
 end

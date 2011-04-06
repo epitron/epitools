@@ -194,6 +194,14 @@ class Browser
     page
   end
 
+  
+  # Delegation
+  [:head, :post, :put].each do |meth|
+    define_method meth do |*args|
+      agent.send(meth, *args)
+    end
+  end
+  
 private
 
   def load_cookies!
