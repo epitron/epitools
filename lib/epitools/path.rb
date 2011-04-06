@@ -24,6 +24,7 @@ class Path
   ## setters
   
   attr_writer :base
+  attr_writer :dirs
   
   def path=(newpath)
     if File.exists? newpath
@@ -33,7 +34,7 @@ class Path
         self.dir, self.filename = File.split(newpath)
       end
     else
-      if path[-1..-1] == File::SEPARATOR
+      if newpath[-1..-1] == File::SEPARATOR # ends in '/'
         self.dir = newpath
       else 
         self.dir, self.filename = File.split(newpath)
@@ -51,7 +52,7 @@ class Path
         @ext = nil
         @base = newfilename
       else
-        @ext = ext
+        self.ext = ext
         if pos = newfilename.rindex(ext)
           @base = newfilename[0...pos]
         end
@@ -64,17 +65,19 @@ class Path
   end
   
   def ext=(newext)
-    if newext.nil? or newext[0] == ?.
-      @ext = newext
+    if newext.blank?
+      @ext = nil
+    elsif newext[0] == ?.
+      @ext = newext[1..-1]
     else
-      @ext = "." + newext
+      @ext = newext
     end
   end
 
   
   ## getters
    
-  # The path's directories as an array. (eg: ['usr', 'src', 'linux'])
+  # The directories in the path, split into an array. (eg: ['usr', 'src', 'linux'])
   attr_reader :dirs   
   
   # The filename without an extension 
@@ -103,7 +106,11 @@ class Path
   
   def filename
     if base
-      base + (ext || "")
+      if ext
+        base + "." + ext
+      else
+        base
+      end
     else
       nil
     end
@@ -194,8 +201,9 @@ class Path
 end
 
 #
-# Path("/some/path") is the same as Path["/some/path"]
+# Path("/some/path") is an alias for Path["/some/path"]
 #
 def Path(*args)
   Path[*args]
 end
+

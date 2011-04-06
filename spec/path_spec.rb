@@ -9,7 +9,7 @@ describe Path do
     path.dirs.should == %w[ blah what.mp4 .mp3 ]
     path.dir.should == "/blah/what.mp4/.mp3"
     path.filename.should == "hello.avi"
-    path.ext.should == ".avi"
+    path.ext.should == "avi"
     path.base.should == "hello"
   end
   
@@ -34,12 +34,12 @@ describe Path do
   it "replaces ext" do
     path = Path.new("/blah/what.mp4/.mp3/hello.avi")
     
-    path.ext.should == ".avi"
-    path.ext = ".mkv"
-    path.ext.should == ".mkv"
+    path.ext.should == "avi"
+    path.ext = "mkv"
+    path.ext.should == "mkv"
     
     path.ext = "mkv"
-    path.ext.should == ".mkv"
+    path.ext.should == "mkv"
   end
 
   it "replaces filename" do
@@ -115,6 +115,14 @@ describe Path do
   it "appending to paths with /" do
     ( Path['/etc']/'passwd' ).should == Path['/etc/passwd']
     ( Path['/etc']/Path['passwd'] ).should_not == Path['/etc/passwd']
+  end
+  
+  it "lets you change the dirs array" do
+    path = Path['/spam/spam/spam/']
+    path.dirs.should == %w[ spam spam spam ]
+    path.dirs << 'humbug'
+    path.dir.should == '/spam/spam/spam/humbug'
+    path.path.should == '/spam/spam/spam/humbug/'
   end
   
 end
