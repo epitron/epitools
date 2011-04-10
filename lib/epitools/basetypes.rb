@@ -221,6 +221,13 @@ class Array
     reverse.zip(other.reverse).reverse
   end  
   
+  #
+  # Pick the middle element.
+  #
+  def middle
+    self[(size-1) / 2]
+  end
+  
 end
 
 

@@ -151,6 +151,13 @@ describe Array do
     [5,39].rzip([:hours, :mins, :secs]).should == [ [5, :mins], [39, :secs] ]
   end
   
+  it "middles" do
+    a = [0,1,2,3,4,5]
+    a.middle.should == 2
+    a << 6
+    a.middle.should == 3
+  end
+  
 end
 
 
