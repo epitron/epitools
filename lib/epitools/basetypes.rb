@@ -587,14 +587,15 @@ class Hash
   
 end
 
-
-if defined?(BasicObject)
-  BlankSlate = BasicObject
-else
-  class BlankSlate
+unless defined?(BasicObject)
+  #
+  # A BasicObject class for Ruby 1.8  
+  #
+  class BasicObject
     instance_methods.each { |m| undef_method m unless m =~ /^__/ }
   end
 end
+
 
 module Kernel
 
@@ -622,7 +623,7 @@ protected
 end
 
 
-class It < BlankSlate # :nodoc:
+class It < BasicObject # :nodoc:
   #undef_method( *(instance_methods - ["__id__", "__send__"]) )
 
   def initialize
@@ -643,7 +644,7 @@ class It < BlankSlate # :nodoc:
   end
 end
 
-class NotWrapper < BlankSlate # :nodoc:
+class NotWrapper < BasicObject # :nodoc:
   def initialize(orig)
     @orig = orig
   end

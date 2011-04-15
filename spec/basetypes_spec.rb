@@ -245,10 +245,10 @@ describe Hash do
 end
 
 
-describe BlankSlate do
+describe BasicObject do
   
   it "is blank!" do
-    BlankSlate.methods(false).should == []
+    BasicObject.methods(false).should == []
   end
   
 end
