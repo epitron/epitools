@@ -1,5 +1,6 @@
 require 'epitools/basetypes'
 require 'bigdecimal'
+require 'set'
 
 class Numeric
   
@@ -9,11 +10,13 @@ class Numeric
 
   NAMES_MEDIUM = [
     "twenty", "thirty", "fourty", "fifty", "sixty", "seventy", "eighty", "ninety"
-  ] 
+  ]
 
   NAMES_LARGE = [
     "thousand", "million", "billion", "trillion", "quadrillion", "quintillion", "sextillion", "septillion", "octillion", "nonillion", "decillion", "undecillion", "duodecillion", "tredecillion", "quattuordecillion", "quindecillion", "sexdecillion", "septendecillion", "octodecillion", "novemdecillion", "vigintillion", "unvigintillion", "duovigintillion", "trevigintillion", "quattuorvigintillion", "quinvigintillion", "sexvigintillion", "septenvigintillion", "octovigintillion", "novemvigintillion", "trigintillion", "untrigintillion", "duotrigintillion"
   ]
+  
+  NAMES_LARGE_LOOKUP = Set.new(NAMES_LARGE)
 
   
   #
@@ -98,24 +101,21 @@ class Numeric
   # eg: 10.million #=> 10_000_000
   #
   def method_missing(meth, &block)
-    
-    if magnitude = NAMES_LARGE.index(meth.to_s)
-      
-      pow     = (magnitude+1) * 3
-      factor  = 10**pow
+    super
+  rescue NoMethodError
+    if NAMES_LARGE_LOOKUP.include? meth.to_s
+      magnitude = NAMES_LARGE.index(meth.to_s) 
+      pow       = (magnitude+1) * 3
+      factor    = 10**pow
       
       if is_a?(Float) 
         (BigDecimal(to_s) * factor).to_i
       else
         self * factor
       end
-      
     else
-      
-      super
-      
+      raise NoMethodError.new(meth)
     end
-    
   end
   
 end
