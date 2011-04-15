@@ -130,7 +130,7 @@ module Colored
   #
   def colorize(string=nil, options = {})
     if string == nil
-      return tagged_colors(self)
+      return self.tagged_colors
     end
     
     if @@is_tty
@@ -226,11 +226,11 @@ module Colored
   # Numeric ANSI colors (from the BBS days):
   #    puts "<10><5>*</5> Hey mom! I am <9>SO</9> colored right now.</10>".colorize
   #
-  def tagged_colors(string)
+  def tagged_colors
     stack = []
 
     # split the string into tags and literal strings
-    tokens          = string.split(/(<\/?[\w\d_]+>)/)
+    tokens          = self.split(/(<\/?[\w\d_]+>)/)
     tokens.delete_if { |token| token.size == 0 }
     
     result        = ""
