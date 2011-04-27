@@ -449,6 +449,21 @@ class Object
     obj
   end
 
+  
+  #
+  # Return a copy of the class with modules mixed into it.
+  #
+  def self.using(*args)
+    if block_given?
+      yield using(*args)
+    else
+      copy = self.dup
+      args.each { |arg| copy.send(:include, arg) }
+      copy
+    end
+  end
+  
+  
   #
   # Instead of:
   #   if cookie_jar.include? cookie
@@ -500,6 +515,7 @@ class Object
   end
 
 end
+
 
 
 class Hash
@@ -584,6 +600,44 @@ class Hash
   def self.of_integers
     new(0)
   end
+
+  #
+  # Makes each element in the `path` array point to a hash containing the next element in the `path`.
+  # Useful for turning a bunch of strings (paths, module names, etc.) into a tree.
+  #
+  # Example:
+  #   h = {}
+  #   h.mkdir_p(["a", "b", "c"])    #=> {"a"=>{"b"=>{"c"=>{}}}}
+  #   h.mkdir_p(["a", "b", "whoa"]) #=> {"a"=>{"b"=>{"c"=>{}, "whoa"=>{}}}}
+  #
+  def mkdir_p(path)
+    return if path.empty?
+    dir = path.first
+    self[dir] ||= {}
+    self[dir].mkdir_p(path[1..-1])
+    self
+  end
+  
+  #
+  # Turn some nested hashes into a tree (returns an array of strings, padded on the left with indents.)
+  #
+  def tree(level=0, indent="  ")
+    result = []
+    dent = indent * level
+    each do |key, val|
+      result << dent+key
+      result += val.tree(level+1) if val.any?
+    end
+    result
+  end  
+  
+  #
+  # Print the result of `tree`
+  #
+  def print_tree
+    tree.each { |row| puts row }
+    nil
+  end  
   
 end
 
@@ -597,52 +651,6 @@ unless defined?(BasicObject)
 end
 
 
-module Kernel
-
-protected
-
-  #
-  # Magic "its" Mapping
-  # -------------------
-  #
-  # The pure-Ruby way:
-  #   User.find(:all).map{|x| x.contacts.map{|y| y.last_name.capitalize }}
-  #
-  # With Symbol#to_proc:
-  #   User.find(:all).map{|x|x.contacts.map(&:last_name).map(&:capitalize)}
-  #
-  # Magic "its" way:
-  #   User.find(:all).map &its.contacts.map(&its.last_name.capitalize)
-  #
-  def it()
-    It.new
-  end
-
-  alias its it
-
-end
-
-
-class It < BasicObject # :nodoc:
-  #undef_method( *(instance_methods - ["__id__", "__send__"]) )
-
-  def initialize
-    @methods = []
-  end
-
-  def method_missing(*args, &block)
-    @methods << [args, block] unless args == [:respond_to?, :to_proc]
-    self
-  end
-
-  def to_proc
-    lambda do |obj|
-      @methods.inject(obj) do |current,(args,block)|
-        current.send(*args, &block)
-      end
-    end
-  end
-end
 
 class NotWrapper < BasicObject # :nodoc:
   def initialize(orig)

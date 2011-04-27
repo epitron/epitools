@@ -2,29 +2,43 @@ require 'epitools/basetypes'
 require 'bigdecimal'
 require 'set'
 
+#
+# Allow numbers to be converted into words, or exprssed more easily with words.
+#
+# Examples:
+#     >> 1.thousand
+#     => 1_000
+
+#     >> 1.27.million.billion
+#     => 1_270_000_000_000_000
+#
+#     >> 12873218731.to_words
+#     => "twelve billion, eight-hundred and seventy-three million, two-hundred and eighteen thousand, seven-hundred and thirty-one"
+#
+# Works on numbers up to a googol!
+#
 class Numeric
   
+  # < 20
   NAMES_SMALL = [
     "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"
   ]
 
+  # 20-90
   NAMES_MEDIUM = [
     "twenty", "thirty", "fourty", "fifty", "sixty", "seventy", "eighty", "ninety"
   ]
 
+  # >= 100 
   NAMES_LARGE = [
     "thousand", "million", "billion", "trillion", "quadrillion", "quintillion", "sextillion", "septillion", "octillion", "nonillion", "decillion", "undecillion", "duodecillion", "tredecillion", "quattuordecillion", "quindecillion", "sexdecillion", "septendecillion", "octodecillion", "novemdecillion", "vigintillion", "unvigintillion", "duovigintillion", "trevigintillion", "quattuorvigintillion", "quinvigintillion", "sexvigintillion", "septenvigintillion", "octovigintillion", "novemvigintillion", "trigintillion", "untrigintillion", "duotrigintillion"
   ]
-  
-  NAMES_LARGE_LOOKUP = Set.new(NAMES_LARGE)
-
   
   #
   # Convert this number to words (eg: 69 => 'sixty-nine').
   # Works with numbers up to a googol (10^100).
   #
   def to_words
-    
     if is_a? Integer
       num = self
     else
@@ -93,18 +107,13 @@ class Numeric
     end
     
     whole_thing.join ', '
-    
   end
-
+  
   #
-  # Gives all numbers ".thousand", ".million", up to ".duotrigintillion" methods.
-  # eg: 10.million #=> 10_000_000
+  # Define the .million, .thousand, .hundred, etc. methods. 
   #
-  def method_missing(meth, &block)
-    super
-  rescue NoMethodError
-    if NAMES_LARGE_LOOKUP.include? meth.to_s
-      magnitude = NAMES_LARGE.index(meth.to_s) 
+  NAMES_LARGE.each_with_index do |name, magnitude|
+    define_method name do
       pow       = (magnitude+1) * 3
       factor    = 10**pow
       
@@ -113,8 +122,6 @@ class Numeric
       else
         self * factor
       end
-    else
-      raise NoMethodError.new(meth)
     end
   end
   

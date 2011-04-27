@@ -73,6 +73,32 @@ describe Object do
   
 end
 
+
+describe Class do
+  
+  it "uses" do
+    module Test1
+      def test1; :test1; end
+    end
+    
+    module Test2
+      def test2; :test2; end
+    end
+    
+    Hash.using(Test1).new.test1.should == :test1
+    Hash.using(Test2).new.test2.should == :test2
+    h = Hash.using(Test1, Test2).new
+    h.test1.should == :test1
+    h.test2.should == :test2
+    
+    Hash.using(Test1) do |h|
+      h.new.test1.should == :test1
+    end    
+  end
+  
+end
+
+
 describe Numeric do
 
   it "commatizes" do
@@ -85,6 +111,7 @@ describe Numeric do
 
 end
 
+
 describe String do
   
   it "rot13s" do
@@ -94,6 +121,7 @@ describe String do
   end
   
 end
+
 
 describe Integer do
   
@@ -240,6 +268,16 @@ describe Hash do
     h.keys.should == @h.keys
     h.map_values!{ 1 }
     h.values.should == [1,1]
+  end
+  
+  it "mkdir_p's and trees" do
+    h = {}
+    h.mkdir_p(["a", "b", "c"]).should == {"a"=>{"b"=>{"c"=>{}}}}
+    h.mkdir_p(["a", "b", "whoa"]).should == {"a"=>{"b"=>{"c"=>{}, "whoa"=>{}}}}
+    
+    lambda { 
+      h.tree.should == ["a", "  b", "    c", "    whoa"]
+    }.should_not raise_error
   end
   
 end
