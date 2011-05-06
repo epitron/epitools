@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{epitools}
-  s.version = "0.4.28"
+  s.version = "0.4.29"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["epitron"]
-  s.date = %q{2011-04-27}
+  s.date = %q{2011-05-06}
   s.description = %q{Miscellaneous utility libraries to make my life easier.}
   s.email = %q{chris@ill-logic.com}
   s.extra_rdoc_files = [
@@ -31,6 +31,7 @@ Gem::Specification.new do |s|
     "lib/epitools/clitools.rb",
     "lib/epitools/colored.rb",
     "lib/epitools/hexdump.rb",
+    "lib/epitools/its.rb",
     "lib/epitools/lcs.rb",
     "lib/epitools/metaclass.rb",
     "lib/epitools/niceprint.rb",
@@ -65,21 +66,6 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.5.2}
   s.summary = %q{NOT UTILS... METILS!}
-  s.test_files = [
-    "spec/basetypes_spec.rb",
-    "spec/browser_spec.rb",
-    "spec/clitools_spec.rb",
-    "spec/lcs_spec.rb",
-    "spec/metaclass_spec.rb",
-    "spec/numwords_spec.rb",
-    "spec/path_spec.rb",
-    "spec/permutations_spec.rb",
-    "spec/rash_spec.rb",
-    "spec/ratio_spec.rb",
-    "spec/spec_helper.rb",
-    "spec/sys_spec.rb",
-    "spec/zopen_spec.rb"
-  ]
 
   if s.respond_to? :specification_version then
     s.specification_version = 3

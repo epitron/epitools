@@ -120,6 +120,25 @@ describe String do
     message.rot13.rot13.should == message
   end
   
+  it "tightens" do
+    " hi   there".tighten.should == "hi there"
+  end
+  
+  it "dewhitespaces" do
+    "\nso there   i \n was, eating my cookies".dewhitespace.should == "so there i was, eating my cookies"
+  end
+  
+  it "nice_lineses" do
+    "\n\n\nblah\n\n\nblah\n\n\n".nice_lines.should == ["blah", "blah"]    
+  end
+  
+  it "urlencodes/decodes" do
+    s = "hi + there & mom + !!!!! I AM ON RSPEC"
+    s.urlencode.should_not == s
+    s.urlencode.should == "hi%20+%20there%20&%20mom%20+%20!!!!!%20I%20AM%20ON%20RSPEC"
+    s.urlencode.urldecode.should == s
+  end
+    
 end
 
 
@@ -278,6 +297,11 @@ describe Hash do
     lambda { 
       h.tree.should == ["a", "  b", "    c", "    whoa"]
     }.should_not raise_error
+  end
+  
+  it "to_querys" do
+    # this will probably fail half the time in Ruby 1.8 because the hash order is random
+    {:donkeys=>7, :stubborn=>true}.to_query.should == "donkeys=7&stubborn=true"
   end
   
 end

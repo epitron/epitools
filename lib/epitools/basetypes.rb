@@ -1,4 +1,5 @@
 require 'pp'
+require 'uri'
 
 # Alias "Enumerator" to "Enum"
 
@@ -115,6 +116,20 @@ class String
   #
   def rot13
     tr('n-za-mN-ZA-M', 'a-zA-Z')
+  end
+  
+  #
+  # Convert non-URI characters into %XXes.
+  #
+  def urlencode
+    URI.escape(self)
+  end
+  
+  #
+  # Convert an URI's %XXes into regular characters.
+  #
+  def urldecode
+    URI.unescape(self)
   end
   
 end
@@ -639,6 +654,35 @@ class Hash
     nil
   end  
   
+  #
+  # Convert the hash into a GET query.
+  #
+  def to_query
+    params = ''
+    stack = []
+  
+    each do |k, v|
+      if v.is_a?(Hash)
+        stack << [k,v]
+      else
+        params << "#{k}=#{v}&"
+      end
+    end
+  
+    stack.each do |parent, hash|
+      hash.each do |k, v|
+        if v.is_a?(Hash)
+          stack << ["#{parent}[#{k}]", v]
+        else
+          params << "#{parent}[#{k}]=#{v}&"
+        end
+      end
+    end
+  
+    params.chop! # trailing &
+    params
+  end
+
 end
 
 unless defined?(BasicObject)
