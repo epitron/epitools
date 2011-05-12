@@ -199,7 +199,7 @@ class Path
   end
   
   def ls
-    class[File.join path, "*"]
+    Path[File.join(path, "*")]
   end
   
 end
