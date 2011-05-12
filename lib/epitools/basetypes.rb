@@ -1,5 +1,4 @@
 require 'pp'
-require 'uri'
 
 # Alias "Enumerator" to "Enum"
 
@@ -122,6 +121,7 @@ class String
   # Convert non-URI characters into %XXes.
   #
   def urlencode
+    require 'uri' unless defined? URI
     URI.escape(self)
   end
   
@@ -129,7 +129,49 @@ class String
   # Convert an URI's %XXes into regular characters.
   #
   def urldecode
+    require 'uri' unless defined? URI
     URI.unescape(self)
+  end
+
+  #
+  # Convert a query string to a hash of params
+  #
+  def to_params
+    require 'cgi' unless defined? CGI
+    CGI.parse(self).map_values{|v| v.is_a?(Array) and v.size == 1 ? v.first : v }
+  end
+  
+  #
+  # Decode a mime64/base64 encoded string
+  #
+  def decode64
+    require 'base64' unless defined? Base64
+    Base64.decode64 self
+  end
+  
+  #
+  # Encode into a mime64/base64 string
+  #
+  def encode64
+    require 'base64' unless defined? Base64
+    Base64.encode64 self
+  end
+  alias_method :base64, :encode64
+
+  #
+  # MD5 the string
+  #  
+  def md5
+    require 'digest/md5' unless defined? Digest::MD5
+    Digest::MD5.hexdigest self
+  end
+  
+  #
+  # SHA1 the string
+  #  
+  def sha1
+    require 'digest/sha1' unless defined? Digest::SHA1
+    Digest::SHA1.hexdigest self
   end
   
 end
@@ -682,7 +724,7 @@ class Hash
     params.chop! # trailing &
     params
   end
-
+  
 end
 
 unless defined?(BasicObject)
