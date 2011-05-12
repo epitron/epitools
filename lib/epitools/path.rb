@@ -198,6 +198,10 @@ class Path
     File.read(path, length, offset)
   end
   
+  def ls
+    class[File.join path, "*"]
+  end
+  
 end
 
 #
