@@ -24,7 +24,6 @@ require_wrapper = proc do |mod|
 end
 
 %w[
-  metaclass 
   basetypes 
   niceprint
   string_to_proc

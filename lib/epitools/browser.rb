@@ -3,6 +3,7 @@ require 'mechanize'
 require 'uri'
 require 'fileutils'
 
+require 'epitools'
 require 'epitools/browser/cache'
 require 'epitools/browser/mechanize_progressbar'
 

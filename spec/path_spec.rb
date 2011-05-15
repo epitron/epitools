@@ -127,10 +127,48 @@ describe Path do
   
   it "handles URLs" do
     path = Path["http://google.com/?search=blah"]
-    p [:path, path]
     path.host.should == "google.com"
     path.query.should == {"search" => "blah"}
     path.uri?.should == true
+  end
+  
+  it "tempfiles" do
+    path = Path.tmpfile
+    path.exists?.should == true
+  end
+  
+  it "appends and writes" do
+    path = Path.tmpfile
+    path.exists?.should == true
+    
+    path.write "blah"
+    path.append "what" 
+    path << "lul"
+    
+    path.read.should == "blahwhatlul"
+    
+    path.write "rawr"
+    
+    path.read.should == "rawr"
+  end
+  
+  it "renames" do
+    path = Path.tmpfile
+    
+    str = path.to_s
+    
+    path.rename(:ext=>".dat")
+    
+    path.to_s.should_not == str 
+    path.to_s.should == str+".dat"
+  end
+  
+  it "deletes" do
+    path = Path.tmpfile
+    path << "data"
+    path.exists?.should == true
+    path.delete!
+    path.exists?.should == false
   end
   
 end

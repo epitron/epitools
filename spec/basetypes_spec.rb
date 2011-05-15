@@ -71,6 +71,21 @@ describe Object do
     10.not.even?.should == false
   end
   
+  it "alias_class_methods" do
+    class Blah
+      def self.classmethod
+        true
+      end
+      
+      alias_class_method :aliased, :classmethod
+    end
+    
+    lambda do 
+      Blah.classmethod.should == true
+    end.should_not raise_error
+    
+  end
+  
 end
 
 
@@ -148,6 +163,11 @@ describe String do
     s.md5.should_not == s
     s.sha1.should_not == s
     s.sha1.should_not == s.md5
+  end
+
+  it "starts/endswith" do
+    "blahblahblah".startswith("blah").should == true    
+    "blahblahblah".endswith("blah").should == true    
   end
     
 end
@@ -346,3 +366,15 @@ describe "truthiness" do
   end
   
 end
+
+
+describe "metaclass" do
+
+  it "metaclass" do
+    o = Object.new
+    o_metaclass = class << o; self; end
+    o.metaclass.should == o_metaclass
+  end
+
+end
+

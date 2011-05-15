@@ -3,7 +3,7 @@ require 'fileutils'
 require 'uri'
 
 class Path
-
+  
   ## initializers
   
   def initialize(newpath)
@@ -15,54 +15,40 @@ class Path
   end
   
   def self.[](str)
-    if str =~ /[\?\*]/ and not str =~ /\\[\?\*]/  # contains glob chars? (unescaped) 
+    if str =~ %r{^[a-z\-]+://}i # URL?
+      Path::URL.new(str)
+    elsif str =~ /[\?\*]/ and not str =~ /\\[\?\*]/  # contains glob chars? (unescaped) 
       glob(str)
     else
       new(str)
     end      
   end
 
+  def self.tmpfile(prefix="tmp")
+    require 'tempfile' unless defined? Tempfile
+    file = Tempfile.new(prefix)
+    path = Path[file]
+    yield path if block_given?
+    path
+  end
   
+  alias_class_method :tempfile, :tmpfile  
+
+
   ## setters
   
   attr_writer :base
   attr_writer :dirs
   
   def path=(newpath)
-    uri = URI.parse(newpath)
-    #p [:uri, uri, uri.absolute?]
-    
-    if uri.absolute?
-      
-      @uri = uri
-      class << self
-        def uri?
-          true
-        end
-        
-        def uri
-          @uri
-        end
-        
-        def host
-          uri.host
-        end
-        
-        def query
-          uri.query && uri.query.to_params
-        end
-      end
-      
-      self.path = uri.path
-    
-    elsif File.exists? newpath
+    if File.exists? newpath
       if File.directory? newpath
         self.dir = newpath
       else
         self.dir, self.filename = File.split(newpath)
       end
     else
-      if newpath[-1..-1] == File::SEPARATOR # ends in '/'
+      if newpath.endswith(File::SEPARATOR) # ends in '/'
         self.dir = newpath
       else 
         self.dir, self.filename = File.split(newpath)
@@ -95,7 +81,7 @@ class Path
   def ext=(newext)
     if newext.blank?
       @ext = nil
-    elsif newext[0] == ?.
+    elsif newext.startswith('.')
       @ext = newext[1..-1]
     else
       @ext = newext
@@ -175,6 +161,10 @@ class Path
     false
   end
   
+  def url?
+    uri?
+  end
+  
   
   ## aliases
   
@@ -195,8 +185,6 @@ class Path
   alias_method :directory=, :dir=
 
   alias_method :directory?, :dir?
-  
-  alias_method :url?, :uri?
   
   ## comparisons
 
@@ -235,6 +223,60 @@ class Path
     Path[File.join(path, "*")]
   end
   
+  ## modifying files
+
+  #
+  # Append
+  #
+  def append(data=nil)
+    self.open("ab") do |f|
+      if data and not block_given?
+        f.write(data)
+      else
+        yield f
+      end
+    end    
+  end
+  alias_method :<<, :append
+  
+  #
+  # Write a string, truncating the file
+  #
+  def write(data=nil)
+    self.open("wb") do |f|
+      if data and not block_given?
+        f.write(data)
+      else
+        yield f
+      end
+    end    
+  end
+  
+  #
+  # Rename
+  #  
+  def rename(options)
+    raise "Options must be a Hash" unless options.is_a? Hash
+    dest = self.with(options)
+    
+    raise "Error: destination (#{dest.inspect}) already exists" if dest.exists?
+    File.rename(path, dest)
+    
+    self.path = dest.path # become dest
+  end
+  
+  def rename_to(dest)
+    rename :path=>dest
+  end
+  
+  alias_method :move,       :rename
+  alias_method :ren,        :rename  
+
+  def delete!
+    File.unlink(self)
+  end
+  alias_method :"unlink!", :"delete!"
+  
   def mkdir_p
     if exists?
       raise "Error: Path already exists."
@@ -254,8 +296,43 @@ class Path
       Path[File.join(path, other)]
     end
   end
+
+end
+
+#
+# A wrapper for URL objects
+#
+class Path::URL < Path
+
+  attr_reader :uri
+  
+  def initialize(uri)
+    @uri = URI.parse(uri)
+    self.path = @uri.path
+  end
+  
+  def uri?
+    true
+  end
+  
+  def host
+    uri.host
+  end
+  
+  def query
+    if query = uri.query
+      query.to_params
+    else
+      nil
+    end
+  end
+  
+  def to_s
+    uri.to_s
+  end
   
 end
+
 
 #
 # Path("/some/path") is an alias for Path["/some/path"]
@@ -264,3 +341,10 @@ def Path(*args)
   Path[*args]
 end
 
+if $0 == __FILE__
+  require 'ruby-debug'
+  #Path.pry
+  #Path["http://google.com/"].pry
+  debugger
+  Path["?"]
+end

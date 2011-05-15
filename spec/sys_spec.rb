@@ -56,9 +56,12 @@ describe Sys::ProcessInfo do
 
 
   specify "cross-platform method" do
-    Sys.interfaces.should_not be_nil
     Sys.cross_platform_method(:cross_platform_test)
     proc{ Sys.cross_platform_test }.should raise_error
+  end
+  
+  specify "interfaces" do
+    Sys.interfaces.should_not be_nil
   end
   
 end

@@ -17,6 +17,13 @@ end
 
 class Object
   #
+  # Slightly gross hack to add a class method.
+  #
+  def self.alias_class_method(dest, src)
+    metaclass.send(:alias_method, dest, src)
+  end
+  
+  #
   # Default "integer?" behaviour.
   #
   def integer?; false; end
@@ -25,6 +32,7 @@ class Object
   # `truthy?` means `not blank?`
   #
   def truthy?; not blank?; end
+
 end
 
 class TrueClass
@@ -172,6 +180,19 @@ class String
   def sha1
     require 'digest/sha1' unless defined? Digest::SHA1
     Digest::SHA1.hexdigest self
+  end
+  
+  # `true` if this string starts with the substring 
+  #  
+  def startswith(substring)
+    self[0...substring.size] == substring
+  end
+  
+  #
+  # `true` if this string ends with the substring 
+  #  
+  def endswith(substring)
+    self[-substring.size..-1] == substring
   end
   
 end
@@ -772,6 +793,30 @@ class Object
     NotWrapper.new(self)
   end
   
+end
+
+# Metaclass 
+class Object
+  # The hidden singleton lurks behind everyone
+  def metaclass
+    class << self
+      self
+    end
+  end
+
+  def meta_eval &blk
+    metaclass.instance_eval &blk
+  end
+
+  # Adds methods to a metaclass
+  def meta_def name, &blk
+    meta_eval { define_method name, &blk }
+  end
+
+  # Defines an instance method within a class
+  def class_def name, &blk
+    class_eval { define_method name, &blk }
+  end
 end
 
 
