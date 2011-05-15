@@ -125,4 +125,12 @@ describe Path do
     path.path.should == '/spam/spam/spam/humbug/'
   end
   
+  it "handles URLs" do
+    path = Path["http://google.com/?search=blah"]
+    p [:path, path]
+    path.host.should == "google.com"
+    path.query.should == {"search" => "blah"}
+    path.uri?.should == true
+  end
+  
 end

@@ -138,6 +138,17 @@ describe String do
     s.urlencode.should == "hi%20+%20there%20&%20mom%20+%20!!!!!%20I%20AM%20ON%20RSPEC"
     s.urlencode.urldecode.should == s
   end
+  
+  it "to_paramses" do
+    "file=yay&setting=1&awesome=true".to_params.should == {"file" => "yay", "setting"=>"1", "awesome"=>"true"}
+  end
+  
+  it "md5/sha1s" do
+    s = "hashme"
+    s.md5.should_not == s
+    s.sha1.should_not == s
+    s.sha1.should_not == s.md5
+  end
     
 end
 
@@ -173,7 +184,6 @@ describe Integer do
     i[0..2].should == [1,1,0]
     i[-3..-1].should == [1,1,1]
     i[0..-1].should == [1,1,0,1,1,1]
-
   end
   
 end
@@ -320,7 +330,6 @@ describe "truthiness" do
   
   it "is truthy!" do
     {
-      
       # truthy things
       true => [
         "asdf", 1, 1.7, :blah, true, [1,2,3], Enumerator.new([1,2,3], :each),
@@ -331,11 +340,9 @@ describe "truthiness" do
       false => [
         "", " ", 0, 0.0, false, nil, [], Enumerator.new([], :each),
       ]
-      
     }.each do |truthiness, objs|
       objs.each { |obj| obj.truthy?.should == truthiness }
     end
-    
   end
   
 end

@@ -1,4 +1,6 @@
 require 'epitools/basetypes'
+require 'fileutils'
+require 'uri'
 
 class Path
 
@@ -27,7 +29,33 @@ class Path
   attr_writer :dirs
   
   def path=(newpath)
-    if File.exists? newpath
+    uri = URI.parse(newpath)
+    #p [:uri, uri, uri.absolute?]
+    
+    if uri.absolute?
+      
+      @uri = uri
+      class << self
+        def uri?
+          true
+        end
+        
+        def uri
+          @uri
+        end
+        
+        def host
+          uri.host
+        end
+        
+        def query
+          uri.query && uri.query.to_params
+        end
+      end
+      
+      self.path = uri.path
+    
+    elsif File.exists? newpath
       if File.directory? newpath
         self.dir = newpath
       else
@@ -142,7 +170,11 @@ class Path
   def symlink?
     File.symlink? path
   end
-
+  
+  def uri?
+    false
+  end
+  
   
   ## aliases
   
@@ -164,7 +196,8 @@ class Path
 
   alias_method :directory?, :dir?
   
-
+  alias_method :url?, :uri?
+  
   ## comparisons
 
   include Comparable
@@ -200,6 +233,26 @@ class Path
   
   def ls
     Path[File.join(path, "*")]
+  end
+  
+  def mkdir_p
+    if exists?
+      raise "Error: Path already exists."
+    else
+      FileUtils.mkdir_p(path)
+    end
+  end
+  
+  def cp_r(dest)
+    FileUtils.cp_r(path, dest) #if Path[dest].exists?
+  end
+  
+  def join(other)
+    if uri?
+      Path[URI.join(path, other).to_s]
+    else
+      Path[File.join(path, other)]
+    end
   end
   
 end
