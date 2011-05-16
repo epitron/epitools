@@ -194,6 +194,14 @@ class String
   def endswith(substring)
     self[-substring.size..-1] == substring
   end
+
+  #
+  # Parse object as JSON
+  #
+  def from_json
+    require 'json' unless defined? JSON
+    JSON.parse self
+  end
   
 end
 

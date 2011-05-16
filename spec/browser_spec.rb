@@ -1,3 +1,4 @@
+require 'pp'
 require 'epitools/browser'
 
 class Mechanize::Page
@@ -5,7 +6,6 @@ class Mechanize::Page
     uri.to_s
   end
 end
-
 
 
 describe Browser do
@@ -18,6 +18,12 @@ describe Browser do
     @browser.cache.delete!
   end
 
+  it "caches javascript" do
+    url = "http://code.jquery.com/jquery-1.0.pack.js"
+    page = @browser.get(url)
+    @browser.cache.get(url).should_not == nil
+  end
+  
   it "googles" do
     page = @browser.get("http://google.com")
     page.body["Feeling Lucky"].should_not be_empty

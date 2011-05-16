@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{epitools}
-  s.version = "0.4.31"
+  s.version = "0.4.33"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["epitron"]
-  s.date = %q{2011-05-12}
+  s.date = %q{2011-05-16}
   s.description = %q{Miscellaneous utility libraries to make my life easier.}
   s.email = %q{chris@ill-logic.com}
   s.extra_rdoc_files = [
@@ -33,7 +33,6 @@ Gem::Specification.new do |s|
     "lib/epitools/hexdump.rb",
     "lib/epitools/its.rb",
     "lib/epitools/lcs.rb",
-    "lib/epitools/metaclass.rb",
     "lib/epitools/niceprint.rb",
     "lib/epitools/numwords.rb",
     "lib/epitools/path.rb",
@@ -50,7 +49,6 @@ Gem::Specification.new do |s|
     "spec/browser_spec.rb",
     "spec/clitools_spec.rb",
     "spec/lcs_spec.rb",
-    "spec/metaclass_spec.rb",
     "spec/numwords_spec.rb",
     "spec/path_spec.rb",
     "spec/permutations_spec.rb",
@@ -64,7 +62,7 @@ Gem::Specification.new do |s|
   s.homepage = %q{http://github.com/epitron/epitools}
   s.licenses = ["WTFPL"]
   s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.6.2}
+  s.rubygems_version = %q{1.7.2}
   s.summary = %q{NOT UTILS... METILS!}
 
   if s.respond_to? :specification_version then

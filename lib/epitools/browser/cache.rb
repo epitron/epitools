@@ -48,10 +48,15 @@ class Browser
     
     alias_method :size, :count
   
+    def valid_page?(page)
+      [:body, :content_type, :uri].all?{|m| page.respond_to? m }
+    end
+       
+    
     def put(page, original_url=nil, options={})
       dmsg [:put, original_url]
   
-      raise "Invalid page" unless [:body, :content_type, :uri].all?{|m| page.respond_to? m }
+      raise "Invalid page" unless valid_page?(page) 
   
       url = page.uri.to_s
   
@@ -98,13 +103,25 @@ class Browser
         #body = compressed_body
         body = Zlib::Inflate.inflate(compressed_body)
   
-        Mechanize::Page.new(
-          URI.parse(url),
-          {'content-type'=>content_type},
-          body,
-          nil,
-          agent
-        )
+        if content_type =~ /^(text\/html)|(application\/xhtml\+xml)/i
+          Mechanize::Page.new(
+            #initialize(uri=nil, response=nil, body=nil, code=nil, mech=nil)
+            URI.parse(url),
+            {'content-type'=>content_type},
+            body,
+            nil,
+            agent
+          )
+        else
+          Mechanize::File.new(
+            #initialize(uri=nil, response=nil, body=nil, code=nil
+            URI.parse(url),
+            {'content-type'=>content_type},
+            body,
+            nil
+          )
+        end
+            
       end
     end
   

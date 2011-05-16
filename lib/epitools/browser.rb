@@ -1,7 +1,7 @@
-
 require 'mechanize'
 require 'uri'
 require 'fileutils'
+require 'json'
 
 require 'epitools'
 require 'epitools/browser/cache'
@@ -39,6 +39,14 @@ class BrowserOptions < OpenStruct
 end
 =end
 
+# Monkeypatches!
+class Mechanize::File
+  def content_type
+    response['content-type']
+  end
+end
+  
+
 #
 # A mechanize class that emulates a web-browser, with cache and everything.
 # Progress bars are enabled by default.
@@ -74,7 +82,7 @@ class Browser
     init_agent!
     init_cache!
   end
-
+                                        
 
   def init_agent!
     @agent = Mechanize.new do |a|
@@ -106,18 +114,46 @@ class Browser
   end
 
 
+  def load_cookies!
+    if File.exists? @cookie_file
+      agent.cookie_jar.load @cookie_file
+      true
+    else
+      false
+    end
+  end
+
+  
+  def save_cookies!
+    agent.cookie_jar.save_as @cookie_file
+    true
+  end
+
+  
+  
   def relative?(url)
     not url[ %r{^https?://} ]
   end
 
+  
+  def cacheable?(page)
+    case page.content_type
+    when %r{^(text|application)}
+      true
+    end
+  end    
 
+  
   def cache_put(page, url)
-    if page.is_a? Mechanize::Page and page.content_type =~ %r{^text/}
-      puts "  |_ writing to cache"
-      cache.put(page, url, :overwrite=>true)
+    if cache.valid_page?(page)
+      if page.content_type =~ %r{(^text/|^application/javascript|javascript)}
+        puts "  |_ writing to cache"
+        cache.put(page, url, :overwrite=>true)
+      end
     end
   end
 
+  
   #
   # Retrieve an URL, and return a Mechanize::Page instance (which acts a 
   # bit like a Nokogiri::HTML::Document instance.)
@@ -136,9 +172,7 @@ class Browser
     #end
 
     # Determine the cache setting
-
-
-    use_cache = options[:use_cache] || @use_cache
+    use_cache = options[:use_cache] || options[:cache] || options[:cached] || @use_cache
 
     cached_already = cache.include?(url)
 
@@ -149,19 +183,13 @@ class Browser
 
     begin
       
-      if cached_already
-        page = cache.get(url)
-        if page.nil?
-          puts "  |_ CACHE FAIL! Re-getting page."
-          page = get(url, false)
-        end
+      if page = cache.get(url)
         puts "  |_ cached (#{page.content_type})"
       else
-        page = agent.get url
+        page = agent.get(url)
         @last_get = Time.now
+        cache_put(page, url)
       end
-
-      cache_put(page, url) unless cached_already
 
       puts
 
@@ -196,22 +224,14 @@ class Browser
   end
 
   
-  # Delegation
-  [:head, :post, :put].each do |meth|
+  #
+  # Delegate certain methods to @agent
+  #
+  [:head, :post, :put, :submit].each do |meth|
     define_method meth do |*args|
       agent.send(meth, *args)
     end
   end
   
-private
-
-  def load_cookies!
-    agent.cookie_jar.load @cookie_file if File.exists? @cookie_file
-  end
-
-  def save_cookies!
-    agent.cookie_jar.save_as @cookie_file
-  end
-
 end
 
