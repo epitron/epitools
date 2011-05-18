@@ -135,6 +135,12 @@ describe Path do
   it "tempfiles" do
     path = Path.tmpfile
     path.exists?.should == true
+    
+    path.write "blah"
+    path.read.should == "blah"
+    
+    path.delete!
+    path.exists?.should == false
   end
   
   it "appends and writes" do
@@ -169,6 +175,18 @@ describe Path do
     path.exists?.should == true
     path.delete!
     path.exists?.should == false
+  end
+  
+  it "checksums" do
+    a, b = Path["*.rb"].take(2)
+    [:sha1, :sha2, :md5].each do |meth|
+      sum1 = a.send(meth)
+      sum2 = b.send(meth)
+      sum1.should_not == sum2
+      sum1.size.should > 5
+      sum1.should =~ /[a-z0-9]/
+      sum2.should =~ /[a-z0-9]/
+    end
   end
   
 end

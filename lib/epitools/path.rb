@@ -5,7 +5,7 @@ require 'uri'
 class Path
   
   ## initializers
-  
+
   def initialize(newpath)
     self.path = newpath
   end
@@ -26,14 +26,18 @@ class Path
 
   def self.tmpfile(prefix="tmp")
     require 'tempfile' unless defined? Tempfile
-    file = Tempfile.new(prefix)
-    path = Path[file]
+    path = Path[ Tempfile.new(prefix).path ]
     yield path if block_given?
     path
   end
-  
+
   alias_class_method :tempfile, :tmpfile  
 
+  
+  def self.home
+    Path[ENV['HOME']]
+  end
+  
 
   ## setters
   
@@ -143,6 +147,14 @@ class Path
   
   def mtime
     File.mtime path
+  end
+  
+  def ctime
+    File.ctime path
+  end
+  
+  def atime
+    File.atime path
   end
   
   def dir?
@@ -296,6 +308,26 @@ class Path
       Path[File.join(path, other)]
     end
   end
+  
+  
+  ## Checksums
+  
+  def sha1
+    require 'digest/sha1' unless defined? Digest::SHA1
+    Digest::SHA1.file(self).hexdigest
+  end
+  
+  def sha2
+    require 'digest/sha2' unless defined? Digest::SHA2
+    Digest::SHA2.file(self).hexdigest
+  end
+  
+  def md5
+    require 'digest/md5' unless defined? Digest::MD5
+    Digest::MD5.file(self).hexdigest
+  end
+  
+  alias_method :md5sum, :md5
 
 end
 
