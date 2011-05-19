@@ -1,6 +1,14 @@
 require 'epitools/basetypes'
-require 'fileutils'
-require 'uri'
+
+autoload :FileUtils, 'fileutils'
+autoload :Tempfile, 'tempfile'
+autoload :URI, 'uri'
+module Digest
+  autoload :SHA1, 'digest/sha1'
+  autoload :SHA2, 'digest/sha2'
+  autoload :MD5, 'digest/md5'
+end
+
 
 class Path
   
@@ -25,20 +33,36 @@ class Path
   end
 
   def self.tmpfile(prefix="tmp")
-    require 'tempfile' unless defined? Tempfile
     path = Path[ Tempfile.new(prefix).path ]
     yield path if block_given?
     path
   end
-
   alias_class_method :tempfile, :tmpfile  
-
   
   def self.home
     Path[ENV['HOME']]
   end
   
-
+  def self.pwd
+    File.expand_path Dir.pwd
+  end
+  
+  def self.pushd
+    @@dir_stack ||= []
+    @@dir_stack.push pwd
+  end
+  
+  def self.popd
+    @@dir_stack ||= [pwd]
+    @@dir_stack.pop
+  end
+  
+  def self.cd(dest); Dir.chdir(dest); end
+  
+  def self.ls(path); Path[path].ls  end
+  
+  def self.ls_r(path); Path[path].ls_r; end
+  
   ## setters
   
   attr_writer :base
@@ -231,9 +255,10 @@ class Path
     File.read(path, length, offset)
   end
   
-  def ls
-    Path[File.join(path, "*")]
-  end
+  def ls; Path[File.join(path, "*")]; end
+
+  def ls_r; Path[File.join(path, "**/*")]; end
+
   
   ## modifying files
 
@@ -265,7 +290,11 @@ class Path
   end
   
   #
-  # Rename
+  # Examples:
+  #   Path["SongySong.mp3"].rename(:basename=>"Songy Song")
+  #   Path["Songy Song.mp3"].rename(:ext=>"aac")
+  #   Path["Songy Song.aac"].rename(:dir=>"/music2")
+  #   Path["/music2/Songy Song.aac"].exists? #=> true
   #  
   def rename(options)
     raise "Options must be a Hash" unless options.is_a? Hash
@@ -276,11 +305,13 @@ class Path
     
     self.path = dest.path # become dest
   end
-  
-  def rename_to(dest)
-    rename :path=>dest
+
+  #
+  # Renames the file the specified full path (like Dir.rename.)
+  #  
+  def rename_to(path)
+    rename :path=>path
   end
-  
   alias_method :move,       :rename
   alias_method :ren,        :rename  
 
@@ -288,6 +319,10 @@ class Path
     File.unlink(self)
   end
   alias_method :"unlink!", :"delete!"
+
+  def mkdir
+    
+  end
   
   def mkdir_p
     if exists?
@@ -309,21 +344,24 @@ class Path
     end
   end
   
+  def truncate
+    File.truncate(self)
+  end
+  
+    
+  
   
   ## Checksums
   
   def sha1
-    require 'digest/sha1' unless defined? Digest::SHA1
     Digest::SHA1.file(self).hexdigest
   end
   
   def sha2
-    require 'digest/sha2' unless defined? Digest::SHA2
     Digest::SHA2.file(self).hexdigest
   end
   
   def md5
-    require 'digest/md5' unless defined? Digest::MD5
     Digest::MD5.file(self).hexdigest
   end
   

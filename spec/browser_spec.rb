@@ -51,6 +51,10 @@ describe Browser::Cache do
     @cache = Browser::Cache.new(@agent)
   end
 
+  after :all do
+    @cache.delete!
+  end
+
   def new_page(body, url)
     Mechanize::Page.new(
       URI.parse(url),
@@ -59,10 +63,6 @@ describe Browser::Cache do
       nil,
       @agent
     )
-  end
-
-  after :all do
-    @cache.delete!
   end
 
   it "writes and reads" do

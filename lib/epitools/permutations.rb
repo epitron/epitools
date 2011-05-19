@@ -2,7 +2,7 @@ require 'epitools/basetypes'
 
 class Array
   
-  alias_method :multiply_without_permutations, :*
+  alias_method :mult, :"*"
   
   #
   # Overloaded * operator.
@@ -23,7 +23,7 @@ class Array
       end
       result
     else
-      send(:multiply_without_permutations, other)
+      send(:mult, other)
     end
   end
   

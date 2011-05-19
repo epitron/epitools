@@ -1,5 +1,14 @@
 require 'pp'
 
+autoload :URI, 'uri'
+autoload :CGI, 'cgi'
+autoload :Base64, 'base64'
+module Digest
+  autoload :MD5, 'digest/md5'
+  autoload :SHA1, 'digest/sha1'
+end
+autoload :JSON, 'json'
+
 # Alias "Enumerator" to "Enum"
 
 if RUBY_VERSION["1.8"]
@@ -129,7 +138,6 @@ class String
   # Convert non-URI characters into %XXes.
   #
   def urlencode
-    require 'uri' unless defined? URI
     URI.escape(self)
   end
   
@@ -137,7 +145,6 @@ class String
   # Convert an URI's %XXes into regular characters.
   #
   def urldecode
-    require 'uri' unless defined? URI
     URI.unescape(self)
   end
 
@@ -145,7 +152,6 @@ class String
   # Convert a query string to a hash of params
   #
   def to_params
-    require 'cgi' unless defined? CGI
     CGI.parse(self).map_values{|v| v.is_a?(Array) and v.size == 1 ? v.first : v }
   end
   
@@ -153,7 +159,6 @@ class String
   # Decode a mime64/base64 encoded string
   #
   def decode64
-    require 'base64' unless defined? Base64
     Base64.decode64 self
   end
   
@@ -161,7 +166,6 @@ class String
   # Encode into a mime64/base64 string
   #
   def encode64
-    require 'base64' unless defined? Base64
     Base64.encode64 self
   end
   alias_method :base64, :encode64
@@ -170,7 +174,6 @@ class String
   # MD5 the string
   #  
   def md5
-    require 'digest/md5' unless defined? Digest::MD5
     Digest::MD5.hexdigest self
   end
   
@@ -178,7 +181,6 @@ class String
   # SHA1 the string
   #  
   def sha1
-    require 'digest/sha1' unless defined? Digest::SHA1
     Digest::SHA1.hexdigest self
   end
   
@@ -199,7 +201,6 @@ class String
   # Parse object as JSON
   #
   def from_json
-    require 'json' unless defined? JSON
     JSON.parse self
   end
   
@@ -242,7 +243,7 @@ end
   
   klass.class_eval do
     
-    alias_method :bit, :[]
+    alias_method :bit, :"[]"
     
     #
     # Extends [] so that Integers can be sliced as if they were arrays.
@@ -250,9 +251,9 @@ end
     def [](arg)
       case arg
       when Integer
-        bit(arg)
+        self.bit(arg)
       when Range
-        bits[arg]
+        self.bits[arg]
       end
     end
     

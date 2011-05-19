@@ -331,7 +331,9 @@ describe Hash do
   
   it "to_querys" do
     # this will probably fail half the time in Ruby 1.8 because the hash order is random
-    {:donkeys=>7, :stubborn=>true}.to_query.should == "donkeys=7&stubborn=true"
+    params = {"donkeys"=>"7", "stubborn"=>"true"}
+    params.to_query.to_params.should == params
+    params.to_query.in?(["donkeys=7&stubborn=true", "stubborn=true&donkeys=7"]).should == true
   end
   
 end

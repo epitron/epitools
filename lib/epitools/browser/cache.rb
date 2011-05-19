@@ -1,23 +1,22 @@
 require 'mechanize'
 require 'sqlite3'
 
-#
-# Emit a quick debug message (only if $DEBUG is true)
-#
-def dmsg(msg)
-  
-  if $DEBUG
-    case msg
+class Browser
+    
+  #
+  # Emit a quick debug message (only if $DEBUG is true)
+  #
+  def self.dmsg(msg)
+    if $DEBUG
+      case msg
       when String
         puts msg
       else
         puts msg.inspect
+      end
     end
   end
   
-end
-
-class Browser
   
   #
   # An SQLite3-backed browser cache (with gzip compressed pages)
@@ -193,6 +192,7 @@ class Browser
     end
   
     def delete!
+      db.close
       File.unlink @filename  
     end
   

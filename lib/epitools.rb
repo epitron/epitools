@@ -1,3 +1,9 @@
+autoload :Path,     'epitools/path'
+autoload :Browser,  'epitools/browser'
+autoload :Rash,     'epitools/rash'
+autoload :Ratio,    'epitools/ratio'
+autoload :Sys,      'epitools/sys'
+
 class Object
 
   unless defined?(__DIR__)
@@ -27,8 +33,6 @@ end
   basetypes 
   niceprint
   string_to_proc
-  ratio
-  path
   zopen
   colored
   clitools
@@ -37,3 +41,4 @@ end
 ].each do |mod|
   require_wrapper.call mod
 end
+
