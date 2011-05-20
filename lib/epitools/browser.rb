@@ -1,9 +1,5 @@
 require 'mechanize'
-require 'uri'
-require 'fileutils'
-require 'json'
-
-require 'epitools'
+require 'epitools/basetypes'
 require 'epitools/browser/cache'
 require 'epitools/browser/mechanize_progressbar'
 

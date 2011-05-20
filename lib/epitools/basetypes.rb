@@ -853,3 +853,16 @@ class Object
 end
 
 
+#
+# Emit a quick debug message (only if $DEBUG is true)
+#
+def dmsg(msg)
+  if $DEBUG
+    case msg
+    when String
+      puts msg
+    else
+      puts msg.inspect
+    end
+  end
+end

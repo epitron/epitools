@@ -1,3 +1,5 @@
+require 'epitools/basetypes'
+
 #
 # Cross-platform operating system functions.
 # Includes: process listing, platform detection, etc.
@@ -322,7 +324,7 @@ module Sys
   # eg: {"eth0"=>"192.168.1.101"}
   #
   def self.interfaces_linux
-    sections = `ifconfig`.split(/^(?=Link encap:Ethernet)/)
+    sections = `/sbin/ifconfig`.split(/^(?=Link encap:Ethernet)/)
     sections_with_relevant_ip = sections.select {|i| i =~ /inet/ }
 
     device_ips = {}
@@ -333,6 +335,23 @@ module Sys
     end
 
     device_ips
+  end
+  
+  #
+  # Windows: Return a hash of (device name, IP address) pairs.
+  #
+  def self.interfaces_windows
+    result = {}
+    `ipconfig`.split_before(/^\w.+:/).each do |chunk|
+      chunk.grep(/^Ethernet adapter (.+):\s*$/) do
+        name = $1
+        chunk.grep(/IPv[46] Address[\.\ ]+: (.+)$/) do
+          address = $1.strip
+          result[name] = address
+        end
+      end
+    end
+    result
   end
   
   #-----------------------------------------------------------------------------

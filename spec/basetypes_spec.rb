@@ -354,13 +354,13 @@ describe "truthiness" do
     {
       # truthy things
       true => [
-        "asdf", 1, 1.7, :blah, true, [1,2,3], Enumerator.new([1,2,3], :each),
+        "yes", "on", "1", "Enabled", 1, 1.7, :blah, true, [1,2,3], Enumerator.new([1,2,3], :each),
         1938389127239847129803741980237498012374,
       ],
       
       # untruthy things
       false => [
-        "", " ", 0, 0.0, false, nil, [], Enumerator.new([], :each),
+        "", " ", "asdf", 0, 0.0, false, nil, [], Enumerator.new([], :each),
       ]
     }.each do |truthiness, objs|
       objs.each { |obj| obj.truthy?.should == truthiness }
