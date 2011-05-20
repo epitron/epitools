@@ -11,7 +11,7 @@ describe Sys::ProcessInfo do
 
     %w[Linux Windows Darwin].include?(Sys.os).should == true
     
-    truths = [:mac?, :darwin?, :windows?].map{|sys| Sys.send(sys)}
+    truths = [:linux?, :mac?, :windows?].map{|sys| Sys.send(sys)}
     truths.count(true).should == 1
   end
     
