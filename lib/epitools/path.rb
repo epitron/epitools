@@ -1,12 +1,12 @@
 require 'epitools/basetypes'
 
-autoload :FileUtils, 'fileutils'
-autoload :Tempfile, 'tempfile'
-autoload :URI, 'uri'
+autoload :FileUtils,  'fileutils'
+autoload :Tempfile,   'tempfile'
+autoload :URI,        'uri'
 module Digest
-  autoload :SHA1, 'digest/sha1'
-  autoload :SHA2, 'digest/sha2'
-  autoload :MD5, 'digest/md5'
+  autoload :SHA1,     'digest/sha1'
+  autoload :SHA2,     'digest/sha2'
+  autoload :MD5,      'digest/md5'
 end
 
 

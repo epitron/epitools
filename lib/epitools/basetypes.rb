@@ -9,7 +9,8 @@ module Digest
 end
 autoload :JSON, 'json'
 
-# Alias "Enumerator" to "Enum"
+
+## Alias "Enumerator" to "Enum"
 
 if RUBY_VERSION["1.8"]
   require 'enumerator' 
@@ -25,6 +26,7 @@ unless defined? Enum
 end
 
 class Object
+  
   #
   # Slightly gross hack to add a class method.
   #
@@ -54,6 +56,8 @@ end
 
 class Numeric
   def integer?; true; end
+
+  def truthy?; self > 0; end
 
   def commatize  
     to_s.gsub(/(\d)(?=\d{3}+(?:\.|$))(\d{3}\..*)?/,'\1,\2')
@@ -98,6 +102,18 @@ class String
   end
 
   #
+  # Does this string contain something that means roughly "true"?
+  #
+  def truthy?
+    case strip.downcase
+    when "1", "true", "yes", "on", "enabled", "affirmative"
+      true
+    else
+      false
+    end
+  end
+
+  #
   # Convert \r\n to \n
   #
   def to_unix
@@ -122,7 +138,8 @@ class String
   # Like #lines, but skips empty lines and removes \n's.
   #
   def nice_lines
-    split("\n").select{|l| not l.blank? }
+    # note: $/ is the platform's newline separator
+    split($/).select{|l| not l.blank? }
   end
   
   alias_method :clean_lines, :nice_lines
@@ -152,7 +169,14 @@ class String
   # Convert a query string to a hash of params
   #
   def to_params
-    CGI.parse(self).map_values{|v| v.is_a?(Array) and v.size == 1 ? v.first : v }
+    CGI.parse(self).map_values do |v|
+      # CGI.parse wraps every value in an array. Unwrap them!
+      if v.is_a?(Array) and v.size == 1
+        v.first
+      else
+        v 
+      end
+    end      
   end
   
   #
@@ -225,9 +249,9 @@ class Integer
   # Convert the number to an array of bits (least significant digit first, or little-endian).
   #
   def to_bits
+    # TODO: Why does thos go into an infinite loop in 1.8.7?
     ("%b" % self).chars.to_a.reverse.map(&:to_i)
   end
-  
   alias_method :bits, :to_bits
   
 end
