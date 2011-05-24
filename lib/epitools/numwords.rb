@@ -1,6 +1,4 @@
-require 'epitools/basetypes'
-require 'bigdecimal'
-require 'set'
+require 'epitools'
 
 #
 # Allow numbers to be converted into words, or exprssed more easily with words.
@@ -118,7 +116,7 @@ class Numeric
       factor    = 10**pow
       
       if is_a?(Float) 
-        (BigDecimal(to_s) * factor).to_i
+        (BigDecimal.new(to_s) * factor).to_i
       else
         self * factor
       end

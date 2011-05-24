@@ -1,3 +1,5 @@
+require 'epitools'
+
 if defined? Rails
   
   class ActiveRecord::Base

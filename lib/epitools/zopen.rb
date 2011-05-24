@@ -1,10 +1,10 @@
-require 'zlib'
+require 'epitools'
 
 #
 # A mutation of "open" that lets you read/write gzip files, as well as
 # regular files.
 #
-# (NOTE: gzip detection is purely based on the filename.)
+# (NOTE: gzip detection is based on the filename, not the contents.)
 #
 # It accepts a block just like open()!
 #
@@ -12,7 +12,7 @@ require 'zlib'
 #    zopen("test.txt")          #=> #<File:test.txt>
 #    zopen("test.txt.gz")       #=> #<Zlib::GzipReader:0xb6c79424>
 #    zopen("otherfile.gz", "w") #=> #<Zlib::GzipWriter:0x7fe30448>>
-#    zopen("test.txt.gz") { |f| f.read } # reads the contents of the .gz file, then closes the file automatically.
+#    zopen("test.txt.gz") { |f| f.read } # read the contents of the .gz file, then close the file handle automatically.
 #
 def zopen(filename, mode="r")
 

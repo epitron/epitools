@@ -35,6 +35,7 @@ module Colored
     'yellow'  => 33,
     'blue'    => 34,
     'magenta' => 35,
+    'purple'  => 35,
     'cyan'    => 36,
     'white'   => 37
   }
@@ -72,7 +73,8 @@ module Colored
   VALID_COLORS = Set.new(
     COLORS.keys +
     COLORS.map { |k,v| "light_#{k}" } +
-    COLORS.map { |k,v| "bold_#{k}"  }
+    COLORS.map { |k,v| "bright_#{k}"  } +
+    ["grey", "gray"]
   )
   
   COLORS.each do |color, value|
@@ -85,6 +87,10 @@ module Colored
     end
 
     define_method("light_#{color}") do
+      colorize(self, :foreground => color, :extra => 'bold')
+    end
+
+    define_method("bright_#{color}") do
       colorize(self, :foreground => color, :extra => 'bold')
     end
 
@@ -102,6 +108,9 @@ module Colored
     end
   end
 
+  alias_method :gray, :light_black
+  alias_method :grey, :light_black
+  
   EXTRAS.each do |extra, value|
     next if extra == 'clear'
     define_method(extra) do 
@@ -210,7 +219,7 @@ module Colored
   def valid_tag?(tag)
     VALID_COLORS.include?(tag) or
     (
-      string =~ /^\d+$/ and
+      tag =~ /^\d+$/ and
       BBS_COLOR_TABLE.include?(tag.to_i)
     )
   end

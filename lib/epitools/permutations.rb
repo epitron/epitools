@@ -1,4 +1,4 @@
-require 'epitools/basetypes'
+require 'epitools'
 
 class Array
   

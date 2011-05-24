@@ -1,4 +1,4 @@
-require 'epitools/colored'
+require 'epitools'
 
 class String
 

@@ -1,4 +1,4 @@
-require 'colored'
+require 'epitools'
 
 ASCII_PRINTABLE = (33..126)
 

@@ -21,4 +21,9 @@ describe Ratio do
     @b.percent.should == "50.0%"
   end
 
+  it "uses the function-style wrapper" do
+    Ratio(1,2).should == Ratio[1,2]
+    Ratio(1,2).should == Ratio.new(1,2)
+  end
+  
 end

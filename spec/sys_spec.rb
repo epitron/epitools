@@ -1,4 +1,4 @@
-require 'epitools/sys'
+require 'epitools'
 
 describe Sys::ProcessInfo do
 

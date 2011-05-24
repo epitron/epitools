@@ -1,4 +1,4 @@
-require 'epitools/numwords'
+require 'epitools'
 
 describe Numeric do
   

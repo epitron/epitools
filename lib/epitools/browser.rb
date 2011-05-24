@@ -1,5 +1,5 @@
+require 'epitools'
 require 'mechanize'
-require 'epitools/basetypes'
 require 'epitools/browser/cache'
 require 'epitools/browser/mechanize_progressbar'
 
@@ -7,35 +7,9 @@ require 'epitools/browser/mechanize_progressbar'
 #require 'socksify'
 class SOCKSError < Exception; end # :nodoc:
 
-# TODO: Put options here.
-=begin
-class BrowserOptions < OpenStruct
-
-  DEFAULTS = {
-    :delay => 1,
-    :delay_jitter => 0.2,
-    :use_cache => true,
-    :use_logs => false,
-    :cookie_file => "cookies.txt"
-  }
-  
-  def initialize(extra_opts)
-    
-    @opts = DEFAULTS.dup
-    
-    for key, val in opts
-      if key.in? DEFAULTS
-        @opts[key] = val
-      else
-        raise "Unknown option: #{key}"
-      end
-    end
-  end
-  
-end
-=end
-
-# Monkeypatches!
+#
+# Slightly more intelligent `Mechanize::File`s
+#
 class Mechanize::File
   def content_type
     response['content-type']
@@ -78,7 +52,6 @@ class Browser
     init_agent!
     init_cache!
   end
-                                        
 
   def init_agent!
     @agent = Mechanize.new do |a|
@@ -91,7 +64,6 @@ class Browser
     load_cookies!
   end
 
-
   def delay(override_delay=nil, override_jitter=nil)
     elapsed   = Time.now - @last_get
     jitter    = rand * (override_jitter || @delay_jitter)
@@ -103,12 +75,10 @@ class Browser
     end
   end
 
-
   def init_cache!
     # TODO: Rescue "couldn't load" exception and disable caching
     @cache = Cache.new(agent) if @use_cache
   end
-
 
   def load_cookies!
     if File.exists? @cookie_file
@@ -118,19 +88,15 @@ class Browser
       false
     end
   end
-
   
   def save_cookies!
     agent.cookie_jar.save_as @cookie_file
     true
   end
-
-  
   
   def relative?(url)
     not url[ %r{^https?://} ]
   end
-
   
   def cacheable?(page)
     case page.content_type
@@ -138,7 +104,6 @@ class Browser
       true
     end
   end    
-
   
   def cache_put(page, url)
     if cache.valid_page?(page)
@@ -193,6 +158,7 @@ class Browser
       puts "  |_ ERROR: #{e.inspect} -- retrying"
       delay(5)
       retry
+      
 =begin      
     rescue Mechanize::ResponseCodeError => e
       
@@ -230,4 +196,34 @@ class Browser
   end
   
 end
+
+
+# TODO: Put options here.
+=begin
+class BrowserOptions < OpenStruct
+
+  DEFAULTS = {
+    :delay => 1,
+    :delay_jitter => 0.2,
+    :use_cache => true,
+    :use_logs => false,
+    :cookie_file => "cookies.txt"
+  }
+  
+  def initialize(extra_opts)
+    
+    @opts = DEFAULTS.dup
+    
+    for key, val in opts
+      if key.in? DEFAULTS
+        @opts[key] = val
+      else
+        raise "Unknown option: #{key}"
+      end
+    end
+  end
+  
+end
+=end
+
 

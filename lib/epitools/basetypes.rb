@@ -1,14 +1,4 @@
-require 'pp'
-
-autoload :URI, 'uri'
-autoload :CGI, 'cgi'
-autoload :Base64, 'base64'
-module Digest
-  autoload :MD5, 'digest/md5'
-  autoload :SHA1, 'digest/sha1'
-end
-autoload :JSON, 'json'
-
+require 'epitools'
 
 ## Alias "Enumerator" to "Enum"
 

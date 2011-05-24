@@ -1,11 +1,7 @@
-autoload :Path,     'epitools/path'
-autoload :Browser,  'epitools/browser'
-autoload :Rash,     'epitools/rash'
-autoload :Ratio,    'epitools/ratio'
-autoload :Sys,      'epitools/sys'
+require 'pp'
+require 'set'
 
 class Object
-
   unless defined?(__DIR__)
     # 
     # This method is convenience for the `File.expand_path(File.dirname(__FILE__))` idiom.
@@ -17,9 +13,9 @@ class Object
       ::File.expand_path(::File.join(dir, *args.map{|a| a.to_s}))
     end
   end
-  
 end
 
+## Pretty error messages
 require_wrapper = proc do |mod|
   #p [:loading, mod]
   begin
@@ -29,7 +25,9 @@ require_wrapper = proc do |mod|
   end
 end
 
+## Require the tools
 %w[
+  autoloads
   basetypes 
   niceprint
   string_to_proc

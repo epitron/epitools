@@ -1,6 +1,4 @@
-require 'pp'
-require 'rubygems'
-require 'colorize'
+require 'epitools'
 
 # TODO: Pick a backtrace format. (Also, add a method to replace default backtracer.)
 # TODO: This chould be in a class.
@@ -71,7 +69,7 @@ end
 
 def color_backtrace_2(lines, options={})
 
-  groups = lines.reverse.split_when { |line,nextline| line.path != nextline.path }
+  groups = lines.reverse.split_at { |line,nextline| line.path != nextline.path }
 
   if options[:no_gems]
     groups = groups.split_when { |a, nexta| a.first.gem? != nexta.first.gem? }
@@ -253,7 +251,13 @@ if $0 == __FILE__
       /usr/local/lib/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
       /usr/local/lib/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
       script/server:3
-  }.split("\n").select{|line| line.any?}
+  }.lines
+  
+  begin
+    String.new nil
+  rescue => e
+    backtrace = e.backtrace
+  end
   
   lines = parse_lines(backtrace)
   #debug_backtrace(lines)

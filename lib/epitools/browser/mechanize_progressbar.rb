@@ -1,4 +1,4 @@
-require 'epitools/progressbar'
+require 'epitools'
 
 #
 # Mechanize Progress Bar extension
