@@ -52,6 +52,11 @@ class Path
   def self.ls(path); Path[path].ls  end
   
   def self.ls_r(path); Path[path].ls_r; end
+
+  ## TODO: Verbose mode
+  #def self.verbose=(value); @@verbose = value; end
+  #def self.verbose; @@verbose ||= false; end
+  
   
   ## setters
   
@@ -302,26 +307,28 @@ class Path
   def rename_to(path)
     rename :path=>path
   end
-  alias_method :move,       :rename
-  alias_method :ren,        :rename  
-
-  def delete!
-    File.unlink(self)
-  end
-  alias_method :"unlink!", :"delete!"
-
-  def mkdir
-    
-  end
+  alias_method :mv,       :rename_to
   
-  def mkdir_p
-    if exists?
-      raise "Error: Path already exists."
-    else
-      FileUtils.mkdir_p(path)
-    end
+  {
+    :mkdir => "Dir.mkdir", 
+    :mkdir_p =>"FileUtils.mkdir_p"
+  }.each do |method, expression|
+    class_eval %{
+      def #{method}
+        if exists?
+          if directory?
+            false
+          else
+            raise "Error: Tried to make a directory over top of an existing file."
+          end
+        else
+          #{expression}(path)
+          true
+        end
+      end
+    }
   end
-  
+
   def cp_r(dest)
     FileUtils.cp_r(path, dest) #if Path[dest].exists?
   end
@@ -333,13 +340,25 @@ class Path
       Path[File.join(path, other)]
     end
   end
+
+
+  ## Dangerous methods.
   
-  def truncate
-    File.truncate(self)
+  def rm
+    if directory?
+      Dir.rmdir(self) == 0
+    else
+      File.unlink(self) == 1
+    end
   end
+  alias_method :"delete!", :rm
+  alias_method :"unlink!", :rm
+  alias_method :"remove!", :rm
   
-    
-  
+  def truncate(offset=0)
+    File.truncate(self, offset)
+  end
+
   
   ## Checksums
   
@@ -357,6 +376,25 @@ class Path
   
   alias_method :md5sum, :md5
 
+  
+  ## Class method versions of FileUtils-like things
+  
+  %w[
+    mkdir
+    mkdir_p 
+    sha1 
+    sha2 
+    md5
+    rm
+    truncate
+  ].each do |method|
+    class_eval %{
+      def self.#{method}(path)
+        Path[path].#{method}
+      end
+    }
+  end
+  
 end
 
 #

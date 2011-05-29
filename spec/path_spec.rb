@@ -38,8 +38,7 @@ describe Path do
     path.ext = "mkv"
     path.ext.should == "mkv"
     
-    path.ext = "mkv"
-    path.ext.should == "mkv"
+    path.filename[-4..-1].should == ".mkv"
   end
 
   it "replaces filename" do
@@ -169,12 +168,25 @@ describe Path do
     path.to_s.should == str+".dat"
   end
   
-  it "deletes" do
+  it "rms" do
     path = Path.tmpfile
     path << "data"
     path.exists?.should == true
-    path.delete!
+    path.rm.should == true
     path.exists?.should == false
+  end
+  
+  it "truncates" do
+    path = Path.tmpfile
+
+    path << "1"*100
+    path.size.should == 100
+
+    path.truncate(50)
+    path.size.should == 50
+
+    path.truncate
+    path.size.should == 0
   end
   
   it "checksums" do
@@ -187,6 +199,21 @@ describe Path do
       sum1.should =~ /[a-z0-9]/
       sum2.should =~ /[a-z0-9]/
     end
+  end
+  
+  it "mkdirs" do
+    tmp = Path.tmpfile
+    lambda { tmp.mkdir }.should raise_error
+    tmp.rm
+    tmp.mkdir.should == true
+    tmp.rm.should == true
+  end
+  
+  it "has classmethods" do
+    path = Path.tmpfile
+    
+    path << "whee"*100
+    path.sha1.should == Path.sha1(path)
   end
   
 end
