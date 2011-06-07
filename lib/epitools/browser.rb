@@ -120,9 +120,7 @@ class Browser
   # bit like a Nokogiri::HTML::Document instance.)
   #
   # Options:
-  #   :use_cache => true/false   | read/write
-  #   :read_cache => true/false  | check cache before getting page
-  #   :write_cache => true/false | write gotten pages to cache
+  #   :cached => true/false   | check cache before getting page
   #
   def get(url, options={})
 
@@ -133,7 +131,7 @@ class Browser
     #end
 
     # Determine the cache setting
-    use_cache = (options[:cached] == false) ? false : @use_cache
+    use_cache = options[:cached].nil? ? @use_cache : options[:cached]
 
     cached_already = cache.include?(url)
 
