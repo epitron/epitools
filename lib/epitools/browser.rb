@@ -142,7 +142,7 @@ class Browser
 
     begin
       
-      if page = cache.get(url)
+      if use_cache and page = cache.get(url)
         puts "  |_ cached (#{page.content_type})"
       else
         page = agent.get(url)
