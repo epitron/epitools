@@ -67,6 +67,8 @@ def lesspipe(*args)
       yield less
     end
   end
+
+rescue Errno::EPIPE
 end
 
 

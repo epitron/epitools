@@ -287,6 +287,8 @@ describe Enumerable do
     a = [1,2,3,4]
     a.foldl(:+).should == a.sum
     %w[hi there].foldl(:+).should == "hithere"
+
+    [ [1],[2],[3],[4] ].foldl(:+).should == [1,2,3,4] 
   end
   
   it "powersets" do

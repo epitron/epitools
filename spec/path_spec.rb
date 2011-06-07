@@ -1,5 +1,4 @@
-require 'epitools/permutations'
-require 'epitools/path'
+require 'epitools'
 
 describe Path do
   
@@ -214,6 +213,40 @@ describe Path do
     
     path << "whee"*100
     path.sha1.should == Path.sha1(path)
+  end
+  
+  it "gzips and gunzips" do
+    path = Path.tmpfile
+    500.times { path << "whee" }
+    
+    path.ext.should_not == "gz"
+    gzipped = path.gzip
+    
+    before = path.size
+    after = gzipped.size
+    before.should > after
+    gzipped.ext.should == "gz"
+    
+    gunzipped = gzipped.gunzip
+    gunzipped.size.should == before
+    gunzipped.should == path
+  end
+  
+  it "exts" do
+    path = Path["file.tar.gz"]
+    path.ext.should == "gz"
+    path.exts.should == ["tar", "gz"]
+  end
+  
+  it "ios and streams" do
+    path = Path.tmpfile
+    f = open(path)
+    f.inspect.should == path.io.inspect
+    f.inspect.should == path.stream.inspect
+  end
+  
+  it "mimes" do
+    Path[__FILE__].mimetype == "application/x-ruby"
   end
   
 end

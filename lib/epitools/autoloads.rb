@@ -23,5 +23,6 @@ autoload :Ratio,    'epitools/ratio'
 autoload :Sys,      'epitools/sys'
 autoload :ProgressBar,  'epitools/progressbar'
 
-
+## Gems
+autoreq :MimeMagic, 'mimemagic'
 

@@ -22,6 +22,9 @@ class Path
     end      
   end
 
+  #
+  # TODO: Remove the tempfile when the Path object is garbage collected or freed.
+  #
   def self.tmpfile(prefix="tmp")
     path = Path[ Tempfile.new(prefix).path ]
     yield path if block_given?
@@ -111,7 +114,6 @@ class Path
     end
   end
 
-  
   ## getters
    
   # The directories in the path, split into an array. (eg: ['usr', 'src', 'linux'])
@@ -153,6 +155,11 @@ class Path
     end
   end
 
+  def exts
+    extensions = basename.split('.')[1..-1]
+    extensions += [@ext] if @ext
+    extensions
+  end
   
   ## fstat info
   
@@ -245,6 +252,8 @@ class Path
       File.open(path, mode)
     end
   end
+  alias_method :io, :open
+  alias_method :stream, :open
   
   def read(length=nil, offset=nil)
     File.read(path, length, offset)
@@ -373,9 +382,62 @@ class Path
   def md5
     Digest::MD5.file(self).hexdigest
   end
-  
   alias_method :md5sum, :md5
 
+  
+  # http://ruby-doc.org/stdlib/libdoc/zlib/rdoc/index.html
+  
+  def gzip
+    gz_filename = self.with(:filename=>filename+".gz")
+    
+    raise "#{gz_filename} already exists" if gz_filename.exists? 
+  
+    open("rb") do |input|    
+      Zlib::GzipWriter.open(gz_filename) do |gzip|
+        IO.copy_stream(input, gzip)
+      end
+    end
+    
+    gz_filename
+  end
+  
+  def gzip!
+    gzipped = self.gzip
+    self.rm
+    self.path = gzipped.path
+  end
+  
+  def gunzip
+    raise "Not a .gz file" unless ext == "gz"
+
+    gunzipped = self.with(:ext=>nil)
+    
+    gunzipped.open("wb") do |out|
+      Zlib::GzipReader.open(self) do |gunzip|
+        IO.copy_stream(gunzip, out)
+      end
+    end
+    
+    gunzipped
+  end
+
+  def gunzip!
+    gunzipped = self.gunzip
+    self.rm
+    self.path = gunzipped.path
+  end
+
+  #
+  # Return the IO object for this file.
+  #
+  def io
+    open
+  end
+  alias_method :stream, :io
+  
+  def =~(pattern)
+    path =~ pattern
+  end
   
   ## Class method versions of FileUtils-like things
   
@@ -394,8 +456,39 @@ class Path
       end
     }
   end
+
+  
+  # Mimetype finding and magic (requires 'mimemagic' gem)
+
+  #
+  # Find the file's mimetype (first from file extension, then by magic)
+  #  
+  def mimetype
+    mimetype_from_ext || magic
+  end
+  alias_method :identify, :mimetype
+    
+  #
+  # Find the file's mimetype (only using the file extension)
+  #  
+  def mimetype_from_ext
+    MimeMagic.by_extension(ext)
+  end
+  
+  #
+  # Find the file's mimetype (by magic)
+  #  
+  def magic
+    open { |io| MimeMagic.by_magic(io) }
+  end
+  
+  def ext_by_magic
+    # TODO: return the extension for the mime type.
+    raise NotImplementedError
+  end
   
 end
+
 
 #
 # A wrapper for URL objects

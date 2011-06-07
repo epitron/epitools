@@ -483,7 +483,7 @@ module Enumerable
   def foldl(methodname=nil, &block)
     result = nil
 
-    raise "Error: pass a parameter OR a block, not both!" if methodname and block
+    raise "Error: pass a parameter OR a block, not both!" unless !!methodname ^ block_given?
       
     if methodname
       
@@ -842,6 +842,19 @@ class Object
   end
 end
 
+unless IO.respond_to? :copy_stream
+  
+  class IO
+    
+    def self.copy_stream(input, output)
+      while chunk = input.read(8192)
+        output.write(chunk)
+      end
+    end
+    
+  end
+  
+end
 
 #
 # Emit a quick debug message (only if $DEBUG is true)
@@ -856,3 +869,5 @@ def dmsg(msg)
     end
   end
 end
+
+

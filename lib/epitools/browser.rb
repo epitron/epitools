@@ -133,7 +133,7 @@ class Browser
     #end
 
     # Determine the cache setting
-    use_cache = options[:use_cache] || options[:cache] || options[:cached] || @use_cache
+    use_cache = (options[:cached] == false) ? false : @use_cache
 
     cached_already = cache.include?(url)
 
