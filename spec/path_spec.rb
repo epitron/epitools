@@ -249,4 +249,9 @@ describe Path do
     Path[__FILE__].mimetype == "application/x-ruby"
   end
   
+  it "whiches" do
+    Path.which("ruby").should_not be_nil
+    Path.which("asdfasdfhkajlsdhfkljashdf").should be_nil
+  end
+  
 end

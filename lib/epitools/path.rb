@@ -60,6 +60,21 @@ class Path
   #def self.verbose=(value); @@verbose = value; end
   #def self.verbose; @@verbose ||= false; end
   
+  if Sys.windows?
+    PATH_SEPARATOR    = ";"
+    BINARY_EXTENSION  = ".exe"
+  else
+    PATH_SEPARATOR    = ":"
+    BINARY_EXTENSION  = ""
+  end
+  
+  def self.which(bin)
+    ENV["PATH"].split(PATH_SEPARATOR).find do |path|
+      result = (Path[path] / (bin + BINARY_EXTENSION))
+      return result if result.exists?
+    end
+    nil
+  end  
   
   ## setters
   

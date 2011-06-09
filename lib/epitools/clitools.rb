@@ -124,3 +124,10 @@ def cmd(*args)
   system(*cmd_args)    
 end
 
+def autoinstall(*packages)
+  all_packages_installed = packages.all? { |pkg| Path.which pkg }
+  
+  unless all_packages_installed
+    cmd(["sudo apt-get install ?", packages.join(' ')])
+  end
+end
