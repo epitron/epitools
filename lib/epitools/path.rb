@@ -12,70 +12,21 @@ class Path
     Dir[str].map { |entry| new(entry) }
   end
   
-  def self.[](str)
-    if str =~ %r{^[a-z\-]+://}i # URL?
-      Path::URL.new(str)
-    elsif str =~ /[\?\*]/ and not str =~ /\\[\?\*]/  # contains glob chars? (unescaped) 
-      glob(str)
-    else
-      new(str)
+  def self.[](path)
+    case path
+    when Path
+      path
+    when String
+      if path =~ %r{^[a-z\-]+://}i # URL?
+        Path::URL.new(path)
+      elsif path =~ /[\?\*]/ and not path =~ /\\[\?\*]/  # contains glob chars? (unescaped) 
+        glob(path)
+      else
+        new(path)
+      end
     end      
   end
 
-  #
-  # TODO: Remove the tempfile when the Path object is garbage collected or freed.
-  #
-  def self.tmpfile(prefix="tmp")
-    path = Path[ Tempfile.new(prefix).path ]
-    yield path if block_given?
-    path
-  end
-  alias_class_method :tempfile, :tmpfile  
-  
-  def self.home
-    Path[ENV['HOME']]
-  end
-  
-  def self.pwd
-    File.expand_path Dir.pwd
-  end
-  
-  def self.pushd
-    @@dir_stack ||= []
-    @@dir_stack.push pwd
-  end
-  
-  def self.popd
-    @@dir_stack ||= [pwd]
-    @@dir_stack.pop
-  end
-  
-  def self.cd(dest); Dir.chdir(dest); end
-  
-  def self.ls(path); Path[path].ls  end
-  
-  def self.ls_r(path); Path[path].ls_r; end
-
-  ## TODO: Verbose mode
-  #def self.verbose=(value); @@verbose = value; end
-  #def self.verbose; @@verbose ||= false; end
-  
-  if Sys.windows?
-    PATH_SEPARATOR    = ";"
-    BINARY_EXTENSION  = ".exe"
-  else
-    PATH_SEPARATOR    = ":"
-    BINARY_EXTENSION  = ""
-  end
-  
-  def self.which(bin)
-    ENV["PATH"].split(PATH_SEPARATOR).find do |path|
-      result = (Path[path] / (bin + BINARY_EXTENSION))
-      return result if result.exists?
-    end
-    nil
-  end  
-  
   ## setters
   
   attr_writer :base
@@ -257,7 +208,6 @@ class Path
     Path.new( File.join(self, other) )
   end  
   
-  
   ## opening/reading files
   
   def open(mode="rb", &block)
@@ -365,11 +315,15 @@ class Path
     end
   end
 
+  def ln_s(dest)
+    dest = Path[dest]
+    FileUtils.ln_s self, dest 
+  end
 
   ## Dangerous methods.
   
   def rm
-    if directory?
+    if directory? and not symlink?
       Dir.rmdir(self) == 0
     else
       File.unlink(self) == 1
@@ -501,12 +455,71 @@ class Path
     # TODO: return the extension for the mime type.
     raise NotImplementedError
   end
+
+  ############################################################################
+  ## Class Methods
+
+  #
+  # TODO: Remove the tempfile when the Path object is garbage collected or freed.
+  #
+  def self.tmpfile(prefix="tmp")
+    path = Path[ Tempfile.new(prefix).path ]
+    yield path if block_given?
+    path
+  end
+  alias_class_method :tempfile, :tmpfile  
+  
+  def self.home
+    Path[ENV['HOME']]
+  end
+  
+  def self.pwd
+    File.expand_path Dir.pwd
+  end
+  
+  def self.pushd
+    @@dir_stack ||= []
+    @@dir_stack.push pwd
+  end
+  
+  def self.popd
+    @@dir_stack ||= [pwd]
+    @@dir_stack.pop
+  end
+  
+  def self.cd(dest); Dir.chdir(dest); end
+  
+  def self.ls(path); Path[path].ls  end
+  
+  def self.ls_r(path); Path[path].ls_r; end
+  
+  def self.ln_s(src, dest); Path[src].ln_s(dest); end
+
+  ## TODO: Verbose mode
+  #def self.verbose=(value); @@verbose = value; end
+  #def self.verbose; @@verbose ||= false; end
+  
+  if Sys.windows?
+    PATH_SEPARATOR    = ";"
+    BINARY_EXTENSION  = ".exe"
+  else
+    PATH_SEPARATOR    = ":"
+    BINARY_EXTENSION  = ""
+  end
+  
+  def self.which(bin)
+    ENV["PATH"].split(PATH_SEPARATOR).find do |path|
+      result = (Path[path] / (bin + BINARY_EXTENSION))
+      return result if result.exists?
+    end
+    nil
+  end  
   
 end
 
 
 #
-# A wrapper for URL objects
+# A wrapper for URL objects.
 #
 class Path::URL < Path
 

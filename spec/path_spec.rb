@@ -254,4 +254,9 @@ describe Path do
     Path.which("asdfasdfhkajlsdhfkljashdf").should be_nil
   end
   
+  it "Path[]s another path" do
+    path = Path.tmpfile
+    Path[path].path.should == path.path
+  end
+  
 end
