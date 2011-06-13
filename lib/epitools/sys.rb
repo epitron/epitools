@@ -297,6 +297,22 @@ module Sys
 
   #-----------------------------------------------------------------------------
 
+  cross_platform_method :hostname
+
+  def self.hostname_linux
+    `uname -n`.strip
+  end
+  
+  def self.hostname_mac
+    `uname -n`.strip.gsub(/\.local$/, '')
+  end
+  
+  def self.hostname_windows
+    raise NotImplementedError
+  end
+
+  #-----------------------------------------------------------------------------
+
   cross_platform_method :interfaces
 
   #
@@ -406,6 +422,8 @@ module Sys
     #$ iostat
     raise "Not implemented"    
   end
+
+  #-----------------------------------------------------------------------------
 
   def self.temperatures
     #/Applications/Utilities/TemperatureMonitor.app/Contents/MacOS/tempmonitor -a -l
