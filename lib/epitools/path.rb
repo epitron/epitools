@@ -13,18 +13,25 @@ class Path
   end
   
   def self.[](path)
+  
     case path
     when Path
       path
     when String
+    
       if path =~ %r{^[a-z\-]+://}i # URL?
         Path::URL.new(path)
-      elsif path =~ /[\?\*]/ and not path =~ /\\[\?\*]/  # contains glob chars? (unescaped) 
-        glob(path)
       else
-        new(path)
+        path = expand_path path
+        if path =~ /(^|[^\\])[\?\*\{\}]/ # contains unescaped glob chars? 
+          glob(path)
+        else
+          new(path)
+        end
       end
-    end      
+      
+    end
+    
   end
 
   ## setters
@@ -356,7 +363,7 @@ class Path
   
   # http://ruby-doc.org/stdlib/libdoc/zlib/rdoc/index.html
   
-  def gzip
+  def gzip(level=nil)
     gz_filename = self.with(:filename=>filename+".gz")
     
     raise "#{gz_filename} already exists" if gz_filename.exists? 
@@ -370,8 +377,8 @@ class Path
     gz_filename
   end
   
-  def gzip!
-    gzipped = self.gzip
+  def gzip!(level=nil)
+    gzipped = self.gzip(level)
     self.rm
     self.path = gzipped.path
   end
@@ -460,6 +467,15 @@ class Path
   ## Class Methods
 
   #
+  # Same as File.expand_path, except preserves the trailing '/'.
+  #
+  def self.expand_path(orig_path)
+    new_path = File.expand_path orig_path
+    new_path << "/" if orig_path.endswith "/"
+    new_path
+  end
+  
+  #
   # TODO: Remove the tempfile when the Path object is garbage collected or freed.
   #
   def self.tmpfile(prefix="tmp")
@@ -474,7 +490,7 @@ class Path
   end
   
   def self.pwd
-    File.expand_path Dir.pwd
+    Path.new expand_path(Dir.pwd)
   end
   
   def self.pushd

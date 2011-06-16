@@ -8,6 +8,7 @@ autoload :Zlib,       'zlib'
 autoload :FileUtils,  'fileutils'
 autoload :Tempfile,   'tempfile'
 autoload :BigDecimal, 'bigdecimal'
+autoload :StringIO,   'stringio'
 
 module Digest
   autoload :SHA1,     'digest/sha1'

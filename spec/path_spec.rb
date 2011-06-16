@@ -259,4 +259,16 @@ describe Path do
     Path[path].path.should == path.path
   end
   
+  it "uses advanced glob features" do
+    #  ruby-1.9.2-p180 :001 > Path["~/.ssh/id_{dsa,rsa}.pub"]
+    #  => /home/epi/.ssh/id_{dsa,rsa}.pub 
+    #  ruby-1.9.2-p180 :002 > Dir["~/.ssh/id_{dsa,rsa}.pub"]
+    #  => [] 
+    #  ruby-1.9.2-p180 :003 > Dir["../../.ssh/id_{dsa,rsa}.pub"]
+    #  => ["../../.ssh/id_rsairb.pub"]
+    
+    Path["~/.ssh/id_{dsa,rsa}.pub"].size.should > 0
+  
+  end
+  
 end

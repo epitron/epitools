@@ -198,6 +198,37 @@ class String
     Digest::SHA1.hexdigest self
   end
   
+  #
+  # gzip the string
+  #
+  def gzip(level=nil)
+    zipped = StringIO.new
+    Zlib::GzipWriter.wrap(zipped, level) { |io| io.write(self) }
+    zipped.string
+  end
+  
+  #
+  # gunzip the string
+  #
+  def gunzip
+    data = StringIO.new(self)
+    Zlib::GzipReader.new(data).read
+  end
+  
+  #
+  # deflate the string
+  #
+  def deflate(level=nil)
+    Zlib::Deflate.deflate(self, level)
+  end
+  
+  #
+  # inflate the string
+  #
+  def inflate
+    Zlib::Inflate.inflate(self)
+  end
+  
   # `true` if this string starts with the substring 
   #  
   def startswith(substring)
@@ -329,6 +360,13 @@ class Array
     self[(size-1) / 2]
   end
   
+  #
+  # XOR operator
+  #
+  def ^(other)
+    (self | other) - (self & other)
+  end
+  
 end
 
 
@@ -340,6 +378,11 @@ module Enumerable
   def blank?
     not any?
   end
+
+  #
+  # I enjoy typing ".all" more than ".to_a"
+  #
+  alias_method :all, :to_a
   
   #
   # Split this enumerable into an array of pieces given some 

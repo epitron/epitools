@@ -164,6 +164,18 @@ describe String do
     s.sha1.should_not == s
     s.sha1.should_not == s.md5
   end
+  
+  it "gzips/gunzips/delfates/inflates" do
+    s = "asdklfjasdfjaeh"
+    s.deflate.should_not == s
+    s.deflate.inflate.should == s
+
+    s.gzip.should_not == s
+    s.gzip.gunzip.should == s
+    
+    s.gzip(9).size.should < s.gzip(0).size
+    s.deflate(9).size.should < s.deflate(0).size
+  end
 
   it "starts/endswith" do
     "blahblahblah".startswith("blah").should == true    
