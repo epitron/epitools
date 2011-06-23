@@ -385,8 +385,7 @@ module Enumerable
   alias_method :all, :to_a
   
   #
-  # Split this enumerable into an array of pieces given some 
-  # boundary condition.
+  # Split this enumerable into chunks, given some boundary condition. (Returns an array of arrays.)
   #
   # Options:
   #   :include_boundary => true  #=> include the element that you're splitting at in the results  
@@ -404,10 +403,9 @@ module Enumerable
   #   chapters = File.read("ebook.txt").split(/Chapter \d+/, :include_boundary=>true)
   #   #=> [ ["Chapter 1", ...], ["Chapter 2", ...], etc. ]
   #
-  # TODO:
-  #   - Ruby 1.9 returns Enumerators for everything now. Maybe do that?
-  #
   def split_at(matcher=nil, options={}, &block)
+    # TODO: Ruby 1.9 returns Enumerators for everything now. Maybe use that?
+    
     return self unless self.any?
     
     include_boundary = options[:include_boundary] || false
@@ -458,7 +456,7 @@ module Enumerable
   end
 
   #
-  # Split the array into chunks, with the boundaries being after the element to split on.
+  # Split the array into chunks, cutting between the matched element and the next element.
   #
   # Example:
   #   [1,2,3,4].split_after{|e| e == 3 } #=> [ [1,2,3], [4] ]
@@ -470,7 +468,7 @@ module Enumerable
   end
 
   #
-  # Split the array into chunks. The boundaries will lie before the element to split on.
+  # Split the array into chunks, cutting between the matched element and the previous element.
   #
   # Example:
   #   [1,2,3,4].split_before{|e| e == 3 } #=> [ [1,2], [3,4] ]

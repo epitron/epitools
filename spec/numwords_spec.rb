@@ -28,4 +28,8 @@ describe Numeric do
     lambda { 10.googol }.should raise_error
   end
   
+  it "handles 1.thousand.to_words properly" do
+    1.thousand.to_words.should == "one thousand"
+  end
+  
 end

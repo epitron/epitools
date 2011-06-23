@@ -15,7 +15,12 @@ module Sys
     return @os if @os
 
     require 'rbconfig'
-    host_os = Config::CONFIG['host_os']
+    if defined? RbConfig
+      host_os = RbConfig::CONFIG['host_os']
+    else
+      host_os = Config::CONFIG['host_os']
+    end
+    
     case host_os
       when /darwin/
         @os = "Darwin"

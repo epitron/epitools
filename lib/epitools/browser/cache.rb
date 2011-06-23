@@ -87,7 +87,7 @@ class Browser
         #body = compressed_body
         body = Zlib::Inflate.inflate(compressed_body)
   
-        if content_type =~ /^(text\/html)|(application\/xhtml\+xml)/i
+        if content_type =~ %r{^(text/html|text/xml|application/xhtml\+xml)}i
           Mechanize::Page.new(
             #initialize(uri=nil, response=nil, body=nil, code=nil, mech=nil)
             URI.parse(url),

@@ -57,51 +57,50 @@ class Numeric
       
       tens, hunds = nil, nil
       
-      chars = triplet.chars.to_a
+      digits = triplet.chars.to_a
       
-      raise "Error: Not a triplet: #{triplet}" if chars.size > 3 or chars.size < 1      
+      raise "Error: Not a triplet: #{triplet}" if digits.size > 3 or digits.size < 1      
       
-      if chars.size == 3
-        n = chars.shift.to_i 
-        hunds = NAMES_SMALL[n] + "-hundred" if n > 0 
-        chars.shift if chars.first == '0'
+      if digits.size == 3
+        digit = digits.shift.to_i 
+        hunds = NAMES_SMALL[digit] + "-hundred" if digit > 0 
+        digits.shift if digits.first == '0'
       end
       
-      if chars.size == 2 
-        n = chars.join('').to_i
+      if digits.size == 2
+        n = digits.join('').to_i
         
         if n > 0 and n < 20 
           tens = NAMES_SMALL[n] 
         elsif n > 0
-          tens = NAMES_MEDIUM[chars.shift.to_i - 2]
-          if chars.first != '0'
-            tens += "-" + NAMES_SMALL[chars.shift.to_i]
+          tens = NAMES_MEDIUM[digits.shift.to_i - 2]
+          if digits.first != '0'
+            tens += "-" + NAMES_SMALL[digits.shift.to_i]
           else
-            chars.shift
+            digits.shift
           end
         end
       end
       
-      if chars.size == 1
-        n = chars.join('').to_i 
+      if digits.size == 1
+        n = digits.join('').to_i 
         tens = NAMES_SMALL[n] if n > 0 
       end
-            
-      
+
       if hunds 
         if tens 
           result << "#{hunds} and #{tens}" 
-        else 
+        else
           result << hunds 
         end
       else 
         result << tens if tens
       end
-  
+
       magnitude = (num_triplets - i)
       result << NAMES_LARGE[magnitude-2] if magnitude > 1
         
-      whole_thing << result.join(' ')
+      whole_thing << result.join(' ') if result.any?
     end
     
     whole_thing.join ', '
