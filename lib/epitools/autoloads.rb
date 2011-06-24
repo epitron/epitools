@@ -9,6 +9,7 @@ autoload :FileUtils,  'fileutils'
 autoload :Tempfile,   'tempfile'
 autoload :BigDecimal, 'bigdecimal'
 autoload :StringIO,   'stringio'
+autoload :Curses,     'curses'
 
 module Digest
   autoload :SHA1,     'digest/sha1'

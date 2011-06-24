@@ -124,6 +124,50 @@ def cmd(*args)
   system(*cmd_args)    
 end
 
+
+#
+# Prompt the user for confirmation.
+#
+# Usage:
+#   prompt("Do you want a cookie?", "Ynqa") #=> returns the letter that the user pressed, in lowercase (and returns the default, 'y', if the user hits ENTER)
+#
+def prompt(message="Are you sure?", options="Yn")
+  opts      = options.scan(/./)
+  optstring = opts.join("/") # case maintained
+  defaults  = opts.select{|o| o.upcase == o }
+  opts      = opts.map{|o| o.downcase}
+
+  raise "Error: Too many default values for the prompt: #{default.inspect}" if defaults.size > 1
+
+  default = defaults.first
+
+  loop do
+  
+    print "#{message} (#{optstring}) "
+    
+    response = STDIN.gets.strip.downcase
+    
+    case response
+    when *opts
+      return response
+    when ""
+      return default.downcase
+    else
+      puts "  |_ Invalid option: #{response.inspect}. Try again."
+    end
+    
+  end
+end
+
+
+#
+# Automatically install a required commandline tool using the platform's package manager (incomplete -- only supports debian :) 
+#
+# * apt-get on debian/ubuntu
+# * yum on fedora
+# * fink/ports on OSX
+# * cygwin on windows
+#
 def autoinstall(*packages)
   all_packages_installed = packages.all? { |pkg| Path.which pkg }
   
