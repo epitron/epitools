@@ -123,6 +123,18 @@ describe Numeric do
     -12983287123.commatize.should == "-12,983,287,123"
     -12983287123.4411.commatize.should == "-12,983,287,123.4411"
   end
+  
+  it "does time things" do
+    1.second.should == 1
+    1.minute.should == 60
+    2.minutes.should == 120
+    2.hours.should == 120*60
+    2.5.days.should == 3600*24*2.5
+    
+    5.days.ago.to_i.should == (Time.now - 5.days).to_i
+    1.year.ago.year.should == Time.now.year - 1 
+    5.days.from_now.to_i.should == (Time.now + 5.days).to_i
+  end
 
 end
 

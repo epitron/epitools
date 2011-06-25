@@ -52,6 +52,31 @@ class Numeric
   def commatize  
     to_s.gsub(/(\d)(?=\d{3}+(?:\.|$))(\d{3}\..*)?/,'\1,\2')
   end
+
+  # Time
+
+  {
+  
+    'second'  => 1,
+    'minute'  => 60,
+    'hour'    => 60 * 60,
+    'day'     => 60 * 60 * 24,
+    'week'    => 60 * 60 * 24 * 7,
+    'month'   => 60 * 60 * 24 * 30,
+    'year'    => 60 * 60 * 24 * 364.25,
+    
+  }.each do |unit, scale|
+    define_method(unit)     { self * scale }
+    define_method(unit+'s') { self * scale }
+  end
+  
+  def ago
+    Time.now - self
+  end
+  
+  def from_now
+    Time.now + self
+  end
 end
 
 class Float
