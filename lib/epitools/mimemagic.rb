@@ -74,6 +74,11 @@ class MimeMagic
   def extensions
     TYPES.key?(type) ? TYPES[type][0] : []
   end
+  
+  # Default extension
+  def ext
+    extensions.first
+  end
 
   # Get mime comment
   def comment
@@ -131,11 +136,11 @@ class MimeMagic
   def self.magic_match(io, matches)
     matches.any? do |offset, value, children|
       match = if Range === offset
-		io.seek(offset.begin)
+                io.seek(offset.begin)
                 io.read(offset.end - offset.begin + value.length).include?(value)
               else
                 io.seek(offset)
-		value == io.read(value.length)
+                value == io.read(value.length)
               end
       match && (!children || magic_match(io, children))
     end

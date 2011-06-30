@@ -458,6 +458,14 @@ class Path
     open { |io| MimeMagic.by_magic(io) }
   end
   
+  #
+  # The filetype (as a standard file extension), verified with Magic.
+  #
+  # (In other words, this will give you the *true* extension, even if the file's
+  # extension is wrong.)
+  #
+  # Note: Prefers long extensions (eg: jpeg over jpg)
+  #
   def type
     @magictype ||= proc do 
       
@@ -465,7 +473,7 @@ class Path
       magic = self.magic
       
       if !ext and magic
-        magic.extensions.first
+        magic.ext
       elsif ext and !magic
         ext
       elsif !ext and !magic
@@ -474,7 +482,7 @@ class Path
         if magic.extensions.include? ext
           ext
         else
-          magic.extensions.first # just incase the extension is incorrect
+          magic.ext # in case the supplied extension is wrong...
         end
       end
       
