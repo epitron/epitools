@@ -2,17 +2,18 @@ require 'epitools'
 
 describe "autoreq" do
 
-  it "should have MimeMagic and Units installed" do
+  it "should have Haml and Units installed" do
     gems = Gem.source_index.to_a.map{|name, spec| spec.name}.uniq
-    gems.include?("mimemagic").should == true
+    gems.include?("haml").should == true
     gems.include?("units").should == true
   end
 
   it "autoreqs a gem" do
-    defined?(MimeMagic).should == nil
+    defined?(Haml).should == nil
 
-    autoreq :MimeMagic, 'mimemagic'
-    lambda { MimeMagic }.should_not raise_error
+    autoreq :Haml, 'haml'
+    !!defined?(Haml).should == false
+    lambda { Haml }.should_not raise_error
   end
     
   it "autoreqs a regular ruby file" do

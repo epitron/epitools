@@ -18,13 +18,11 @@ module Digest
 end
 
 ## Nonstandard library
-autoload :Path,     'epitools/path'
-autoload :Browser,  'epitools/browser'
-autoload :Rash,     'epitools/rash'
-autoload :Ratio,    'epitools/ratio'
-autoload :Sys,      'epitools/sys'
+autoload :MimeMagic,    'epitools/mimemagic'
+autoload :Path,         'epitools/path'
+autoload :Browser,      'epitools/browser'
+autoload :Rash,         'epitools/rash'
+autoload :Ratio,        'epitools/ratio'
+autoload :Sys,          'epitools/sys'
 autoload :ProgressBar,  'epitools/progressbar'
-
-## Gems
-autoreq :MimeMagic, 'mimemagic'
 

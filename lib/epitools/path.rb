@@ -450,7 +450,7 @@ class Path
   def mimetype_from_ext
     MimeMagic.by_extension(ext)
   end
-  
+
   #
   # Find the file's mimetype (by magic)
   #  
@@ -458,11 +458,29 @@ class Path
     open { |io| MimeMagic.by_magic(io) }
   end
   
-  def ext_by_magic
-    # TODO: return the extension for the mime type.
-    raise NotImplementedError
+  def type
+    @magictype ||= proc do 
+      
+      ext   = self.ext
+      magic = self.magic
+      
+      if !ext and magic
+        magic.extensions.first
+      elsif ext and !magic
+        ext
+      elsif !ext and !magic
+        :unknown
+      else # ext and magic
+        if magic.extensions.include? ext
+          ext
+        else
+          magic.extensions.first # just incase the extension is incorrect
+        end
+      end
+      
+    end.call
   end
-
+  
   ############################################################################
   ## Class Methods
 

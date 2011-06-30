@@ -246,7 +246,11 @@ describe Path do
   end
   
   it "mimes" do
-    Path[__FILE__].mimetype == "application/x-ruby"
+    Path[__FILE__].mimetype.should == "application/x-ruby"
+  end
+  
+  it "magic types" do
+    Path[__FILE__].type.should == "rb"
   end
   
   it "whiches" do
