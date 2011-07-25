@@ -11,7 +11,7 @@ describe Rash do
       "other" => "whee",
       true    => false,
       1       => "awesome"
-      # /.+/ => "EVERYTHING"
+      #/.+/ => "EVERYTHING"
     )
   end
   

@@ -85,6 +85,12 @@ describe Object do
     end.should_not raise_error
     
   end
+
+  it "marshals/unmarshals" do
+    :whee.marshal.unmarshal.should == :whee
+    :whee.marshal.should == Marshal.dump(:whee)
+  end
+    
   
 end
 
@@ -193,7 +199,7 @@ describe String do
     "blahblahblah".startswith("blah").should == true    
     "blahblahblah".endswith("blah").should == true    
   end
-    
+  
 end
 
 
@@ -215,6 +221,12 @@ describe Integer do
     2.to_bits.should == [0,1]
     3.to_bits.should == [1,1]
     42.to_bits.should == [0,1,0,1,0,1]
+    
+    # round trip
+    20.times do
+      n = rand(918282393982)
+      n.to_bits.reverse.join.to_i(2).should == n
+    end
   end
   
   it "slices into bits" do

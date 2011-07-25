@@ -10,6 +10,9 @@ autoload :Tempfile,   'tempfile'
 autoload :BigDecimal, 'bigdecimal'
 autoload :StringIO,   'stringio'
 autoload :Curses,     'curses'
+autoload :DateTime,   'date'
+autoload :Date,       'date'
+autoload :DelegateClass, 'delegate'
 
 module Digest
   autoload :SHA1,     'digest/sha1'
@@ -20,6 +23,7 @@ end
 ## Nonstandard library
 autoload :MimeMagic,    'epitools/mimemagic'
 autoload :Path,         'epitools/path'
+autoload :Ezdb,         'epitools/ezdb'
 autoload :Browser,      'epitools/browser'
 autoload :Rash,         'epitools/rash'
 autoload :Ratio,        'epitools/ratio'

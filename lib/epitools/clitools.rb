@@ -68,7 +68,7 @@ def lesspipe(*args)
     end
   end
 
-rescue Errno::EPIPE
+rescue Errno::EPIPE, Interrupt
 end
 
 
@@ -174,4 +174,14 @@ def autoinstall(*packages)
   unless all_packages_installed
     cmd(["sudo apt-get install ?", packages.join(' ')])
   end
+end
+
+#
+# Return the [width,height] of the terminal.
+#
+def geometry
+  Curses.init_screen
+  result = [Curses.cols, Curses.lines]
+  Curses.close_screen
+  result
 end

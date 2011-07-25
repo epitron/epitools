@@ -14,8 +14,8 @@ require 'epitools'
 #    zopen("otherfile.gz", "w") #=> #<Zlib::GzipWriter:0x7fe30448>>
 #    zopen("test.txt.gz") { |f| f.read } # read the contents of the .gz file, then close the file handle automatically.
 #
-def zopen(path, mode="r")
-
+def zopen(path, mode="rb")
+  
   path = Path[path] unless path.is_a? Path
   file = path.open(mode)
   

@@ -33,6 +33,10 @@ class Object
   # `truthy?` means `not blank?`
   #
   def truthy?; not blank?; end
+  
+  def marshal
+    Marshal.dump self
+  end
 
 end
 
@@ -274,6 +278,17 @@ class String
     JSON.parse self
   end
   
+  #
+  # Convert the string to a Path object.
+  #
+  def to_p
+    Path[self]
+  end
+  
+  def unmarshal
+    Marshal.restore self
+  end
+  
 end
 
 
@@ -417,6 +432,7 @@ module Enumerable
   #                                  (default: false)
   #   :after => true             #=> split after the matched element (only has an effect when used with :include_boundary)  
   #                                  (default: false)
+  #   :once => flase             #=> only perform one split (default: false)
   #
   # Examples: 
   #   [1,2,3,4,5].split{ |e| e == 3 }                           
@@ -448,10 +464,13 @@ module Enumerable
 
     chunks = []
     current_chunk = []
+    
+    splits = 0
+    max_splits = options[:once] == true ? 1 : options[:max_splits]    
 
     each do |e|
 
-      if boundary_test_proc.call(e)
+      if boundary_test_proc.call(e) and (max_splits == nil or splits < max_splits)
         
         if current_chunk.empty? and not include_boundary 
           next # hit 2 boundaries in a row... just keep moving, people!
@@ -468,6 +487,8 @@ module Enumerable
           current_chunk = []                              # start a new result
           current_chunk << e        if include_boundary   # include the boundary, if necessary
         end
+
+        splits += 1
         
       else
         current_chunk << e
@@ -507,7 +528,11 @@ module Enumerable
   # Sum the elements
   #  
   def sum
-    inject(0) { |total,n| total + n }
+    if block_given?
+      inject(0) { |total,elem| total + yield(elem) }    
+    else
+      inject(0) { |total,elem| total + elem }
+    end
   end
   
   #

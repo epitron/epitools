@@ -82,11 +82,12 @@ require_wrapper = proc do |mod|
   end
 end
 
-## Require the tools
+#
+# Make all the modules autoload, and require all the monkeypatches
+#
 %w[
   autoloads
   basetypes 
-  niceprint
   string_to_proc
   zopen
   colored

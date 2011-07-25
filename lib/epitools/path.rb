@@ -77,6 +77,8 @@ class Path
     @dirs = File.expand_path(newdir).split(File::SEPARATOR)[1..-1]
   end
   
+  # TODO: Figure out how to fix the 'path.with(:ext=>ext+".other")' problem (when 'ext == nil')...
+  
   def ext=(newext)
     if newext.blank?
       @ext = nil
@@ -105,6 +107,28 @@ class Path
     else
       ""
     end
+  end
+  
+  def relative_to(anchor=nil)
+    anchor ||= Path.pwd 
+    
+    # operations to transform anchor into self
+    
+    # stage 1: go ".." until we find a common dir prefix
+    #          (discard everything and go '/' if there's no common dir)
+    # stage 2: append the rest of the other path 
+    
+    # find common prefix
+    smaller, bigger = [ anchor.dirs, self.dirs ].sort_by(&:size)
+    common_prefix_end = bigger.zip(smaller).index { |a,b | a != b }
+    common_prefix = bigger[0...common_prefix_end] 
+    
+    if common_prefix.any?
+      dots = nil
+    end
+    
+    self.dirs & anchor.dirs
+    
   end
   
   # The current directory (with a trailing /)
@@ -168,6 +192,10 @@ class Path
     File.symlink? path
   end
   
+  def broken_symlink?
+    File.symlink?(path) and not File.exists?(path)
+  end
+  
   def uri?
     false
   end
@@ -212,6 +240,8 @@ class Path
   # Path["/etc"]/"passwd" == Path["/etc/passwd"]
   #
   def /(other)
+    # / <- fixes jedit syntax highlighting bug.
+    # TODO: make it work for "/dir/dir"/"/dir/file" 
     Path.new( File.join(self, other) )
   end  
   
@@ -272,6 +302,12 @@ class Path
   #   Path["Songy Song.aac"].rename(:dir=>"/music2")
   #   Path["/music2/Songy Song.aac"].exists? #=> true
   #  
+  def rename!(options)
+    dest = rename(options)
+    self.path = dest.path # become dest
+    self
+  end
+  
   def rename(options)
     raise "Options must be a Hash" unless options.is_a? Hash
     dest = self.with(options)
@@ -279,17 +315,25 @@ class Path
     raise "Error: destination (#{dest.inspect}) already exists" if dest.exists?
     File.rename(path, dest)
     
-    self.path = dest.path # become dest
+    dest
   end
 
   #
   # Renames the file the specified full path (like Dir.rename.)
   #  
   def rename_to(path)
-    rename :path=>path
+    rename :path=>path.to_s
   end
   alias_method :mv,       :rename_to
   
+  def rename_to!(path)
+    rename! :path=>path.to_s
+  end
+  alias_method :mv!,       :rename_to!
+  
+  #
+  # Generate two almost identical methods: mkdir and mkdir_p 
+  #
   {
     :mkdir => "Dir.mkdir", 
     :mkdir_p =>"FileUtils.mkdir_p"
@@ -298,13 +342,13 @@ class Path
       def #{method}
         if exists?
           if directory?
-            false
+            Path[path]
           else
             raise "Error: Tried to make a directory over top of an existing file."
           end
         else
           #{expression}(path)
-          true
+          Path[path]
         end
       end
     }
@@ -412,7 +456,7 @@ class Path
   alias_method :stream, :io
   
   def =~(pattern)
-    path =~ pattern
+    to_s =~ pattern
   end
   
   ## Class method versions of FileUtils-like things
@@ -458,6 +502,8 @@ class Path
     open { |io| MimeMagic.by_magic(io) }
   end
   
+  # TODO: rename type => magicext
+  
   #
   # The filetype (as a standard file extension), verified with Magic.
   #
@@ -467,26 +513,32 @@ class Path
   # Note: Prefers long extensions (eg: jpeg over jpg)
   #
   def type
-    @magictype ||= proc do 
+    @cached_type ||= begin
       
-      ext   = self.ext
-      magic = self.magic
+      if file? or symlink?
       
-      if !ext and magic
-        magic.ext
-      elsif ext and !magic
-        ext
-      elsif !ext and !magic
-        :unknown
-      else # ext and magic
-        if magic.extensions.include? ext
+        ext   = self.ext
+        magic = self.magic
+        
+        if ext and magic
+          if magic.extensions.include? ext
+            ext
+          else
+            magic.ext # in case the supplied extension is wrong...
+          end
+        elsif !ext and magic
+          magic.ext
+        elsif ext and !magic
           ext
-        else
-          magic.ext # in case the supplied extension is wrong...
+        else # !ext and !magic
+          :unknown
         end
+        
+      elsif dir?
+        :directory
       end
       
-    end.call
+    end
   end
   
   ############################################################################
@@ -566,6 +618,10 @@ end
 class Path::URL < Path
 
   attr_reader :uri
+
+  #
+  # TODO: only include certain methods from Path (delegate style)
+  #       (eg: remove commands that write)
   
   def initialize(uri)
     @uri = URI.parse(uri)
@@ -575,11 +631,42 @@ class Path::URL < Path
   def uri?
     true
   end
+
+  #
+  # Example:
+  #
+  # When this is: http://host.com:port/path/filename.ext?param1=value1&param2=value2&...
+  #
+  def to_s
+    uri.to_s
+  end
   
+
+  #
+  # ...this is: 'http'
+  #  
+  def scheme
+    uri.scheme
+  end
+  alias_method :protocol, :scheme
+  
+  #
+  # ...and this is: 'host.com'
+  #
   def host
     uri.host
   end
   
+  #
+  # ...and this is: 80
+  #
+  def port
+    uri.host
+  end
+  
+  #
+  # ...and this is: {param1: value1, param2: value2, ...etc... }
+  #
   def query
     if query = uri.query
       query.to_params
@@ -588,9 +675,7 @@ class Path::URL < Path
     end
   end
   
-  def to_s
-    uri.to_s
-  end
+  # ...and `path` is /path/filename.ext
   
 end
 
