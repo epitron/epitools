@@ -1,4 +1,5 @@
 ## Standard library
+autoload :Set,        'set'
 autoload :URI,        'uri'
 autoload :CGI,        'cgi'
 autoload :Base64,     'base64'
@@ -12,7 +13,8 @@ autoload :StringIO,   'stringio'
 autoload :Curses,     'curses'
 autoload :DateTime,   'date'
 autoload :Date,       'date'
-autoload :DelegateClass, 'delegate'
+autoload :Open3,      'open3'
+#autoload :DelegateClass, 'delegate'
 
 module Digest
   autoload :SHA1,     'digest/sha1'
@@ -21,7 +23,6 @@ module Digest
 end
 
 ## Nonstandard library
-autoload :MimeMagic,    'epitools/mimemagic'
 autoload :Path,         'epitools/path'
 autoload :Ezdb,         'epitools/ezdb'
 autoload :Browser,      'epitools/browser'
@@ -29,4 +30,9 @@ autoload :Rash,         'epitools/rash'
 autoload :Ratio,        'epitools/ratio'
 autoload :Sys,          'epitools/sys'
 autoload :ProgressBar,  'epitools/progressbar'
+autoload :Trie,         'epitools/trie'
+autoload :MimeMagic,    'epitools/mimemagic'
+autoload :Term,         'epitools/term'
 
+## Gems
+autoreq  :ANSI,         'ansi' 

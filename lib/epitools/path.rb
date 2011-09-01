@@ -1,5 +1,58 @@
+#
+# TODOs:
+#   Relative paths
+#   Rename bugs
+#   tmp bugs
+#
+
 require 'epitools'
 
+#
+# Path: An object-oriented wrapper for files.
+#       (Combines useful methods from FileUtils, File, Dir, and more!)
+#
+# Each Path object has the following attributes:
+#
+#    path            => the entire path
+#    filename        => just the name and extension
+#    basename        => just the filename
+#    ext             => just the extension
+#    dir             => just the directory
+#    dirs            => an array of directories
+#
+# Note: all of the above attributes can be modified to produce new paths!
+# Here's a useful example:
+#   
+#   # Check if there's a '.git' directory in the current or parent directories.
+#   def inside_a_git_repository?
+#     path = Path.pwd # get the current directory
+#     while path.dirs.any?
+#       return true if (path/".git").exists?
+#       path.dirs.pop
+#     end
+#     false
+#   end
+#    
+#
+# Examples:
+#
+#   Path["*.jpeg"].each { |path| path.rename(:ext=>"jpg") }
+#
+#   Path["filename.txt"] << "Append data!"
+#
+#   entries = Path["/etc"].ls
+#
+#   Path
+#
+# Swap two files:
+#
+#   a, b = Path["file_a", "file_b"]
+#   temp = a.with(:ext=>a.ext+".swapping")
+#   a.mv(temp)
+#   b.mv(a)
+#   temp.mv(b)
+#   
+#
 class Path
   
   ## initializers
@@ -22,7 +75,7 @@ class Path
       if path =~ %r{^[a-z\-]+://}i # URL?
         Path::URL.new(path)
       else
-        path = expand_path path
+        path = Path.expand_path(path)
         if path =~ /(^|[^\\])[\?\*\{\}]/ # contains unescaped glob chars? 
           glob(path)
         else
@@ -205,26 +258,6 @@ class Path
   end
   
   
-  ## aliases
-  
-  alias_method :to_path,    :path
-  alias_method :to_str,     :path
-  alias_method :to_s,       :path
-
-  alias_method :pathname,   :path
-  alias_method :basename,   :base
-  alias_method :basename=,  :base=
-  alias_method :extname,    :ext
-  alias_method :extname=,   :ext=
-  alias_method :dirname,    :dir
-  alias_method :dirname=,   :dir=
-  alias_method :extension,  :ext
-  alias_method :extension=, :ext=
-  alias_method :directory,  :dir
-  alias_method :directory=, :dir=
-
-  alias_method :directory?, :dir?
-  
   ## comparisons
 
   include Comparable
@@ -242,7 +275,8 @@ class Path
   def /(other)
     # / <- fixes jedit syntax highlighting bug.
     # TODO: make it work for "/dir/dir"/"/dir/file" 
-    Path.new( File.join(self, other) )
+    #Path.new( File.join(self, other) )
+    Path[ File.join(self, other) ]
   end  
   
   ## opening/reading files
@@ -261,10 +295,23 @@ class Path
     File.read(path, length, offset)
   end
   
+  def unmarshal
+    read.unmarshal
+  end
+  
   def ls; Path[File.join(path, "*")]; end
 
   def ls_r; Path[File.join(path, "**/*")]; end
 
+
+  def siblings
+    ls - [self]
+  end
+  
+  def touch
+    open("a") { }
+    self
+  end
   
   ## modifying files
 
@@ -278,7 +325,8 @@ class Path
       else
         yield f
       end
-    end    
+    end
+    self
   end
   alias_method :<<, :append
   
@@ -331,24 +379,32 @@ class Path
   end
   alias_method :mv!,       :rename_to!
   
+  def reload!
+    self.path = to_s
+  end
+  
   #
   # Generate two almost identical methods: mkdir and mkdir_p 
   #
   {
     :mkdir => "Dir.mkdir", 
     :mkdir_p =>"FileUtils.mkdir_p"
-  }.each do |method, expression|
+  }.each do |method, command|
     class_eval %{
       def #{method}
         if exists?
           if directory?
             Path[path]
           else
-            raise "Error: Tried to make a directory over top of an existing file."
+            raise "Error: A file by this name already exists."
           end
         else
-          #{expression}(path)
-          Path[path]
+          #{command}(path)
+          #Path[path]
+          p [:path, path]
+          self.path = path # regenerate object
+          p [:path, path]
+          self
         end
       end
     }
@@ -358,6 +414,10 @@ class Path
     FileUtils.cp_r(path, dest) #if Path[dest].exists?
   end
   
+  def mv(dest)
+    FileUtils.mv(path, dest)
+  end
+
   def join(other)
     if uri?
       Path[URI.join(path, other).to_s]
@@ -366,11 +426,44 @@ class Path
     end
   end
 
+
   def ln_s(dest)
     dest = Path[dest]
     FileUtils.ln_s self, dest 
   end
 
+  ## Owners and permissions
+  
+  def chmod(mode)
+    FileUtils.chmod(mode, self)
+    self
+  end
+  
+  def chown(usergroup)
+    user, group = usergroup.split(":")
+    FileUtils.chown(user, group, self)
+    self
+  end
+  
+  def chmod_R(mode)
+    if directory?
+      FileUtils.chmod_R(mode, self)
+      self
+    else
+      raise "Not a directory."
+    end
+  end
+  
+  def chown_R(usergroup)
+    user, group = usergroup.split(":")
+    if directory?
+      FileUtils.chown_R(user, group, self)
+      self
+    else
+      raise "Not a directory."
+    end
+  end
+  
   ## Dangerous methods.
   
   def rm
@@ -385,7 +478,7 @@ class Path
   alias_method :"remove!", :rm
   
   def truncate(offset=0)
-    File.truncate(self, offset)
+    File.truncate(self, offset) if exists?
   end
 
   
@@ -458,25 +551,23 @@ class Path
   def =~(pattern)
     to_s =~ pattern
   end
-  
-  ## Class method versions of FileUtils-like things
-  
-  %w[
-    mkdir
-    mkdir_p 
-    sha1 
-    sha2 
-    md5
-    rm
-    truncate
-  ].each do |method|
-    class_eval %{
-      def self.#{method}(path)
-        Path[path].#{method}
-      end
-    }
-  end
 
+  def lstat
+    #@lstat ||= File.lstat self
+    File.lstat self
+  end
+  
+  def mode
+    lstat.mode
+  end
+  
+  def parent
+    if file?
+      with(:filename=>nil)
+    else
+      with(:dirs=>dirs[0...-1])
+    end
+  end
   
   # Mimetype finding and magic (requires 'mimemagic' gem)
 
@@ -541,9 +632,65 @@ class Path
     end
   end
   
+  ## aliases
+  
+  alias_method :to_path,    :path
+  alias_method :to_str,     :path
+  alias_method :to_s,       :path
+
+  alias_method :pathname,   :path
+  alias_method :basename,   :base
+  alias_method :basename=,  :base=
+  alias_method :extname,    :ext
+  alias_method :extname=,   :ext=
+  alias_method :dirname,    :dir
+  alias_method :dirname=,   :dir=
+  alias_method :extension,  :ext
+  alias_method :extension=, :ext=
+  alias_method :directory,  :dir
+  alias_method :directory=, :dir=
+
+  alias_method :directory?, :dir?
+  
+  alias_method :exist?,     :exists?
+  
   ############################################################################
   ## Class Methods
 
+  #
+  # FileUtils-like class-method versions of instance methods
+  # (eg: `Path.mv(src, dest)`)
+  #
+  # Note: Methods with cardinality 1 (`method/1`) are instance methods that take
+  # one parameter, and hence, class methods that take two parameters.
+  #
+  AUTOGENERATED_CLASS_METHODS = %w[
+    mkdir
+    mkdir_p 
+    sha1 
+    sha2 
+    md5
+    rm
+    truncate
+    mv/1
+    move/1
+    chmod/1
+    chown/1
+    chown_R/1
+    chmod_R/1
+  ].each do |spec|
+    method, cardinality = spec.split("/")
+    cardinality = cardinality.to_i
+  
+    class_eval %{
+      def self.#{method}(path#{", *args" if cardinality > 0})
+        Path[path].#{method}#{"(*args)" if cardinality > 0}
+      end
+    }
+  end
+  
+  
+  
   #
   # Same as File.expand_path, except preserves the trailing '/'.
   #
@@ -562,6 +709,7 @@ class Path
     path
   end
   alias_class_method :tempfile, :tmpfile  
+  alias_class_method :tmp,      :tmpfile  
   
   def self.home
     Path[ENV['HOME']]
@@ -687,10 +835,11 @@ def Path(*args)
   Path[*args]
 end
 
-if $0 == __FILE__
-  require 'ruby-debug'
-  #Path.pry
-  #Path["http://google.com/"].pry
-  debugger
-  Path["?"]
+class String
+  def to_Path
+    Path.new self
+  end
+  
+  alias_method :to_P, :to_Path
 end
+

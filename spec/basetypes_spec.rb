@@ -165,6 +165,12 @@ describe String do
     "\n\n\nblah\n\n\nblah\n\n\n".nice_lines.should == ["blah", "blah"]    
   end
   
+  it "strips color" do
+    s = "woot!"
+    color_s = s.light_green
+    color_s.strip_color.should == s  
+  end
+  
   it "urlencodes/decodes" do
     s = "hi + there & mom + !!!!! I AM ON RSPEC"
     s.urlencode.should_not == s

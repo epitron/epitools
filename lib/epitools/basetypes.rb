@@ -32,11 +32,22 @@ class Object
   #
   # `truthy?` means `not blank?`
   #
-  def truthy?; not blank?; end
+  def truthy?
+    if respond_to? :blank?
+      not blank?
+    else
+      not nil?
+    end
+  end
   
   def marshal
     Marshal.dump self
   end
+
+  #
+  # Lets you say: `object.is_an? Array`
+  #  
+  alias_method :is_an?, :is_a?
 
 end
 
@@ -145,13 +156,21 @@ class String
   def tighten
     gsub(/[\t ]+/,' ').strip
   end
-  
+
   #
   # Remove redundant whitespace AND newlines.
   #
   def dewhitespace
     gsub(/\s+/,' ').strip
   end
+
+  #
+  # Remove ANSI color codes.
+  #
+  def strip_color
+    gsub(/\e\[.*?(\d)+m/, '')
+  end
+  alias_method :strip_ansi, :strip_color 
 
   #
   # Like #lines, but skips empty lines and removes \n's.
@@ -281,9 +300,10 @@ class String
   #
   # Convert the string to a Path object.
   #
-  def to_p
+  def as_path
     Path[self]
   end
+  alias_method :to_p, :as_path
   
   def unmarshal
     Marshal.restore self
@@ -681,11 +701,12 @@ class Object
   #
   def bench(message=nil)
     start = Time.now
-    yield
+    result = yield
     elapsed = Time.now - start
     
     print "[#{message}] " if message
-    puts "elapsed time: %0.5fs" % elapsed 
+    puts "elapsed time: %0.5fs" % elapsed
+    result
   end
   alias time bench
   
@@ -962,3 +983,21 @@ def dmsg(msg)
 end
 
 
+def del(x)
+  case thing
+    when String
+      del(x.to_sym)
+    when Class, Module
+      remove_const x
+    when Method
+      x.owner.send(:undef_method, x.name)
+    when Symbol
+      if Object.const_get(x)
+        remove_const x
+      elsif method(x)
+        undef_method x
+      end
+    else
+      raise "Error: don't know how to 'del #{x.inspect}'"
+  end
+end

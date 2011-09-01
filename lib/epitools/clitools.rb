@@ -1,4 +1,4 @@
-require 'epitools'
+#require 'epitools'
 
 class String
 
@@ -67,8 +67,9 @@ def lesspipe(*args)
       yield less
     end
   end
-
+  
 rescue Errno::EPIPE, Interrupt
+  # less just quit -- eat the exception.
 end
 
 
@@ -176,12 +177,5 @@ def autoinstall(*packages)
   end
 end
 
-#
-# Return the [width,height] of the terminal.
-#
-def geometry
-  Curses.init_screen
-  result = [Curses.cols, Curses.lines]
-  Curses.close_screen
-  result
-end
+
+

@@ -147,7 +147,7 @@ describe Path do
     
     path.write "blah"
     path.append "what" 
-    path << "lul"
+    (path << "lul").should == path
     
     path.read.should == "blahwhatlul"
     
@@ -204,8 +204,8 @@ describe Path do
     tmp = Path.tmpfile
     lambda { tmp.mkdir }.should raise_error
     tmp.rm
-    tmp.mkdir.should == true
-    tmp.rm.should == true
+    tmp.mkdir.should be_truthy
+    tmp.rm.should be_truthy
   end
   
   it "has classmethods" do
@@ -273,6 +273,50 @@ describe Path do
     
     Path["~/.ssh/id_{dsa,rsa}.pub"].size.should > 0
   
+  end
+  
+  it "modes" do
+    Path.tmpfile.mode.class.should == Fixnum
+  end
+  
+  it "chmods and chmod_Rs" do
+    tmp = Path.tmpfile
+    tmp2 = Path.tmpfile
+    tmp.touch
+    tmp2.touch
+    
+    newmode = tmp.mode 
+    tmp.chmod("+x")
+    system("chmod", "+x", tmp2)
+    tmp.mode.should == tmp2.mode
+  end
+  
+  it "siblingses" do
+    sibs = Path.tempfile.siblings
+    sibs.is_an?(Array).should == true
+    sibs.include?(self).should == false
+  end
+  
+  it 'path/".."s shows parent dir of file' do
+    # path/
+    tmp = Path.tmpfile
+    tmp.rm if tmp.exists?
+    tmp.mkdir
+    p tmp
+    p tmp.dirs
+    #tmp.to_s.endswith('/').should == true
+    file = tmp/"file"
+    file.touch
+    p file
+    file.dirs.should == tmp.dirs
+    file.filename.should != tmp.filename
+  end
+  
+  it 'swaps two files' do
+    raise "errorn!"
+    # swap two regular files
+    # swap a symlink and a regular file
+    # swap two symlinks
   end
   
 end

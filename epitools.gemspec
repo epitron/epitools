@@ -5,22 +5,24 @@
 
 Gem::Specification.new do |s|
   s.name = %q{epitools}
-  s.version = "0.4.49"
+  s.version = "0.5.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["epitron"]
-  s.date = %q{2011-06-29}
+  s.date = %q{2011-08-13}
   s.description = %q{Miscellaneous utility libraries to make my life easier.}
   s.email = %q{chris@ill-logic.com}
   s.extra_rdoc_files = [
     "LICENSE",
-    "README.rdoc"
+    "README.rdoc",
+    "TODO"
   ]
   s.files = [
     ".document",
     "LICENSE",
     "README.rdoc",
     "Rakefile",
+    "TODO",
     "VERSION",
     "epitools.gemspec",
     "lib/epitools.rb",
@@ -31,6 +33,7 @@ Gem::Specification.new do |s|
     "lib/epitools/browser/mechanize_progressbar.rb",
     "lib/epitools/clitools.rb",
     "lib/epitools/colored.rb",
+    "lib/epitools/ezdb.rb",
     "lib/epitools/hexdump.rb",
     "lib/epitools/its.rb",
     "lib/epitools/lcs.rb",
@@ -47,12 +50,15 @@ Gem::Specification.new do |s|
     "lib/epitools/ratio.rb",
     "lib/epitools/string_to_proc.rb",
     "lib/epitools/sys.rb",
+    "lib/epitools/term.rb",
+    "lib/epitools/trie.rb",
     "lib/epitools/zopen.rb",
     "spec/autoreq_spec.rb",
     "spec/basetypes_spec.rb",
     "spec/browser_spec.rb",
     "spec/clitools_spec.rb",
     "spec/colored_spec.rb",
+    "spec/ezdb_spec.rb",
     "spec/lcs_spec.rb",
     "spec/numwords_spec.rb",
     "spec/path_spec.rb",
@@ -62,15 +68,17 @@ Gem::Specification.new do |s|
     "spec/spec.opts",
     "spec/spec_helper.rb",
     "spec/sys_spec.rb",
+    "spec/term_spec.rb",
     "spec/zopen_spec.rb"
   ]
   s.homepage = %q{http://github.com/epitron/epitools}
   s.licenses = ["WTFPL"]
   s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.6.2}
+  s.rubygems_version = %q{1.3.7}
   s.summary = %q{NOT UTILS... METILS!}
 
   if s.respond_to? :specification_version then
+    current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
     s.specification_version = 3
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
