@@ -148,7 +148,7 @@ module Colored
   end
 
   #
-  # A class/instance method to colorize a string.
+  # Colorize a string (this method is called by #red, #blue, #red_on_green, etc.)
   #
   # Accepts options:
   #   :foreground
@@ -157,6 +157,15 @@ module Colored
   #       The name of the background color as a string.
   #   :extra
   #       Extra styling, like 'bold', 'light', 'underline', 'reversed', or 'clear'.
+  #
+  #
+  # With no options, it uses tagged colors:
+  #
+  #    puts "<light_green><magenta>*</magenta> Hey mom! I am <light_blue>SO</light_blue> colored right now.</light_green>".colorize
+  #
+  # Or numeric ANSI tagged colors (from the BBS days):
+  #    puts "<10><5>*</5> Hey mom! I am <9>SO</9> colored right now.</10>".colorize
+  #
   #
   def colorize(string=nil, options = {})
     if string == nil
@@ -247,14 +256,6 @@ module Colored
     
   #
   # Colorize a string that has "color tags".
-  #
-  # Examples:
-  #
-  # Colors as words:
-  #    puts "<light_green><magenta>*</magenta> Hey mom! I am <light_blue>SO</light_blue> colored right now.</light_green>".colorize
-  #
-  # Numeric ANSI colors (from the BBS days):
-  #    puts "<10><5>*</5> Hey mom! I am <9>SO</9> colored right now.</10>".colorize
   #
   def tagged_colors
     stack = []
