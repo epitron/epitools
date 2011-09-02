@@ -6,6 +6,9 @@
 #
 # It adds methods to String to allow easy coloring.
 #
+# (Note: Colors are automatically disabled if your program is piped to another program,
+#        ie: if STDOUT is not a TTY)
+#
 # Basic examples:
 #
 #   >> "this is red".red
@@ -19,23 +22,22 @@
 #
 #   >> "<yellow>This is using <green>color tags</green> to colorize.".colorize
 #   >> "<1>N<9>u<11>m<15>eric tags!".colorize
+#   (For those who still remember the DOS color palette and want more terse tagged-colors.)
 #
 # Highlight search results:
 #
 #   >> string.gsub(pattern) { |match| "<yellow>#{match}</yellow>" }.colorize
 #
-
-
-Myello there!
-
-I added some features to colored that I thought would be useful (mostly to me, but hopefully to others):
-
-  * Detect whether STDOUT is a tty or a pipe, and disable colors if it's a pipe. (Can be overridden by `Colored.force!` or `Colored.enable!`)
-  * Let the user specify colors using tags. (I added this because it makes writing a apps that   * BBS-style color codes for the tagged colours (eg: `"<4>red</4>, <1>blue</1>, <13>light magenta</13>, etc..".colorize`), for those who still remember the DOS color palette and want more terse tagged-colors.
-
-If there's anything that you think I should clean up, I'd be happy to. I'd love to see these features in colored!
-
-
+# Forcing colors:
+#
+# Since the presence of a terminal is detected automatically, the colors will be
+# disabled when you pipe your program to another program. However, if you want to
+# show colors when piped (eg: when you pipe to `less -R`), you can force it: 
+#
+#   >> Colored.enable!
+#   >> Colored.disable!
+#   >> Colored.enable_temporarily { puts "whee!".red }
+#
 
 require 'set'
 require 'rbconfig'
