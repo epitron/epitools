@@ -1,28 +1,47 @@
-require 'Win32/Console/ANSI' if RUBY_PLATFORM =~ /win32/
-require 'set'
-
 #
-# ANSI Colour-coding for terminals that support it.
+# ANSI Colour-coding (for terminals that support it.)
+#
 # Originally by defunkt (Chris Wanstrath)
+#   Enhanced by epitron (Chris Gahan)
 #
-# It extends String with methods that insert terminal codes.
+# It adds methods to String to allow easy coloring.
 #
-# Examples:
+# Basic examples:
 #
-#    >> "this is red".red
-#  
-#    >> "this is red with a blue background (read: ugly)".red_on_blue
+#   >> "this is red".red
+#   >> "this is red with a blue background (read: ugly)".red_on_blue
+#   >> "this is light blue".light_blue
+#   >> "this is red with an underline".red.underline
+#   >> "this is really bold and really blue".bold.blue
 #
-#    >> "this is light blue".light_blue
+# Color tags:
+# (Note: You don't *need* to close color tags, but you can!)
 #
-#    >> "<yellow>This is using <green>tags</green> to colorize.".colorize
+#   >> "<yellow>This is using <green>color tags</green> to colorize.".colorize
+#   >> "<1>N<9>u<11>m<15>eric tags!".colorize
 #
-#    >> "this is red with an underline".red.underline
+# Highlight search results:
 #
-#    >> "this is really bold and really blue".bold.blue
+#   >> string.gsub(pattern) { |match| "<yellow>#{match}</yellow>" }.colorize
 #
-#    >> Colored.red "This is red" # but this part is mostly untested
-#
+
+
+Myello there!
+
+I added some features to colored that I thought would be useful (mostly to me, but hopefully to others):
+
+  * Detect whether STDOUT is a tty or a pipe, and disable colors if it's a pipe. (Can be overridden by `Colored.force!` or `Colored.enable!`)
+  * Let the user specify colors using tags. (I added this because it makes writing a apps that   * BBS-style color codes for the tagged colours (eg: `"<4>red</4>, <1>blue</1>, <13>light magenta</13>, etc..".colorize`), for those who still remember the DOS color palette and want more terse tagged-colors.
+
+If there's anything that you think I should clean up, I'd be happy to. I'd love to see these features in colored!
+
+
+
+require 'set'
+require 'rbconfig'
+require 'Win32/Console/ANSI' if Config::CONFIG['host_os'] =~ /mswin|mingw/
+#require 'Win32/Console/ANSI' if RUBY_PLATFORM =~ /win32/
+
 module Colored
   extend self
 
