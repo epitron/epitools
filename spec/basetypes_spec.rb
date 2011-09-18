@@ -141,7 +141,7 @@ describe Numeric do
     1.year.ago.year.should == Time.now.year - 1 
     5.days.from_now.to_i.should == (Time.now + 5.days).to_i
   end
-
+  
 end
 
 
@@ -246,6 +246,17 @@ describe Integer do
     i[0..2].should == [1,1,0]
     i[-3..-1].should == [1,1,1]
     i[0..-1].should == [1,1,0,1,1,1]
+  end
+
+  it "converts to/from base62" do
+    Integer::BASE62_BASE.should == 62
+  
+    [1,20,500,501,34191923].each do |n|
+      n.to_base62.from_base62.should == n
+    end
+    
+    sum = "asdf".md5
+    sum.to_base62.from_base62.to_s(16).should == sum
   end
   
 end

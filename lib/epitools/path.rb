@@ -263,7 +263,18 @@ class Path
   include Comparable
   
   def <=>(other)
-    self.path <=> other.path
+    case other
+    when Path
+      self.path <=> other.path
+    when String
+      self.path == other
+    else
+      raise "Invalid comparison: Path to #{other.class}"
+    end
+  end
+  
+  def ==(other)
+    self.path == other.to_s
   end
 
   
@@ -748,13 +759,24 @@ class Path
     PATH_SEPARATOR    = ":"
     BINARY_EXTENSION  = ""
   end
-  
-  def self.which(bin)
-    ENV["PATH"].split(PATH_SEPARATOR).find do |path|
-      result = (Path[path] / (bin + BINARY_EXTENSION))
-      return result if result.exists?
+
+  #
+  # A clone of `/usr/bin/which`: pass in the name of a binary, and it'll search the PATH
+  # returning the absolute location of the binary if it exists, or `nil` otherwise.
+  #
+  # (Note: If you pass more than one argument, it'll return an array of `Path`s instead of
+  #        a single path.)
+  #  
+  def self.which(bin, *extras)
+    if extras.empty?
+      ENV["PATH"].split(PATH_SEPARATOR).find do |path|
+        result = (Path[path] / (bin + BINARY_EXTENSION))
+        return result if result.exists?
+      end
+      nil
+    else
+      ([bin] + extras).map { |bin| which(bin) }
     end
-    nil
   end  
   
 end

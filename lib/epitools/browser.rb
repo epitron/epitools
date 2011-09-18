@@ -1,4 +1,5 @@
 require 'epitools'
+gem 'mechanize', '~> 1.0'
 require 'mechanize'
 require 'epitools/browser/cache'
 require 'epitools/browser/mechanize_progressbar'

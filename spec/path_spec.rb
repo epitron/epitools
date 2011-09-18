@@ -256,6 +256,8 @@ describe Path do
   it "whiches" do
     Path.which("ruby").should_not be_nil
     Path.which("asdfasdfhkajlsdhfkljashdf").should be_nil
+    Path.which("ruby").class.should == Path
+    Path.which("gzip", "ls", "rm").should == ["/bin/gzip", "/bin/ls", "/bin/rm"]
   end
   
   it "Path[]s another path" do

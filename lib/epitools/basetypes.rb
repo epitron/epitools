@@ -59,7 +59,31 @@ class FalseClass
   def truthy?; false; end
 end
 
+class Float
+  #
+  # 'true' if the float is 0.0
+  #
+  def blank?; self == 0.0; end
+end
+
+class NilClass
+  #
+  # Always 'true'; nil is considered blank.
+  #
+  def blank?; true; end
+end
+
+class Symbol
+  #
+  # Symbols are never blank.
+  #
+  def blank?; false; end
+end
+
+
+
 class Numeric
+
   def integer?; true; end
 
   def truthy?; self > 0; end
@@ -68,8 +92,9 @@ class Numeric
     to_s.gsub(/(\d)(?=\d{3}+(?:\.|$))(\d{3}\..*)?/,'\1,\2')
   end
 
-  # Time
-
+  #
+  # Time methods
+  #
   {
   
     'second'  => 1,
@@ -92,28 +117,94 @@ class Numeric
   def from_now
     Time.now + self
   end
+  
 end
 
-class Float
+class Integer
+  
   #
-  # 'true' if the float is 0.0
+  # 'true' if the integer is 0
   #
-  def blank?; self == 0.0; end
+  def blank?; self == 0; end
+
+  #
+  # Convert the number into a hexadecimal string representation.
+  # (Identical to to_s(16), except that numbers < 16 will have a 0 in front of them.)
+  #
+  def to_hex
+    "%0.2x" % self
+  end
+    
+  #
+  # Convert the number to an array of bits (least significant digit first, or little-endian).
+  #
+  def to_bits
+    # TODO: Why does thos go into an infinite loop in 1.8.7?
+    ("%b" % self).chars.to_a.reverse.map(&:to_i)
+  end
+  alias_method :bits, :to_bits
+  
+  #
+  # Cached constants for base62 encoding
+  #
+  BASE62_DIGITS   = ['0'..'9', 'A'..'Z', 'a'..'z'].map(&:to_a).flatten 
+  BASE62_BASE     = BASE62_DIGITS.size
+
+  #
+  # Convert a number to a string representation (in "base62" encoding).
+  # 
+  # Base62 encoding represents the number using the characters: 0..9, A..Z, a..z
+  #
+  # It's the same scheme that url shorteners and YouTube uses for their
+  # ID strings. (eg: http://www.youtube.com/watch?v=dQw4w9WgXcQ)
+  #
+  def to_base62
+    result = []
+    remainder = self
+    max_power = ( Math.log(self) / Math.log(BASE62_BASE) ).floor
+    
+    max_power.downto(0) do |power|
+      divisor = BASE62_BASE**power
+      #p [:div, divisor, :rem, remainder]      
+      digit, remainder = remainder.divmod(divisor)
+      result << digit
+    end
+    
+    result << remainder if remainder > 0
+    
+    result.map{|digit| BASE62_DIGITS[digit]}.join ''
+  end
 end
 
-class NilClass
-  #
-  # Always 'true'; nil is considered blank.
-  #
-  def blank?; true; end
+
+#
+# Monkeypatch [] into Bignum and Fixnum using class_eval.
+#
+# (This is necessary because [] is defined directly on the classes, and a mixin
+#  module will still be overridden by Big/Fixnum's native [] method.)
+#
+[Bignum, Fixnum].each do |klass|
+  
+  klass.class_eval do
+    
+    alias_method :bit, :"[]"
+    
+    #
+    # Extends [] so that Integers can be sliced as if they were arrays.
+    #
+    def [](arg)
+      case arg
+      when Integer
+        self.bit(arg)
+      when Range
+        self.bits[arg]
+      end
+    end
+    
+  end
+  
 end
 
-class Symbol
-  #
-  # Symbols are never blank.
-  #
-  def blank?; false; end
-end
 
 class String
   
@@ -217,20 +308,51 @@ class String
     end      
   end
   
+
+
+  #
+  # Cached constants for base62 decoding.
+  #  
+  BASE62_DIGITS  = Hash[ Integer::BASE62_DIGITS.map.with_index{|letter,index| [letter,index]} ]
+  BASE62_BASE    = Integer::BASE62_BASE
+  
+  #
+  # Convert a string (encoded in base16 "hex" -- for example, an MD5 or SHA1 hash)
+  # into "base62" format. (See Integer#to_base62 for more info.)  
+  #
+  def to_base62
+    to_i(16).to_base62
+  end
+  
+  #
+  # Convert a string encoded in base62 into an integer.
+  # (See Integer#to_base62 for more info.)
+  #
+  def from_base62
+    accumulator = 0
+    digits = chars.map { |c| BASE62_DIGITS[c] }.reverse
+    digits.each_with_index do |digit, power|
+      accumulator += (BASE62_BASE**power) * digit if digit > 0
+    end
+    accumulator
+  end
+
   #
   # Decode a mime64/base64 encoded string
   #
-  def decode64
+  def from_base64
     Base64.decode64 self
   end
+  alias_method :decode64, :from_base64 
   
   #
   # Encode into a mime64/base64 string
   #
-  def encode64
+  def to_base64
     Base64.encode64 self
   end
-  alias_method :base64, :encode64
+  alias_method :base64,   :to_base64
+  alias_method :encode64, :to_base64
 
   #
   # MD5 the string
@@ -312,61 +434,6 @@ class String
 end
 
 
-class Integer
-  
-  #
-  # 'true' if the integer is 0
-  #
-  def blank?; self == 0; end
-
-  #
-  # Convert the number into a hexadecimal string representation.
-  #
-  def to_hex
-    "%0.2x" % self
-  end
-    
-  #
-  # Convert the number to an array of bits (least significant digit first, or little-endian).
-  #
-  def to_bits
-    # TODO: Why does thos go into an infinite loop in 1.8.7?
-    ("%b" % self).chars.to_a.reverse.map(&:to_i)
-  end
-  alias_method :bits, :to_bits
-  
-end
-
-
-#
-# Monkeypatch [] into Bignum and Fixnum using class_eval.
-#
-# (This is necessary because [] is defined directly on the classes, and a mixin
-#  module will still be overridden by Big/Fixnum's native [] method.)
-#
-[Bignum, Fixnum].each do |klass|
-  
-  klass.class_eval do
-    
-    alias_method :bit, :"[]"
-    
-    #
-    # Extends [] so that Integers can be sliced as if they were arrays.
-    #
-    def [](arg)
-      case arg
-      when Integer
-        self.bit(arg)
-      when Range
-        self.bits[arg]
-      end
-    end
-    
-  end
-  
-end
-
-
 class Array
 
   #
@@ -425,6 +492,13 @@ class Array
   #
   def ^(other)
     (self | other) - (self & other)
+  end
+  
+  #
+  # Pick a random element.
+  #
+  def pick
+    self[rand(size)]
   end
   
 end
