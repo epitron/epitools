@@ -501,6 +501,14 @@ class Array
     self[rand(size)]
   end
   
+  #
+  # Divide the array into n pieces.
+  #
+  def / pieces 
+    piece_size = (size.to_f / pieces).ceil
+    each_slice(piece_size).to_a
+  end
+
 end
 
 

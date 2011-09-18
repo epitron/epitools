@@ -288,6 +288,17 @@ describe Array do
     a.middle.should == 3
   end
   
+  it "/'s" do
+    a = [1,2,3,4,5]
+    b = [1,2,3,4]
+
+    # splits?
+    (a/2).should == [[1,2,3],[4,5]]
+    (a/3).should == [[1,2],[3,4],[5]]
+    
+    (b/2).should == [[1,2],[3,4]] 
+  end
+  
 end
 
 
