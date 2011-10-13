@@ -66,7 +66,6 @@ class Path
   end
   
   def self.[](path)
-  
     case path
     when Path
       path
@@ -74,17 +73,22 @@ class Path
     
       if path =~ %r{^[a-z\-]+://}i # URL?
         Path::URL.new(path)
+      elsif path =~ /^javascript:/
+        Path::JS.new(path)
       else
+      
+        # todo: highlight backgrounds of codeblocks to show indent level & put boxes (or rules?) around (between?) double-spaced regions
+        
         path = Path.expand_path(path)
         if path =~ /(^|[^\\])[\?\*\{\}]/ # contains unescaped glob chars? 
           glob(path)
         else
           new(path)
         end
+        
       end
       
     end
-    
   end
 
   ## setters
@@ -305,6 +309,13 @@ class Path
   def read(length=nil, offset=nil)
     File.read(path, length, offset)
   end
+
+  #
+  # All the lines in this file, chomped.
+  #  
+  def lines
+    io.lines.map(&:chomp)
+  end
   
   def unmarshal
     read.unmarshal
@@ -362,12 +373,16 @@ class Path
   #   Path["/music2/Songy Song.aac"].exists? #=> true
   #  
   def rename!(options)
+raise "Broken!"
+    
     dest = rename(options)
     self.path = dest.path # become dest
     self
   end
   
   def rename(options)
+raise "Broken!"
+    
     raise "Options must be a Hash" unless options.is_a? Hash
     dest = self.with(options)
     
@@ -381,11 +396,14 @@ class Path
   # Renames the file the specified full path (like Dir.rename.)
   #  
   def rename_to(path)
+raise "Broken!"
+  
     rename :path=>path.to_s
   end
   alias_method :mv,       :rename_to
   
   def rename_to!(path)
+raise "Broken!"
     rename! :path=>path.to_s
   end
   alias_method :mv!,       :rename_to!

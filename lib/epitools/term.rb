@@ -1,17 +1,42 @@
-require 'epitools'
+#require 'epitools'
 
-class Term
+module Term
 
+  extend self
+  
+  attr_accessor :wrap, :x, :y
+ 
   #
   # Return the [width,height] of the terminal.
   #
-  def self.size
+  def size
     Curses.init_screen
     result = [Curses.cols, Curses.lines]
     Curses.close_screen
     result
   end
   
+  def width;  size[0]; end
+  def height; size[1]; end
+  def goto(x,y); @x, @y = x, y; end
+  def pos; [@x, @y]; end
+  
+  def color(fore, back=nil)
+    @fore = fore
+    @back = back if back   
+  end
+  
+  def puts(s)
+    # some curses shit    
+  end
+  
+  class Window
+    def initialize
+    end
+    
+    def scroll(dx, dy)
+    end
+  end
   
   class Table
 

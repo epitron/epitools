@@ -15,6 +15,8 @@ unless defined? Enum
   end
 end
 
+RbConfig = Config unless defined? RbConfig
+
 class Object
   
   #
@@ -271,6 +273,7 @@ class String
     split($/).select{|l| not l.blank? }
   end
   
+  alias_method :nicelines,   :nice_lines
   alias_method :clean_lines, :nice_lines
 
   #
@@ -1070,12 +1073,12 @@ def del(x)
     when String
       del(x.to_sym)
     when Class, Module
-      remove_const x
+      Object.send(:remove_const, x)
     when Method
       x.owner.send(:undef_method, x.name)
     when Symbol
       if Object.const_get(x)
-        remove_const x
+        Object.send(:remove_const, x)
       elsif method(x)
         undef_method x
       end

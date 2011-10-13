@@ -41,7 +41,7 @@
 
 require 'set'
 require 'rbconfig'
-require 'Win32/Console/ANSI' if Config::CONFIG['host_os'] =~ /mswin|mingw/
+require 'Win32/Console/ANSI' if RbConfig::CONFIG['host_os'] =~ /mswin|mingw/
 #require 'Win32/Console/ANSI' if RUBY_PLATFORM =~ /win32/
 
 module Colored
