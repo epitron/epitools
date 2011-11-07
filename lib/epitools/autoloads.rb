@@ -16,6 +16,12 @@ autoload :Date,       'date'
 autoload :Open3,      'open3'
 #autoload :DelegateClass, 'delegate'
 
+if RUBY_VERSION["1.8.7"]
+  autoload :Prime,      'mathn'
+else
+  autoload :Prime,      'prime'
+end
+
 module Digest
   autoload :SHA1,     'digest/sha1'
   autoload :SHA2,     'digest/sha2'
