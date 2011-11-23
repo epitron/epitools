@@ -58,32 +58,10 @@ describe Iter do
     @i.should == [1,2,3,4,5]
   end
   
-  it "cluters nearby elements" do
-    class Cluster < Array
-      def min_distance(other)
-        a, b = other.max, other.min
-        x, y = max, min
-        [a-x, a-y, b-x, b-y].map(&:abs).min
-      end
+  it "sorts an array" do
+    i = Iter.new [3,7,3,1,3]
+    i.each { |a|
       
-      def absorb(other)
-        concat other
-        sort!
-        other.clear 
-      end
-    end
-  
-    a = [1,2,5,6,7,10,11,13].map { |e| Cluster.new [e] }
-    i = Iter.new(a)
-    
-    i.each_cons(2) do |a,b|
-      if b.any? and a.any? and a.min_distance(b) <= 1
-        b.absorb(a)
-        a.remove
-      end
-    end
-    
-    i.to_a.should == [[1,2],[5,6,7],[10,11],[13]]
-  end
-  
+    }
+  end  
 end

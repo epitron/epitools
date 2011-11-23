@@ -14,6 +14,7 @@ class Rash
   def initialize(initial={})
     @hash           = {}
     @regexes        = []
+    @ranges         = []
     @regex_counts   = Hash.new(0)
     @optimize_every = 500
     @lookups        = 0
@@ -22,9 +23,12 @@ class Rash
   end
 
   def []=(key, value)
-    if key.is_a? Regexp
+    case key
+    when Regexp
       #key = normalize_regex(key)  # this used to just do: /#{regexp}/
       @regexes << key
+    when Range
+      @ranges << key
     end
     @hash[key] = value
   end
@@ -37,36 +41,45 @@ class Rash
     keys.select { |key| key =~ regex if key.is_a? String }.map{ |key| @hash[key] }    
   end
   
+  #
+  # Return the first thing that matches the key.
+  #
   def [](key)
-    return @hash[key] if @hash.include? key
+    all(key).first
+  end
+  
+  #
+  # Return everything that matches the key.
+  #
+  def all(key)
+    return [@hash[key]] if @hash.include? key
 
     case key
+    when String
+      optimize_if_necessary!
       
-      when String
-        optimize_if_necessary!
-        
-        regexes = @regexes.select { |r| r =~ key }
-        
-        if regexes.any?
-          return regexes.map do |regex|
-            @regex_counts[regex] += 1 
-            @hash[regex]  
-          end
-        end
-        
-      when Regexp
-        
-        matches = search_strings(key)
-        
-        if matches.any?
-          return matches
-        end
+      regexes = @regexes.select { |r| r =~ key }
       
-    else
-      return @hash[key]
+      if regexes.any?
+        return regexes.map do |regex|
+          @regex_counts[regex] += 1 
+          @hash[regex]  
+        end
+      end
+      
+    when Integer
+      return @ranges.select { |r| r.include? key }.map { |range| @hash[range] }
+    
+    when Regexp
+      matches = search_strings(key)
+      
+      if matches.any?
+        return matches
+      end
+      
     end
-
-    nil
+    
+    []
   end
   
   def update(other)
