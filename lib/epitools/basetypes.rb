@@ -176,6 +176,15 @@ class Integer
     
     result.map{|digit| BASE62_DIGITS[digit]}.join ''
   end
+
+  #
+  # Returns the all the prime factors of a number.
+  #
+  def factors
+    Prime # autoload the prime module
+    prime_division.map { |n,count| [n]*count }.flatten 
+  end
+  
 end
 
 
@@ -312,11 +321,10 @@ class String
   end
   
 
-
   #
   # Cached constants for base62 decoding.
   #  
-  BASE62_DIGITS  = Hash[ Integer::BASE62_DIGITS.map.with_index{|letter,index| [letter,index]} ]
+  BASE62_DIGITS  = Hash[ Integer::BASE62_DIGITS.zip((0...Integer::BASE62_DIGITS.size).to_a) ]
   BASE62_BASE    = Integer::BASE62_BASE
   
   #

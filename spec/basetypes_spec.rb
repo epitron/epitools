@@ -259,6 +259,11 @@ describe Integer do
     sum.to_base62.from_base62.to_s(16).should == sum
   end
   
+  it "factors numbers" do
+    10.factors.should == [2,5]
+    256.factors.should == [2,2,2,2,2,2,2,2]
+  end
+  
 end
 
 
