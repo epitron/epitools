@@ -33,6 +33,7 @@ autoload :ProgressBar,  'epitools/progressbar'
 autoload :Trie,         'epitools/trie'
 autoload :MimeMagic,    'epitools/mimemagic'
 autoload :Term,         'epitools/term'
+autoload :Iter,         'epitools/iter'
 
 ## Gems
 autoreq  :ANSI,         'ansi' 

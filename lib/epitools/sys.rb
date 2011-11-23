@@ -224,8 +224,10 @@ module Sys
   def self.ps(*pids)
     options = PS_FIELDS.join(',')
     
+    pids = pids.map(&:to_i)
+    
     if pids.any?
-      command = "ps -p #{pids.map(&:to_i).join(',')} -o #{options}"
+      command = "ps -p #{pids.join(',')} -o #{options}"
     else
       command = "ps ax -o #{options}"
     end

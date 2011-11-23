@@ -57,8 +57,8 @@ class Path
   
   ## initializers
 
-  def initialize(newpath)
-    self.path = newpath
+  def initialize(newpath, hints={})
+    self.send("path=", newpath, hints)
   end
 
   def self.glob(str)
@@ -96,9 +96,14 @@ class Path
   attr_writer :base
   attr_writer :dirs
   
-  def path=(newpath)
-    if File.exists? newpath
-      if File.directory? newpath
+  #
+  # This is the core that initializes the whole class.
+  #
+  # Note: The `hints` parameter contains options so `path=` doesn't have to touch the filesytem as much.
+  # 
+  def path=(newpath, hints={})
+    if hints[:type] or File.exists? newpath
+      if hints[:type] == :dir or File.directory? newpath
         self.dir = newpath
       else
         self.dir, self.filename = File.split(newpath)
@@ -261,6 +266,14 @@ class Path
     uri?
   end
   
+  def child_of?(parent)
+    parent.parent_of? self
+  end
+  
+  def parent_of?(child)
+    # If `self` is a parent of `child`, it's a prefix.
+    child.path[/^#{Regexp.escape self.path}\/.+/] != nil
+  end
   
   ## comparisons
 
@@ -324,7 +337,16 @@ class Path
   def ls; Path[File.join(path, "*")]; end
 
   def ls_r; Path[File.join(path, "**/*")]; end
-
+  
+  def ls_dirs
+    ls.select(&:dir?)
+    #Dir.glob("#{path}*/", File::FNM_DOTMATCH).map { |s| Path.new(s, :type=>:dir) }
+  end
+  
+  def ls_files
+    ls.select(&:file?)
+    #Dir.glob("#{path}*", File::FNM_DOTMATCH).map { |s| Path.new(s, :type=>:file) }
+  end
 
   def siblings
     ls - [self]
@@ -455,7 +477,6 @@ raise "Broken!"
     end
   end
 
-
   def ln_s(dest)
     dest = Path[dest]
     FileUtils.ln_s self, dest 
@@ -582,7 +603,7 @@ raise "Broken!"
   end
 
   def lstat
-    #@lstat ||= File.lstat self
+    #@lstat ||= File.lstat self    # to cache or not to cache -- that is the question.
     File.lstat self
   end
   
@@ -590,6 +611,9 @@ raise "Broken!"
     lstat.mode
   end
   
+  #
+  # Find the parent directory. If the `Path` is a filename, it returns the containing directory.
+  #
   def parent
     if file?
       with(:filename=>nil)
@@ -597,6 +621,21 @@ raise "Broken!"
       with(:dirs=>dirs[0...-1])
     end
   end
+  
+  #
+  # Follows all symlinks to give the true location of a path.
+  #
+  if File.respond_to?(:realpath)
+    def realpath
+      Path.new File.realpath(path)
+    end
+  else
+    def realpath
+      require 'pathname'
+      Path.new Pathname.new(path).realpath
+    end
+  end
+
   
   # Mimetype finding and magic (requires 'mimemagic' gem)
 
@@ -701,6 +740,7 @@ raise "Broken!"
     md5
     rm
     truncate
+    realpath
     mv/1
     move/1
     chmod/1
@@ -717,9 +757,8 @@ raise "Broken!"
       end
     }
   end
-  
-  
-  
+
+
   #
   # Same as File.expand_path, except preserves the trailing '/'.
   #
@@ -811,7 +850,7 @@ class Path::URL < Path
   # TODO: only include certain methods from Path (delegate style)
   #       (eg: remove commands that write)
   
-  def initialize(uri)
+  def initialize(uri, hints={})
     @uri = URI.parse(uri)
     self.path = @uri.path
   end
@@ -849,7 +888,7 @@ class Path::URL < Path
   # ...and this is: 80
   #
   def port
-    uri.host
+    uri.port
   end
   
   #

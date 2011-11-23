@@ -126,6 +126,7 @@ describe Path do
   it "handles URLs" do
     path = Path["http://google.com/?search=blah"]
     path.host.should == "google.com"
+    path.port.should == 80
     path.query.should == {"search" => "blah"}
     path.uri?.should == true
   end
@@ -319,6 +320,36 @@ describe Path do
     # swap two regular files
     # swap a symlink and a regular file
     # swap two symlinks
+  end
+  
+  it 'realpaths' do
+    Path["/etc"].realpath.should == Path["/etc"]
+    
+  end
+  
+  it 'parents and childs properly' do
+  
+    root = Path["/"]
+    parent = Path["/blah/stuff"]
+    child = Path["/blah/stuff/what"]
+    neither = Path["/whee/yay"]
+
+    # Table of parent=>child relationships    
+    {
+      parent => child,
+      root   => parent,
+      root   => child,
+      root   => neither,
+    }.each do |p, c|
+      p.parent_of?(c).should == true
+      c.parent_of?(p).should == false
+      
+      c.child_of?(p).should == true
+      p.child_of?(c).should == false
+    end
+    
+    neither.parent_of?(child).should == false
+    neither.parent_of?(parent).should == false
   end
   
 end

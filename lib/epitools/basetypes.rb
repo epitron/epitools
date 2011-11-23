@@ -511,6 +511,9 @@ class Array
     piece_size = (size.to_f / pieces).ceil
     each_slice(piece_size).to_a
   end
+  
+
+  alias_method :unzip, :transpose
 
 end
 
@@ -720,6 +723,38 @@ module Enumerable
     (0...2**a.size).map do |bitmask|
       a.select.with_index{ |e, i| bitmask[i] == 1 }
     end
+  end
+
+  #
+  # Does the opposite of #zip -- converts [ [:a, 1], [:b, 2] ] to [ [:a, :b], [1, 2] ]
+  #  
+  def unzip
+    # TODO: make it work for arrays containing uneven-length contents
+    to_a.transpose
+  end
+  
+  #
+  # Associative grouping; groups all elements who share something in common with each other.
+  # You supply a block which takes two elements; return true if they belong in the same group. 
+  #
+  # Example:
+  #   [1,2,5,6].group_neighbours_by { |a,b| b-a <= 1 } #=> [ [1,2], [5,6] ]
+  #
+  def group_neighbours_by(&block)
+    result = []
+    cluster = [first]
+    each_cons(2) do |a,b|
+      if yield(a,b)
+        cluster << b
+      else
+        result << cluster
+        cluster = [b]
+      end
+    end
+    
+    result << cluster if cluster.any?
+    
+    result    
   end
   
 end

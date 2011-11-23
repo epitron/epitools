@@ -358,8 +358,17 @@ describe Enumerable do
   it "powersets" do
     [1,2,3].powerset.should == [[], [1], [2], [1, 2], [3], [1, 3], [2, 3], [1, 2, 3]]
     Enum.new([1,2], :each).powerset.should == [[], [1], [2], [1, 2]]
-  end    
+  end
   
+  it "unzips" do
+    [ [:a, 1], [:b, 2] ].unzip.should == [ [:a, :b], [1, 2] ]
+  end
+  
+  it "group_neighbours_bys" do
+    a = [1,2,5,6,7,10,11,13]
+    result = a.group_neighbours_by { |a,b| b-a <= 1 }
+    result.should == [[1,2],[5,6,7],[10,11],[13]]
+  end
 end
 
 describe Hash do

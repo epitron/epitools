@@ -1,5 +1,11 @@
 #require 'epitools'
 
+#
+# Example usage:
+#   puts Term::Table[ (1..100).to_a ].horizontally #=> prints all the numbers, ordered across rows
+#   puts Term::Table[ (1..100).to_a ].vertically #=> prints all the numbers, ordered across columns
+#   puts Term::Table[ [[1,2], [3,4]] ] #=> prints the table that was supplied
+#
 module Term
 
   extend self
