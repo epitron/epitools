@@ -743,10 +743,13 @@ module Enumerable
   
   #
   # Associative grouping; groups all elements who share something in common with each other.
-  # You supply a block which takes two elements; return true if they belong in the same group. 
+  # You supply a block which takes two elements, and have it return true if they are "neighbours"
+  # (eg: belong in the same group). 
   #
   # Example:
   #   [1,2,5,6].group_neighbours_by { |a,b| b-a <= 1 } #=> [ [1,2], [5,6] ]
+  #
+  # (Note: This is a very fast one-pass algorithm -- therefore, the groups must be pre-sorted.)
   #
   def group_neighbours_by(&block)
     result = []
@@ -764,6 +767,7 @@ module Enumerable
     
     result    
   end
+  alias_method :group_neighbors_by, :group_neighbours_by 
   
 end
 
