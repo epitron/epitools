@@ -170,8 +170,27 @@ class Path
       ""
     end
   end
+
+  #
+  # Path relative to current directory (Path.pwd)
+  #
+  def relative
+    relative_to(pwd)
+  end
+
+  def relative_to(to)
+    from = path.split(File::SEPARATOR)
+    to = Path[to].path.split(File::SEPARATOR)
+    p [from, to]
+    from.length.times do
+      break if from[0] != to[0]
+      from.shift; to.shift
+    end
+    fname = from.pop
+    join(*(from.map { RELATIVE_PARENTDIR } + to))
+  end
   
-  def relative_to(anchor=nil)
+  def relative_to2(anchor=nil)
     anchor ||= Path.pwd 
     
     # operations to transform anchor into self
@@ -231,15 +250,15 @@ class Path
   end
   
   def mtime
-    File.mtime path
+    lstat.mtime
   end
   
   def ctime
-    File.ctime path
+    lstat.ctime path
   end
   
   def atime
-    File.atime path
+    lstat.atime path
   end
   
   def dir?
@@ -257,6 +276,11 @@ class Path
   def broken_symlink?
     File.symlink?(path) and not File.exists?(path)
   end
+  
+  def symlink_target
+    Path.new File.readlink(path) 
+  end
+  alias_method :readlink, :symlink_target
   
   def uri?
     false
@@ -514,6 +538,33 @@ raise "Broken!"
     end
   end
   
+  def lstat
+    @lstat ||= File.lstat self    # to cache or not to cache -- that is the question.
+    #File.lstat self
+  end
+  
+  def mode
+    lstat.mode
+  end
+
+  # TODO: Unstub
+  def owner?
+    raise "STUB"
+  end
+  
+  def executable?
+    mode & 0o111 > 0 
+  end
+  alias_method :exe?, :executable?
+  
+  def writable?
+    mode & 0o222 > 0
+  end
+
+  def readable?
+    mode & 0o444 > 0
+  end
+
   ## Dangerous methods.
   
   def rm
@@ -602,15 +653,6 @@ raise "Broken!"
     to_s =~ pattern
   end
 
-  def lstat
-    #@lstat ||= File.lstat self    # to cache or not to cache -- that is the question.
-    File.lstat self
-  end
-  
-  def mode
-    lstat.mode
-  end
-  
   #
   # Find the parent directory. If the `Path` is a filename, it returns the containing directory.
   #

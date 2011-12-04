@@ -16,7 +16,7 @@ class Iter
   end
   
   def self.from_elems(elems)
-    new([]).tap{|i| i.container = elems}
+    new([]).tap { |i| i.container = elems }
   end
 
   def ==(other)
@@ -60,10 +60,14 @@ class Iter
   class Elem < BasicObject
   
     attr_accessor :val
-
+    
     def initialize(iter, val)
       @iter = iter
-      @val  = val
+      @val  = val.elem? ? val.value : val 
+    end
+    
+    def elem?
+      true
     end
     
     def ==(other)
@@ -143,7 +147,6 @@ class Iter
       "<Elem: #{@val.inspect}>"
     end
   end
-
   
 end
 

@@ -1,4 +1,4 @@
-require 'epitools/rash'
+require 'epitools'
 
 describe Rash do
 
@@ -38,5 +38,11 @@ describe Rash do
     @r[1000].should == "rangey"
     @r[1001].should == nil
   end
-
+  
+  it "calls procs on matches when they're values" do
+    r = Rash.new( /(ello)/ => proc { |m| m[1] } )
+    r["hello"].should == "ello"
+    r["ffffff"].should == nil
+  end
+  
 end

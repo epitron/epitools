@@ -1,4 +1,5 @@
 require 'epitools/iter'
+require 'pry'
 
 describe Iter do
 
@@ -39,6 +40,9 @@ describe Iter do
   it "replaces" do
     @i.first.replace_with(-1)
     @i.to_a.should == [-1,2,3,4,5]    
+    @i.last.replace_with(@i.last)
+    @i.to_a.should == [-1,2,3,4,5]
+    (!!@i.last.value.inspect[/Elem/]).should == false     
   end
   
   it "slices, values, indexes, etc." do

@@ -22,6 +22,13 @@ class Rash
     update(initial)
   end
 
+  def update(other)
+    for key, value in other
+      self[key] = value
+    end
+    self
+  end
+  
   def []=(key, value)
     case key
     when Regexp
@@ -33,14 +40,6 @@ class Rash
     @hash[key] = value
   end
   
-  def search_regexes(string)
-    @regexes.select { |r| string =~ r }.map { |r| @regex_counts[regex] += 1; @hash[r] } 
-  end
-  
-  def search_strings(regex)
-    keys.select { |key| key =~ regex if key.is_a? String }.map{ |key| @hash[key] }    
-  end
-  
   #
   # Return the first thing that matches the key.
   #
@@ -49,44 +48,44 @@ class Rash
   end
   
   #
-  # Return everything that matches the key.
+  # Return everything that matches the query.
   #
-  def all(key)
-    return [@hash[key]] if @hash.include? key
+  def all(query)
+    return Enumerator.new(self, :all, query) unless block_given?   
+  
+    if @hash.include? query
+      yield @hash[query]
+      return
+    end
 
-    case key
+    case query
     when String
       optimize_if_necessary!
-      
-      regexes = @regexes.select { |r| r =~ key }
-      
-      if regexes.any?
-        return regexes.map do |regex|
-          @regex_counts[regex] += 1 
-          @hash[regex]  
+      @regexes.each do |regex|
+        if match = regex.match(query)
+          @regex_counts[regex] += 1
+          value = @hash[regex]
+          if value.responds_to? :call
+            yield value.call(match)
+          else
+            yield value
+          end
         end
       end
       
     when Integer
-      return @ranges.select { |r| r.include? key }.map { |range| @hash[range] }
+      @ranges.each do |range| 
+        yield @hash[range] if range.include? query
+      end
     
     when Regexp
-      matches = search_strings(key)
-      
-      if matches.any?
-        return matches
+      # TODO: this doesn't seem very useful. should I ditch it? let me know!
+      @hash.each do |key,val|
+        yield val if key.is_a? String and query =~ key 
       end
-      
+  
     end
     
-    []
-  end
-  
-  def update(other)
-    for key, value in other
-      self[key] = value
-    end
-    self
   end
   
   def method_missing(*args, &block)

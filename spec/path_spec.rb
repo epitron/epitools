@@ -22,6 +22,10 @@ describe Path do
     path.dir.should == abs_path 
   end
   
+  it "'relative_to's" do
+    Path["/etc"].relative_to(Path["/tmp"]).should == "../tmp"
+  end
+  
   it "handles directories" do
     path = Path.new("/etc/")
     
@@ -315,20 +319,7 @@ describe Path do
     file.filename.should != tmp.filename
   end
   
-  it 'swaps two files' do
-    raise "errorn!"
-    # swap two regular files
-    # swap a symlink and a regular file
-    # swap two symlinks
-  end
-  
-  it 'realpaths' do
-    Path["/etc"].realpath.should == Path["/etc"]
-    
-  end
-  
   it 'parents and childs properly' do
-  
     root = Path["/"]
     parent = Path["/blah/stuff"]
     child = Path["/blah/stuff/what"]
@@ -352,4 +343,46 @@ describe Path do
     neither.parent_of?(parent).should == false
   end
   
+  it "checks file modes" do
+    path = Path.tmpfile
+    path.exe?.should == false
+    path.chmod(0o666)
+    p path.mode
+    (path.mode & 0o666).should > 0
+  end
+  
+  it 'symlinks and symlink_targets' do
+    path = Path.tmpfile
+    path << "some data"
+    
+    target = "#{path}-symlinked"
+    
+    path.ln_s target
+    
+    target = Path[target]
+    target.symlink?.should == true
+    target.read.should == path.read
+    target.symlink_target.should == path    
+  end
+  
+  it 'swaps two files' do
+    raise "errorn!"
+    # swap two regular files
+    # swap a symlink and a regular file
+    # swap two symlinks
+  end
+  
+  it 'realpaths' do
+    etc = Path["/etc"]
+    tmp = Path.tmpfile
+    tmp.rm
+    etc.ln_s tmp
+    
+    tmp.symlink_target.should == etc
+    tmp.realpath.should == etc
+    Path["/etc/../etc"].realpath.should == etc
+  end
+  
+  
+
 end

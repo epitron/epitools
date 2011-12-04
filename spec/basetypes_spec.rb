@@ -205,6 +205,14 @@ describe String do
     "blahblahblah".startswith("blah").should == true    
     "blahblahblah".endswith("blah").should == true    
   end
+
+  it "amounts" do
+    "cookie".amount(5).should == "5 cookies"
+    "cookie".amount(0).should == "0 cookies"
+    "shirt".amount(17).should == "17 shirts"
+    "dollar".amount(-10).should == "-10 dollars"
+    "love".amount(1).should == "1 love"
+  end
   
 end
 
@@ -304,6 +312,11 @@ describe Array do
     (b/2).should == [[1,2],[3,4]] 
   end
   
+  it "includes?s" do
+    [:a, :b, :c].includes?(:c).should == true
+    [:a, :b, :c].includes?(5).should == false
+  end
+  
 end
 
 
@@ -374,6 +387,12 @@ describe Enumerable do
     result = a.group_neighbours_by { |a,b| b-a <= 1 }
     result.should == [[1,2],[5,6,7],[10,11],[13]]
   end
+  
+  it "includes?s" do
+    [:a, :b, :c].to_enum.includes?(:c).should == true
+    [:a, :b, :c].to_enum.includes?(5).should == false
+  end
+  
 end
 
 describe Hash do
@@ -416,6 +435,44 @@ describe Hash do
     params.to_query.in?(["donkeys=7&stubborn=true", "stubborn=true&donkeys=7"]).should == true
   end
   
+  it "includes?s and key?s" do
+    @h.key?("key1").should == true
+    @h.includes?("key1").should == true
+  end
+  
+end
+
+
+describe Time do
+  it "time in words" do
+    Time.now.in_words.should == "just now"
+    1.second.ago.in_words.should == "1 second ago"
+    2.seconds.ago.in_words.should == "2 seconds ago"
+    3.weeks.ago.in_words.should == "3 weeks ago"
+    4.5.weeks.ago.in_words.should == "1 month ago"
+    2.months.ago.in_words.should == "2 months ago"
+    2.years.ago.in_words.should == "2 years ago"
+    2.5.years.ago.in_words.should == "2 years ago"
+
+    2.5.years.from_now.in_words.should == "2 years from now"
+  end
+end
+
+
+describe Binding do
+  a = 1
+  b = proc { a }
+  
+  b.binding.keys.should == [:a, :b]
+  b.binding.keys.should == b.binding.local_variables
+  
+  b.binding[:a].should == 1
+  b.binding["a"].should == 1
+  b.binding[:b].should == b
+  
+  b.binding[:a] = 5
+  b.binding[:a].should == 5
+  b.call.should == 5
 end
 
 
@@ -449,6 +506,22 @@ describe "truthiness" do
   
 end
 
+describe "proper grammar" do
+
+  it "responds_to?" do
+    proc{}.responds_to?(:call).should == true
+  end
+  
+  it "includes?" do
+    [1,2,3,4,5].includes?(5).should == true
+  end
+  
+  it "is_an?" do
+    Object.new.is_an?(Object).should == true
+  end
+
+end
+
 
 describe "metaclass" do
 
@@ -456,6 +529,21 @@ describe "metaclass" do
     o = Object.new
     o_metaclass = class << o; self; end
     o.metaclass.should == o_metaclass
+  end
+
+end
+
+
+describe "global methods" do
+
+  it "locals's" do
+    require 'binding_of_caller'
+  
+    a = 5
+    b = 10
+    _what_ = :splunge
+    
+    locals.should == {:a=>5, :b=>10}
   end
 
 end

@@ -14,6 +14,8 @@ autoload :Curses,     'curses'
 autoload :DateTime,   'date'
 autoload :Date,       'date'
 autoload :Open3,      'open3'
+autoload :Timeout,    'timeout'
+autoload :Find,       'find'
 #autoload :DelegateClass, 'delegate'
 
 if RUBY_VERSION["1.8.7"]

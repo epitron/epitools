@@ -54,7 +54,7 @@ module Term
   
     def initialize(data, options={})
       @data         = data.map(&:to_s)
-      @strip_color = options[:strip_color] || options[:strip_ansi]
+      @strip_color = options[:ansi] || options[:colorized] || options[:colored] || options[:strip_color] || options[:strip_ansi]
 
       if strip_color
         @max_size = @data.map { |e| e.strip_color.size }.max

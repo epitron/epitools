@@ -17,6 +17,8 @@ end
 
 RbConfig = Config unless defined? RbConfig
 
+
+
 class Object
   
   #
@@ -47,10 +49,11 @@ class Object
   end
 
   #
-  # Lets you say: `object.is_an? Array`
+  # Proper grammar.
   #  
   alias_method :is_an?, :is_a?
-
+  alias_method :responds_to?, :respond_to?
+  
 end
 
 class TrueClass
@@ -105,7 +108,7 @@ class Numeric
     'day'     => 60 * 60 * 24,
     'week'    => 60 * 60 * 24 * 7,
     'month'   => 60 * 60 * 24 * 30,
-    'year'    => 60 * 60 * 24 * 364.25,
+    'year'    => 60 * 60 * 24 * 365,
     
   }.each do |unit, scale|
     define_method(unit)     { self * scale }
@@ -121,6 +124,48 @@ class Numeric
   end
   
 end
+
+
+class Time
+
+  #
+  # Relative time, in words. (eg: "1 second ago", "2 weeks from now", etc.)
+  #
+  def in_words
+    delta   = (Time.now-self).to_i
+    a       = delta.abs
+    
+    amount  = case a
+      when 0                  
+        'just now'
+      when 1                  
+        'a second'
+      when 2..59              
+        "second".amount(a) 
+      when 1.minute...1.hour            
+        "minute".amount(a/1.minute)
+      when 1.hour...1.day           
+        "hour".amount(a/1.hour)
+      when 1.day...7.days
+        "day".amount(a/1.day)
+      when 1.week...1.month
+        "week".amount(a/1.week)
+      when 1.month...12.months
+        "month".amount(a/1.month)
+      else
+        "year".amount(a/1.year)
+    end
+              
+    if delta < 0
+      amount += " from now"
+    elsif delta > 0
+      amount += " ago"
+    end
+  end
+  
+end
+
+
 
 class Integer
   
@@ -215,6 +260,7 @@ end
   end
   
 end
+
 
 
 class String
@@ -441,6 +487,27 @@ class String
   def unmarshal
     Marshal.restore self
   end
+
+  #
+  # Convert this string into a string describing this many of the string.
+  # (Note: Doesn't know anything about proper grammar.)
+  #
+  # Example:
+  #   "cookie".amount(0)    #=> "0 cookies"
+  #   "shirt".amount(17)    #=> "17 shirts"
+  #   "dollar".amount(-10)  #=> "-10 dollars"
+  #   "love".amount(1)      #=> "1 love"
+  #
+  def amount(n)
+    case n
+    when 0 
+      "0 #{self}s"
+    when 1, -1
+      "#{n} #{self}"
+    else
+      "#{n} #{self}s"
+    end
+  end
   
 end
 
@@ -508,9 +575,7 @@ class Array
   #
   # Pick a random element.
   #
-  def pick
-    self[rand(size)]
-  end
+  alias_method :pick, :sample
   
   #
   # Divide the array into n pieces.
@@ -536,9 +601,34 @@ module Enumerable
   end
 
   #
-  # I enjoy typing ".all" more than ".to_a"
+  # `.all` is more fun to type than `.to_a`
   #
   alias_method :all, :to_a
+
+  #
+  # `includes?` is gramatically correct.
+  #
+  alias_method :includes?,  :include?
+
+  
+  #  
+  # Skip the first n elements and return an Enumerator for the rest, or pass them
+  # in succession to the block, if given. This is like "drop", but returns an enumerator
+  # instead of converting the whole thing to an array.
+  #
+  def skip(n)
+    if block_given?
+      each do |x|
+        if n > 0
+          n -= 1
+        else
+          yield x
+        end
+      end
+    else
+      enum_for :skip, n
+    end
+  end
   
   #
   # Split this enumerable into chunks, given some boundary condition. (Returns an array of arrays.)
@@ -946,6 +1036,24 @@ class Hash
     new(0)
   end
 
+  def self.lazy!
+    Hash.class_eval do
+      def method_missing(name, *args)
+        if args.any?
+          super
+        else
+          self[name] || self[name.to_s]
+        end
+      end
+    end
+  end  
+  
+  #
+  # `key?` and `includes?` is an alias for `include?`
+  #  
+  alias_method :key?,       :include?
+  alias_method :includes?,  :include?
+  
   #
   # Makes each element in the `path` array point to a hash containing the next element in the `path`.
   # Useful for turning a bunch of strings (paths, module names, etc.) into a tree.
@@ -1013,7 +1121,66 @@ class Hash
     params
   end
   
+  #
+  # Query a hash using MQL (see: http://wiki.freebase.com/wiki/MQL_operators for reference)
+  #
+  # Examples: 
+  #   > query(name: /steve/)
+  #   > query(/title/ => ??)
+  #   > query(articles: [{title: ??}])
+  #   > query(responses: [])
+  #   > query("date_of_birth<" => "2000")
+  #
+  def query(template)
+    results = [] 
+    template.each do |key,val|
+      case key
+      when Regexp, String
+      when Array
+      when Hash
+        results += hash.query(template)  
+      end
+    end
+    
+    map do |key,val|
+    end    
+  end
+  alias_method :mql, :query
+  
 end
+
+class MatchData
+
+  #
+  # Return a hash of named matches
+  #
+  def to_hash
+    Hash[ names.zip(captures) ]
+  end
+  
+end
+
+
+class Binding
+
+  def [](key)
+    eval(key.to_s)
+  end
+  
+  def []=(key, val)
+    Thread.current[:_alter_binding_local_] = val
+    eval("#{key} = Thread.current[:_alter_binding_local_]")
+    Thread.current[:_alter_binding_local_] = nil
+  end
+
+  def local_variables
+    eval("local_variables")
+  end
+  alias_method :keys, :local_variables
+
+end
+
+
 
 unless defined?(BasicObject)
   #
@@ -1133,3 +1300,12 @@ def del(x)
       raise "Error: don't know how to 'del #{x.inspect}'"
   end
 end
+
+def locals
+  caller = binding.of_caller(1)
+  vars = caller.eval("local_variables").reject{|e| e[/^_/]}
+  vals = caller.eval("[ #{vars.join(",")} ]")
+  Hash[ vars.zip(vals) ]
+end
+
+
