@@ -477,7 +477,7 @@ end
 
 describe Proc do
 
-  it "merge" do
+  it "joins procs" do
     a = proc { 1 } & proc { 2 }
     a.call.should == [1,2]
 
@@ -485,7 +485,7 @@ describe Proc do
     a.call.should == [[1,2],3]
   end
   
-  it "chains" do
+  it "chains procs" do
     b = proc { 1 } | proc { |input| input + 1 }
     b.call.should == 2
     b = b.chain( proc { |input| input + 1 } )

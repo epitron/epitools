@@ -1185,12 +1185,27 @@ end
 
 class Proc
 
-  def merge(other=nil, &block)
+  #
+  # Joins two procs together, returning a new proc.
+  #
+  # Example:
+  #   newproc = proc { 1 } & proc { 2 }
+  #   newproc.call #=> [1, 2]
+  #
+  def join(other=nil, &block)
     other ||= block
     proc { |*args| [self.call(*args), other.call(*args)] }
   end
-  alias_method :&, :merge
+  alias_method :&, :join
   
+  #
+  # Chains two procs together, returning a new proc. The output from each proc is passed into
+  # the input of the next one.
+  #
+  # Example:
+  #   chain = proc { 1 } | proc { |input| input + 1 }
+  #   chain.call #=> 2
+  #
   def chain(other=nil, &block)
     other ||= block
     proc { |*args| other.call( self.call(*args) ) }
