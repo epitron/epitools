@@ -139,7 +139,7 @@ class Time
       when 0                  
         'just now'
       when 1                  
-        'a second'
+        '1 second'
       when 2..59              
         "second".amount(a) 
       when 1.minute...1.hour            
@@ -161,6 +161,8 @@ class Time
     elsif delta > 0
       amount += " ago"
     end
+    
+    amount
   end
   
 end
@@ -1180,6 +1182,22 @@ class Binding
 
 end
 
+
+class Proc
+
+  def merge(other=nil, &block)
+    other ||= block
+    proc { |*args| [self.call(*args), other.call(*args)] }
+  end
+  alias_method :&, :merge
+  
+  def chain(other=nil, &block)
+    other ||= block
+    proc { |*args| other.call( self.call(*args) ) }
+  end
+  alias_method :|, :chain 
+  
+end
 
 
 unless defined?(BasicObject)

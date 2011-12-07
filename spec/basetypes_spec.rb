@@ -475,6 +475,25 @@ describe Binding do
   b.call.should == 5
 end
 
+describe Proc do
+
+  it "merge" do
+    a = proc { 1 } & proc { 2 }
+    a.call.should == [1,2]
+
+    a &= proc { 3 }
+    a.call.should == [[1,2],3]
+  end
+  
+  it "chains" do
+    b = proc { 1 } | proc { |input| input + 1 }
+    b.call.should == 2
+    b = b.chain( proc { |input| input + 1 } )
+    b.call(1).should == 3 
+  end
+    
+end
+
 
 describe BasicObject do
   
