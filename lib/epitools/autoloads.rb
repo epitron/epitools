@@ -4,7 +4,6 @@ autoload :URI,        'uri'
 autoload :CGI,        'cgi'
 autoload :Base64,     'base64'
 autoload :JSON,       'json'
-autoload :YAML,       'yaml'
 autoload :Zlib,       'zlib'
 autoload :FileUtils,  'fileutils'
 autoload :Tempfile,   'tempfile'
@@ -16,7 +15,14 @@ autoload :Date,       'date'
 autoload :Open3,      'open3'
 autoload :Timeout,    'timeout'
 autoload :Find,       'find'
+autoload :Benchmark,  'benchmark'
 #autoload :DelegateClass, 'delegate'
+
+# YAML is sometimes loaded improperly.
+if defined? YAML and not defined? YAML.parse
+  del YAML  # remove the existing module
+  autoload :YAML, 'yaml'
+end
 
 if RUBY_VERSION["1.8.7"]
   autoload :Prime,      'mathn'

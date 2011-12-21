@@ -104,6 +104,18 @@ describe Path do
     s2[15..-1].should == s1    
   end
   
+  it "reads/writes json and yaml" do
+    data = { "hello" => "there", "amazing" => [1,2,3,4] }
+    
+    yaml = Path.tmpfile
+    yaml.write_yaml(data)
+    yaml.from_yaml.should == data
+    
+    json = Path.tmpfile
+    json.write_json(data)
+    json.from_json.should == data
+  end
+  
   it "makes paths THREE WAYS!" do
     [
       Path(__FILE__),

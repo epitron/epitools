@@ -346,7 +346,7 @@ class Path
   def read(length=nil, offset=nil)
     File.read(path, length, offset)
   end
-
+  
   #
   # All the lines in this file, chomped.
   #  
@@ -410,6 +410,22 @@ class Path
       end
     end    
   end
+  
+
+  # Convert the object to JSON and write it to the file (overwriting the existing file).
+  def write_json(object); write object.to_json; end
+
+  # Parse the file as JSON
+  def read_json; read.from_json; end
+  alias_method :from_json, :read_json
+
+  # Convert the object to YAML and write it to the file (overwriting the existing file).
+  def write_yaml(object); write object.to_yaml; end
+
+  # Parse the file as YAML
+  def read_yaml; read.from_yaml; end
+  alias_method :from_yaml, :read_yaml
+
   
   #
   # Examples:

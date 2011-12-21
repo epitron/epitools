@@ -29,14 +29,22 @@ describe Object do
     "butt".in?("butts!!!").should == true
   end
  
-  it "benches" do
+  it "times" do
     lambda { 
-      bench("benchmark test") { x = 10 }
+      time("time test") { x = 10 }
     }.should_not raise_error
 
     lambda { 
-      bench("benchmark test") { raise "ERROR" }
+      time("time test") { raise "ERROR" }
     }.should raise_error
+  end
+  
+  it "benches" do
+    lambda { bench { rand }                 }.should_not raise_error
+    lambda { bench(20) { rand }             }.should_not raise_error
+    lambda { bench                          }.should raise_error
+    lambda { bench(:rand => proc { rand }, :notrand => proc { 1 })        }.should_not raise_error
+    lambda { bench(200, :rand => proc { rand }, :notrand => proc { 1 })   }.should_not raise_error
   end
 
   it "trys" do
@@ -359,10 +367,17 @@ describe Enumerable do
     [1,1,3,3].average.should == 2.0
   end
 
-  it "recursively maps" do
-    [[1,2],[3,4]].recursive_map {|e| e ** 2}.should == [[1,4],[9,16]] 
-    [1,2,3,4].recursive_map {|e| e ** 2}.should == [1,4,9,16] 
-    [[],[],1,2,3,4].recursive_map {|e| e ** 2}.should == [[], [], 1, 4, 9, 16] 
+  it "maps deeply" do
+    [[1,2],[3,4]].deep_map {|e| e ** 2}.should == [[1,4],[9,16]] 
+    [1,2,3,4].deep_map {|e| e ** 2}.should == [1,4,9,16] 
+    [[],[],1,2,3,4].deep_map {|e| e ** 2}.should == [[], [], 1, 4, 9, 16] 
+  end
+  
+  it "selects deeply" do
+    [[1,2],[3,4]].deep_select {|e| e % 2 == 0 }.should == [2,4] 
+    {1=>2, 3=>{4=>5, 6=>7}}.deep_select {|k,v| k == 1 }.should == {1=>2} 
+    #[1,2,3,4].deep_select {|e| e ** 2}.should == [1,4,9,16] 
+    #[[],[],1,2,3,4].deep_select {|e| e ** 2}.should == [[], [], 1, 4, 9, 16] 
   end
   
   it "foldl's" do
@@ -565,5 +580,13 @@ describe "global methods" do
     locals.should == {:a=>5, :b=>10}
   end
 
+end
+
+describe "to_jsons and to_yamls" do
+  data = {"a"=>"b", "yes"=>true, "hello"=>[1,2,3,4,5]}
+  data.to_json.from_json.should == data  
+
+  data = {:a=>"b", 1=>true, "hello"=>[1,2,3,4,5]}
+  data.to_yaml.from_yaml.should == data  
 end
 

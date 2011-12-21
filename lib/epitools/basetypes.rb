@@ -47,12 +47,46 @@ class Object
   def marshal
     Marshal.dump self
   end
+  alias_method :to_marshal, :marshal
+  
+  def to_yaml
+    YAML::dump(self)
+  end
+  
+  def to_json
+    JSON::pretty_generate(self)
+  end
 
   #
   # Proper grammar.
   #  
   alias_method :is_an?, :is_a?
   alias_method :responds_to?, :respond_to?
+
+  #
+  # Emit a quick debug message (only if $DEBUG is true)
+  #
+  def dmsg(msg)
+    if $DEBUG
+      case msg
+      when String
+        puts msg
+      else
+        puts msg.inspect
+      end
+    end
+  end
+  
+  #
+  # Return a hash of local variables in the caller's scope: {:variable_name=>value} 
+  #
+  def locals
+    require 'binding_of_caller'
+    caller = binding.of_caller(1)
+    vars = caller.eval("local_variables").reject{|e| e[/^_/]}
+    vals = caller.eval("[ #{vars.join(",")} ]")
+    Hash[ vars.zip(vals) ]
+  end
   
 end
 
@@ -472,12 +506,27 @@ class String
   end
 
   #
-  # Parse object as JSON
+  # Parse this string as JSON
   #
   def from_json
-    JSON.parse self
+    JSON.parse(self)
   end
   
+  #
+  # Parse this string as YAML
+  #
+  def from_yaml
+    YAML.parse(self).to_ruby
+  end
+
+  #
+  # Unmarshal the string (transform it into Ruby datatypes).
+  #  
+  def unmarshal
+    Marshal.restore self
+  end
+  alias_method :from_marshal, :unmarshal
+
   #
   # Convert the string to a Path object.
   #
@@ -486,10 +535,6 @@ class String
   end
   alias_method :to_p, :as_path
   
-  def unmarshal
-    Marshal.restore self
-  end
-
   #
   # Convert this string into a string describing this many of the string.
   # (Note: Doesn't know anything about proper grammar.)
@@ -573,10 +618,28 @@ class Array
   def ^(other)
     (self | other) - (self & other)
   end
+
+  #
+  # Shuffle the array
+  #
+  unless defined? shuffle
+    def shuffle
+      sort_by{rand}
+    end
+  end
   
   #
-  # Pick a random element.
+  # Pick (a) random element(s).
   #
+  unless defined? sample
+    def sample(n=1)
+      if n == 1
+        self[rand(size)]
+      else
+        shuffle[0...n]
+      end
+    end
+  end
   alias_method :pick, :sample
   
   #
@@ -757,21 +820,41 @@ module Enumerable
   # recursively on that element.
   #
   # Example:
-  #   [ [1,2], [3,4] ].map_recursively{|e| e ** 2 } #=> [ [1,4], [9,16] ] 
+  #   [ [1,2], [3,4] ].deep_map{|e| e ** 2 } #=> [ [1,4], [9,16] ] 
   #
-  def recursive_map(*args, &block)
-    map(*args) do |e|
-      if e.is_a? Array or e.is_a? Enumerable
-        e.map(*args, &block)
+  def deep_map(depth=nil, &block)
+    map do |e|
+      if (e.is_a? Array or e.is_a? Enumerable) and (depth && depth > 0)
+        e.map(depth-1, &block)
       else
         block.call(e)
       end
     end
   end
   
-  alias_method :map_recursively,  :recursive_map
-  alias_method :map_recursive,    :recursive_map 
+  alias_method :recursive_map,    :deep_map
+  alias_method :map_recursively,  :deep_map
+  alias_method :map_recursive,    :deep_map 
 
+  #
+  # The same as "select", except that if an element is an Array or Enumerable, select is called
+  # recursively on that element.
+  #
+  # Example:
+  #   [ [1,2], [3,4] ].deep_map{|e| e ** 2 } #=> [ [1,4], [9,16] ] 
+  #
+  def deep_select(depth=nil, &block)
+    select do |e|
+      if (e.is_a? Array or e.is_a? Enumerable) and (depth && depth > 0)
+        e.select(depth-1, &block)
+      else
+        block.call(e)
+      end
+    end
+  end
+  
+  alias_method :recursive_select, :deep_select
+  
 
   #
   # Identical to "reduce" in ruby1.9 (or foldl in haskell.)
@@ -921,9 +1004,9 @@ class Object
   end
 
   #
-  # Benchmark a block!
+  # Time a block.
   #
-  def bench(message=nil)
+  def time(message=nil)
     start = Time.now
     result = yield
     elapsed = Time.now - start
@@ -932,7 +1015,47 @@ class Object
     puts "elapsed time: %0.5fs" % elapsed
     result
   end
-  alias time bench
+  
+  #
+  # Quick and easy benchmark.
+  #
+  # Examples:
+  #   bench { something }
+  #   bench(90000000) { something }
+  #   bench :fast => proc { fast_method }, :slow => proc { slow_method }
+  #
+  # In Ruby 1.9:
+  #   bench fast: ->{ fast_method }, slow: ->{ slow_method }
+  #
+  def bench(*args, &block)
+      
+    # Shitty perl-esque hack to let the method take all the different kind of arguments.
+    opts  = Hash === args.last ? args.pop : {}
+    n     = args.first || 100
+  
+    if opts.any?
+    
+      raise "Error: Supply either a do/end block, or procs as options. Not both." if block_given?
+      raise "Error: Options must be procs." unless opts.all? { |k, v| v.is_a?(Proc) }
+
+      benchblock = proc do |bm|
+        opts.each do |name, blk|
+          bm.report(name.to_s) { n.times &blk }
+        end
+      end
+      
+    elsif block_given?
+    
+      benchblock = proc do |bm|
+        bm.report { n.times &block }
+      end
+      
+    else
+      raise "Error: Must supply some code to benchmark."
+    end
+    
+    Benchmark.bmbm(&benchblock)
+  end
   
 
   #
@@ -1038,6 +1161,10 @@ class Hash
     new(0)
   end
 
+  #
+  # Hash keys become methods, kinda like OpenStruct. These methods have the lowest priority,
+  # so be careful. They will be overridden by any methods on Hash.
+  #
   def self.lazy!
     Hash.class_eval do
       def method_missing(name, *args)
@@ -1298,47 +1425,6 @@ unless IO.respond_to? :copy_stream
     
   end
   
-end
-
-#
-# Emit a quick debug message (only if $DEBUG is true)
-#
-def dmsg(msg)
-  if $DEBUG
-    case msg
-    when String
-      puts msg
-    else
-      puts msg.inspect
-    end
-  end
-end
-
-
-def del(x)
-  case thing
-    when String
-      del(x.to_sym)
-    when Class, Module
-      Object.send(:remove_const, x)
-    when Method
-      x.owner.send(:undef_method, x.name)
-    when Symbol
-      if Object.const_get(x)
-        Object.send(:remove_const, x)
-      elsif method(x)
-        undef_method x
-      end
-    else
-      raise "Error: don't know how to 'del #{x.inspect}'"
-  end
-end
-
-def locals
-  caller = binding.of_caller(1)
-  vars = caller.eval("local_variables").reject{|e| e[/^_/]}
-  vals = caller.eval("[ #{vars.join(",")} ]")
-  Hash[ vars.zip(vals) ]
 end
 
 
