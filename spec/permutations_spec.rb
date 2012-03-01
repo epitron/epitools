@@ -1,5 +1,6 @@
-require 'epitools/basetypes'
-require 'epitools/permutations'
+#require 'epitools/core_ext'
+#require 'epitools/permutations'
+require 'epitools'
 
 describe "Permutations" do
   

@@ -21,8 +21,9 @@ autoload :Benchmark,  'benchmark'
 # YAML is sometimes loaded improperly.
 if defined? YAML and not defined? YAML.parse
   del YAML  # remove the existing module
-  autoload :YAML, 'yaml'
 end
+
+autoload :YAML, 'yaml'
 
 if RUBY_VERSION["1.8.7"]
   autoload :Prime,      'mathn'
@@ -49,5 +50,7 @@ autoload :MimeMagic,    'epitools/mimemagic'
 autoload :Term,         'epitools/term'
 autoload :Iter,         'epitools/iter'
 
-## Gems
-autoreq  :ANSI,         'ansi' 
+## Gems (common)
+autoreq  :ANSI,         'ansi'
+autoreq  :BSON,         'bson'
+

@@ -16,7 +16,6 @@
 # Daniel Mendler
 #
 require 'epitools/mimemagic_tables'
-require 'stringio'
 
 # Mime type detection
 class MimeMagic

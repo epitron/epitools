@@ -12,9 +12,14 @@ class Iter
   attr_accessor :container
 
   def initialize(vals)
-    @container = vals.map{|val| Elem.new(self, val)}
+    @container = vals.map { |val| elem(val) }
   end
   
+  # Wrap a value in an Elem container
+  def elem(val)
+    Elem.new(self, val)
+  end
+
   def self.from_elems(elems)
     new([]).tap { |i| i.container = elems }
   end
@@ -31,12 +36,14 @@ class Iter
   def each
     @container.each do |elem|
       yield elem
+      elem.visited = true
     end
   end
   
   def each_cons(num=1)
     @container.each_cons(num) do |(*elems)|
       yield *elems 
+      elems.each { |e| e.visited = true }
     end
   end
   
@@ -59,11 +66,12 @@ class Iter
   
   class Elem < BasicObject
   
-    attr_accessor :val
+    attr_accessor :val, :visited
     
     def initialize(iter, val)
       @iter = iter
-      @val  = val.elem? ? val.value : val 
+      @val  = val.is_a?(Elem) ? val.value : val
+      @visited = false
     end
     
     def elem?
@@ -80,6 +88,10 @@ class Iter
     
     def current
       self
+    end
+    
+    def visited?
+      @visited
     end
     
     def next
@@ -149,4 +161,3 @@ class Iter
   end
   
 end
-

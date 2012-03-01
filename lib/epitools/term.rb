@@ -116,6 +116,10 @@ module Term
       render sliced_into(num_columns)
     end
     
+    def to_s
+      by_rows
+    end
+    
     def render(rows, options={})
       num_cols  = rows.first.size
       result    = []

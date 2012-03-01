@@ -8,14 +8,13 @@
 require 'epitools'
 
 #
-# Path: An object-oriented wrapper for files.
-#       (Combines useful methods from FileUtils, File, Dir, and more!)
+# Path: An object-oriented wrapper for files. (Combines useful methods from FileUtils, File, Dir, and more!)
 #
 # Each Path object has the following attributes:
 #
 #    path            => the entire path
 #    filename        => just the name and extension
-#    basename        => just the filename
+#    basename        => just the filename (without extension)
 #    ext             => just the extension
 #    dir             => just the directory
 #    dirs            => an array of directories
@@ -33,25 +32,27 @@ require 'epitools'
 #     false
 #   end
 #    
-#
-# Examples:
+# More examples:
 #
 #   Path["*.jpeg"].each { |path| path.rename(:ext=>"jpg") }
-#
 #   Path["filename.txt"] << "Append data!"
-#
-#   entries = Path["/etc"].ls
-#
-#   Path
+#   etcfiles = Path["/etc"].ls
+#   Path["*.txt"].each(&:gzip)
 #
 # Swap two files:
 #
 #   a, b = Path["file_a", "file_b"]
-#   temp = a.with(:ext=>a.ext+".swapping")
+#   temp = a.with(:ext=>a.ext+".swapping") # return a modified version of this object
 #   a.mv(temp)
 #   b.mv(a)
 #   temp.mv(b)
-#   
+#
+# Paths can be created for existant and non-existant files. If you want to create a nonexistant
+# directory, just add a '/' at the end, so Path knows. (eg: Path["/etc/nonexistant/"]).
+#
+# Performance has been an important factor in Path's design, so doing crazy things with Path
+# usually doesn't kill your machine. Go nuts!
+#
 #
 class Path
   
@@ -695,8 +696,6 @@ raise "Broken!"
   end
 
   
-  # Mimetype finding and magic (requires 'mimemagic' gem)
-
   #
   # Find the file's mimetype (first from file extension, then by magic)
   #  
@@ -719,16 +718,16 @@ raise "Broken!"
     open { |io| MimeMagic.by_magic(io) }
   end
   
-  # TODO: rename type => magicext
-  
   #
-  # The filetype (as a standard file extension), verified with Magic.
+  # Returns the filetype (as a standard file extension), verified with Magic.
   #
   # (In other words, this will give you the *true* extension, even if the file's
   # extension is wrong.)
   #
   # Note: Prefers long extensions (eg: jpeg over jpg)
   #
+  # TODO: rename type => magicext?
+  #  
   def type
     @cached_type ||= begin
       

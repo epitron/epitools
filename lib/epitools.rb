@@ -58,19 +58,40 @@ class Object
     end
   end
   
+  # The hidden singleton lurks behind everyone
+  def metaclass
+    class << self
+      self
+    end
+  end
+
+  def meta_eval &blk
+    metaclass.instance_eval &blk
+  end
+
+  # Adds methods to a metaclass
+  def meta_def name, &blk
+    meta_eval { define_method name, &blk }
+  end
+
+  # Defines an instance method within a class
+  def class_def name, &blk
+    class_eval { define_method name, &blk }
+  end
+
 end
 
 #
-# Patch 'Module#const_missing' to support 'autoreq'
+# Patch 'Module#const_missing' to support 'autoreq' (which can autoload gems)
 #
 class Module
 
-  @@autoreq_searching_for = nil
+  @@autoreq_is_searching_for = nil
   
   alias const_missing_without_autoreq const_missing
   
   def const_missing(const)
-    return if const == @@autoreq_searching_for
+    return if const == @@autoreq_is_searching_for
     
     if thing = autoreqs[const]
       case thing
@@ -83,7 +104,7 @@ class Module
       end
     end
     
-    @@autoreq_searching_for = const
+    @@autoreq_is_searching_for = const
     const_get(const) || const_missing_without_autoreq(const)
   end
   
@@ -109,8 +130,7 @@ end
 #
 %w[
   autoloads
-  basetypes 
-  string_to_proc
+  core_ext 
   zopen
   colored
   clitools

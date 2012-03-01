@@ -150,6 +150,12 @@ describe Numeric do
     5.days.from_now.to_i.should == (Time.now + 5.days).to_i
   end
   
+  it "thingses" do
+    10.things.should == [0,1,2,3,4,5,6,7,8,9]
+    4.things {|n| n * 5 }.should == [0,5,10,15]
+    -1.things.should == []
+  end
+
 end
 
 
@@ -518,6 +524,14 @@ describe BasicObject do
   
 end
 
+describe Range do
+
+  it "generates random numbers" do
+    r = 1..10
+    50.times { r.includes?(r.rand).should == true }
+  end
+
+end
 
 describe "truthiness" do
   
