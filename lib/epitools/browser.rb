@@ -140,6 +140,8 @@ class Browser
     puts "[ GET #{url} (using cache: #{use_cache}) ]"
     
     delay unless cached_already
+    max_retries = 4
+    retries = 0
 
     begin
       
@@ -156,9 +158,12 @@ class Browser
     rescue Net::HTTPBadResponse, Errno::ECONNRESET, SocketError, Timeout::Error, SOCKSError => e
       raise if e.message == "getaddrinfo: Name or service not known"
 
+      retries += 1
+      return if retries >= max_retries
+
       puts "  |_ ERROR: #{e.inspect} -- retrying"
       delay(5)
-      retry
+      retry 
       
 =begin      
     rescue Mechanize::ResponseCodeError => e
