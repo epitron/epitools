@@ -154,6 +154,8 @@ class Browser
       puts
 
     rescue Net::HTTPBadResponse, Errno::ECONNRESET, SocketError, Timeout::Error, SOCKSError => e
+      raise if e.message == "getaddrinfo: Name or service not known"
+
       puts "  |_ ERROR: #{e.inspect} -- retrying"
       delay(5)
       retry
