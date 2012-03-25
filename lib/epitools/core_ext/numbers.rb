@@ -45,50 +45,43 @@ class Numeric
     end
   end
 
-end
+  [:cos,
+   :sin,
+   :tan,
+   :acos,
+   :asin,
+   :atan,
+   :cosh,
+   :sinh,
+   :tanh,
+   :acosh,
+   :asinh,
+   :atanh,
+   :exp,
+   :log2,
+   :log10,
+   :sqrt,
+   :cbrt,
+   :frexp,
+   :erf,
+   :erfc,
+   :gamma,
+   :lgamma
+  ].each do |meth|
 
+    class_eval %{
+      def #{meth}
+        Math.#{meth}(self)
+      end
+    }
 
-class Time
-
-  #
-  # Relative time, in words. (eg: "1 second ago", "2 weeks from now", etc.)
-  #
-  def in_words
-    delta   = (Time.now-self).to_i
-    a       = delta.abs
-    
-    amount  = case a
-      when 0                  
-        'just now'
-      when 1                  
-        '1 second'
-      when 2..59              
-        "second".amount(a) 
-      when 1.minute...1.hour            
-        "minute".amount(a/1.minute)
-      when 1.hour...1.day           
-        "hour".amount(a/1.hour)
-      when 1.day...7.days
-        "day".amount(a/1.day)
-      when 1.week...1.month
-        "week".amount(a/1.week)
-      when 1.month...12.months
-        "month".amount(a/1.month)
-      else
-        "year".amount(a/1.year)
-    end
-              
-    if delta < 0
-      amount += " from now"
-    elsif delta > 0
-      amount += " ago"
-    end
-    
-    amount
   end
-  
-end
 
+  def log(n)
+    Math.log(self, n)
+  end
+
+end
 
 
 class Integer
@@ -153,9 +146,26 @@ class Integer
     Prime # autoload the prime module
     prime_division.map { |n,count| [n]*count }.flatten 
   end
-  
-end
 
+  #
+  # Factorial (iterated style)
+  #
+  def fact
+    total = 1
+    self.downto(2) { |x| total *= x }
+    total
+  end
+  alias_method :factorial, :fact
+
+  #
+  # Fibonacci (recursive style)
+  #
+  def fib
+    self < 2 ? self : (self-1).fib + (self-2).fib
+  end
+  alias_method :fibonacci, :fib
+
+end
 
 #
 # Monkeypatch [] into Bignum and Fixnum using class_eval.
@@ -185,5 +195,43 @@ end
   
 end
 
+class Time
 
-
+  #
+  # Relative time, in words. (eg: "1 second ago", "2 weeks from now", etc.)
+  #
+  def in_words
+    delta   = (Time.now-self).to_i
+    a       = delta.abs
+    
+    amount  = case a
+      when 0
+        'just now'
+      when 1
+        '1 second'
+      when 2..59
+        "second".amount(a)
+      when 1.minute...1.hour
+        "minute".amount(a/1.minute)
+      when 1.hour...1.day
+        "hour".amount(a/1.hour)
+      when 1.day...7.days
+        "day".amount(a/1.day)
+      when 1.week...1.month
+        "week".amount(a/1.week)
+      when 1.month...12.months
+        "month".amount(a/1.month)
+      else
+        "year".amount(a/1.year)
+    end
+    
+    if delta < 0
+      amount += " from now"
+    elsif delta > 0
+      amount += " ago"
+    end
+    
+    amount
+  end
+  
+end

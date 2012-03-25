@@ -17,15 +17,15 @@ describe Object do
     c = Cookie.new; c.size = 10; c.chips = 200
     w = c.with(:chips=>50)
     
-    w.size.should == c.size
+    w.size.should      == c.size
     w.chips.should_not == c.chips
-    w.should_not === c
+    w.should_not       === c
   end
   
   it "in?" do
-    5.in?([1,2,3,4,5,6]).should == true
-    5.in?(1..10).should == true
-    5.in?(20..30).should == false
+    5.in?([1,2,3,4,5,6]).should   == true
+    5.in?(1..10).should           == true
+    5.in?(20..30).should          == false
     "butt".in?("butts!!!").should == true
   end
  
@@ -61,21 +61,21 @@ describe Object do
 
     def s.test(a); a; end
     
-    s.test(1).should == 1
-    s.try(:test, 1).should == 1
+    s.test(1).should                == 1
+    s.try(:test, 1).should          == 1
     
     lambda { s.test }.should raise_error
     lambda { s.try(:test) }.should raise_error
     
     def s.blocky; yield; end
-
-    s.blocky{ 1 }.should == 1
-    s.try(:blocky){ 1 }.should == 1
+    
+    s.blocky{ 1 }.should            == 1
+    s.try(:blocky){ 1 }.should      == 1
     s.try(:nonexistant){ 1 }.should == nil
   end
   
   it "nots" do
-    10.even?.should == true
+    10.even?.should     == true
     10.not.even?.should == false
   end
   
@@ -131,39 +131,47 @@ end
 describe Numeric do
 
   it "commatizes" do
-    123.commatize.should == "123"
-    1234.commatize.should == "1,234"
-    12983287123.commatize.should == "12,983,287,123"
-    -12983287123.commatize.should == "-12,983,287,123"
+    123.commatize.should               == "123"
+    1234.commatize.should              == "1,234"
+    12983287123.commatize.should       == "12,983,287,123"
+    -12983287123.commatize.should      == "-12,983,287,123"
     -12983287123.4411.commatize.should == "-12,983,287,123.4411"
   end
   
   it "does time things" do
-    1.second.should == 1
-    1.minute.should == 60
-    2.minutes.should == 120
-    2.hours.should == 120*60
-    2.5.days.should == 3600*24*2.5
+    1.second.should             == 1
+    1.minute.should             == 60
+    2.minutes.should            == 120
+    2.hours.should              == 120*60
+    2.5.days.should             == 3600*24*2.5
     
-    5.days.ago.to_i.should == (Time.now - 5.days).to_i
-    1.year.ago.year.should == Time.now.year - 1 
+    5.days.ago.to_i.should      == (Time.now - 5.days).to_i
+    1.year.ago.year.should      == Time.now.year - 1 
     5.days.from_now.to_i.should == (Time.now + 5.days).to_i
   end
   
   it "thingses" do
-    10.things.should == [0,1,2,3,4,5,6,7,8,9]
+    10.things.should             == [0,1,2,3,4,5,6,7,8,9]
     4.things {|n| n * 5 }.should == [0,5,10,15]
-    -1.things.should == []
+    -1.things.should             == []
+  end
+
+  it "maths" do
+    10.cos.should == Math.cos(10)
+    20.sin.should == Math.sin(20)
+    1.5.exp.should == Math.exp(1.5)
+
+    253.log(5).should == Math.log(253,5)
+    (2**(4212.log(2))).should == 4212.0
   end
 
 end
-
 
 describe String do
   
   it "rot13s" do
     message = "Unbreakable Code"
-    message.rot13.should_not == message
+    message.rot13.should_not   == message
     message.rot13.rot13.should == message
   end
   
@@ -424,24 +432,25 @@ describe Hash do
     
   it "maps keys" do
     h = @h.map_keys{|k| k.upcase}
-    h.keys.should == @h.keys.map{|k| k.upcase}
+    h.keys.should   == @h.keys.map{|k| k.upcase}
     h.values.should == @h.values
     
     h.map_keys! { 1 }
-    h.keys.should == [1]
+    h.keys.should   == [1]
   end
   
   it "maps values" do
     h = @h.map_values{|v| v.upcase}
+
     h.values.should == @h.values.map{|v| v.upcase}
-    h.keys.should == @h.keys
-    h.map_values!{ 1 }
+    h.keys.should   == @h.keys
+    h.map_values! { 1 }
     h.values.should == [1,1]
   end
   
   it "mkdir_p's and trees" do
     h = {}
-    h.mkdir_p(["a", "b", "c"]).should == {"a"=>{"b"=>{"c"=>{}}}}
+    h.mkdir_p(["a", "b", "c"]).should    == {"a"=>{"b"=>{"c"=>{}}}}
     h.mkdir_p(["a", "b", "whoa"]).should == {"a"=>{"b"=>{"c"=>{}, "whoa"=>{}}}}
     
     lambda { 
@@ -457,7 +466,7 @@ describe Hash do
   end
   
   it "includes?s and key?s" do
-    @h.key?("key1").should == true
+    @h.key?("key1").should      == true
     @h.includes?("key1").should == true
   end
   
@@ -466,15 +475,15 @@ end
 
 describe Time do
   it "time in words" do
-    Time.now.in_words.should == "just now"
-    1.second.ago.in_words.should == "1 second ago"
-    2.seconds.ago.in_words.should == "2 seconds ago"
-    3.weeks.ago.in_words.should == "3 weeks ago"
-    4.5.weeks.ago.in_words.should == "1 month ago"
-    2.months.ago.in_words.should == "2 months ago"
-    2.years.ago.in_words.should == "2 years ago"
-    2.5.years.ago.in_words.should == "2 years ago"
-
+    Time.now.in_words.should           == "just now"
+    1.second.ago.in_words.should       == "1 second ago"
+    2.seconds.ago.in_words.should      == "2 seconds ago"
+    3.weeks.ago.in_words.should        == "3 weeks ago"
+    4.5.weeks.ago.in_words.should      == "1 month ago"
+    2.months.ago.in_words.should       == "2 months ago"
+    2.years.ago.in_words.should        == "2 years ago"
+    2.5.years.ago.in_words.should      == "2 years ago"
+    
     2.5.years.from_now.in_words.should == "2 years from now"
   end
 end
@@ -487,13 +496,13 @@ describe Binding do
   b.binding.keys.should == [:a, :b]
   b.binding.keys.should == b.binding.local_variables
   
-  b.binding[:a].should == 1
+  b.binding[:a].should  == 1
   b.binding["a"].should == 1
-  b.binding[:b].should == b
+  b.binding[:b].should  == b
   
   b.binding[:a] = 5
-  b.binding[:a].should == 5
-  b.call.should == 5
+  b.binding[:a].should  == 5
+  b.call.should         == 5
 end
 
 describe Proc do
