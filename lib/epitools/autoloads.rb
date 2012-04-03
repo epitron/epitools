@@ -51,6 +51,6 @@ autoload :Term,         'epitools/term'
 autoload :Iter,         'epitools/iter'
 
 ## Gems (common)
+autoreq  :Nokogiri,     'nokogiri'
 autoreq  :ANSI,         'ansi'
 autoreq  :BSON,         'bson'
-

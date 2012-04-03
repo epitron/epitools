@@ -104,16 +104,29 @@ describe Path do
     s2[15..-1].should == s1    
   end
   
-  it "reads/writes json and yaml" do
+  it "reads/writes various formats (json, yaml, etc.)" do
     data = { "hello" => "there", "amazing" => [1,2,3,4] }
     
     yaml = Path.tmpfile
     yaml.write_yaml(data)
-    yaml.from_yaml.should == data
+    yaml.read_yaml.should == data
     
     json = Path.tmpfile
     json.write_json(data)
-    json.from_json.should == data
+    json.read_json.should == data
+
+    data = "<h1>The best webpage in the universe.</h1>"
+    html = Path.tmpfile
+    html.write data
+    html.read_html.at("h1").to_s.should == data
+  end
+
+  it "parses files" do
+    data = {"hello"=>"there"}
+
+    f = Path["/tmp/something.json"]
+    f.write_json(data)
+    f.parse.should == data
   end
   
   it "makes paths THREE WAYS!" do

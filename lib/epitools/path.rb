@@ -411,22 +411,67 @@ class Path
       end
     end    
   end
-  
 
-  # Convert the object to JSON and write it to the file (overwriting the existing file).
-  def write_json(object); write object.to_json; end
+  #
+  # Parse the file based on the file extension.
+  # (Handles json, html, yaml, marshal.)
+  #
+  def parse
+    case ext.downcase
+    when 'json'
+      read_json
+    when 'html', 'htm'
+      read_html
+    when 'xml', 'rdf', 'rss'
+      read_xml
+    when 'yaml', 'yml'
+      read_yaml
+    when 'marshal'
+      read_marshal
+    when 'bson'
+      read_bson
+    else
+      raise "Unrecognized format: #{ext}"
+    end
+  end
 
   # Parse the file as JSON
-  def read_json; read.from_json; end
+  def read_json
+    JSON.load(io)
+  end
   alias_method :from_json, :read_json
+  
+  # Convert the object to JSON and write it to the file (overwriting the existing file).
+  def write_json(object)
+    write object.to_json
+  end
+
+  def read_html
+    Nokogiri::HTML(io)
+  end
 
   # Convert the object to YAML and write it to the file (overwriting the existing file).
-  def write_yaml(object); write object.to_yaml; end
+  def write_yaml(object)
+    write object.to_yaml
+  end
 
   # Parse the file as YAML
-  def read_yaml; read.from_yaml; end
+  def read_yaml
+    YAML.load(io)
+  end
   alias_method :from_yaml, :read_yaml
 
+  def read_xml
+    Nokogiri::XML(io)
+  end
+
+  def read_marshal
+    Marshal.load(io)
+  end
+
+  def read_bson
+    BSON.deserialize(read)
+  end
   
   #
   # Examples:
@@ -756,7 +801,8 @@ raise "Broken!"
       
     end
   end
-  
+
+
   ## aliases
   
   alias_method :to_path,    :path
@@ -960,15 +1006,14 @@ class Path::URL < Path
   end
   
   # ...and `path` is /path/filename.ext
-  
 end
 
 
 #
 # Path("/some/path") is an alias for Path["/some/path"]
 #
-def Path(*args)
-  Path[*args]
+def Path(arg)
+  Path[arg]
 end
 
 class String
@@ -978,4 +1023,3 @@ class String
   
   alias_method :to_P, :to_Path
 end
-
