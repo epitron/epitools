@@ -175,3 +175,24 @@ class Range
   end
 
 end
+
+
+class Struct
+
+  #
+  # Transform this struct into a JSON hash
+  #
+  def to_hash
+    hash = {}
+    each_pair { |k,v| hash[k] = v }
+    hash
+  end
+
+  #
+  # Transform the struct into a simple JSON hash.
+  #
+  def to_json(*args)
+    to_hash.to_json
+  end
+
+end

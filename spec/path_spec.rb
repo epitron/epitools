@@ -5,21 +5,21 @@ describe Path do
   it "initializes and accesses everything" do
     path = Path.new("/blah/what.mp4/.mp3/hello.avi")
     
-    path.dirs.should == %w[ blah what.mp4 .mp3 ]
-    path.dir.should == "/blah/what.mp4/.mp3"
+    path.dirs.should     == %w[ blah what.mp4 .mp3 ]
+    path.dir.should      == "/blah/what.mp4/.mp3"
     path.filename.should == "hello.avi"
-    path.ext.should == "avi"
-    path.base.should == "hello"
+    path.ext.should      == "avi"
+    path.base.should     == "hello"
   end
   
   it "works with relative paths" do
     path = Path.new("../hello.mp3/blah")
     
     path.filename.should == "blah"
-    path.ext.should == nil
+    path.ext.should      == nil
     
-    abs_path = File.join(File.expand_path(".."), "hello.mp3")
-    path.dir.should == abs_path 
+    abs_path             = File.join(File.expand_path(".."), "hello.mp3")
+    path.dir.should      == abs_path 
   end
   
   it "'relative_to's" do
@@ -30,14 +30,14 @@ describe Path do
     path = Path.new("/etc/")
     
     path.dirs.should_not == nil
-    path.dir.should == "/etc"
+    path.dir.should      == "/etc"
     path.filename.should == nil
   end
   
   it "replaces ext" do
     path = Path.new("/blah/what.mp4/.mp3/hello.avi")
-    
     path.ext.should == "avi"
+
     path.ext = "mkv"
     path.ext.should == "mkv"
     
@@ -45,35 +45,36 @@ describe Path do
   end
 
   it "replaces filename" do
-    path = Path.new(__FILE__)
+    path             = Path.new(__FILE__)
     path.dir?.should == false
-    path.filename = nil
+    
+    path.filename    = nil
     path.dir?.should == true
   end
   
   it "fstats" do
     path = Path.new(__FILE__)
     
-    path.exists?.should == true
-    path.dir?.should == false
-    path.file?.should == true
-    path.symlink?.should == false
+    path.exists?.should     == true
+    path.dir?.should        == false
+    path.file?.should       == true
+    path.symlink?.should    == false
     path.mtime.class.should == Time
   end
   
   it "globs" do
-    path = Path.new(__FILE__)
-    glob = path.dir + "/*spec.rb"
+    path  = Path.new(__FILE__)
+    glob  = path.dir + "/*spec.rb"
     specs = Path.glob(glob)
     path.in?(specs).should == true
   end
   
   it "Path[file] and Path[glob]s" do
-    path = Path.new(__FILE__)
-    path.should == Path[__FILE__]
-
-    glob = path.dir + "/*spec.rb"
-    specs = Path.glob(glob)
+    path              = Path.new(__FILE__)
+    path.should       == Path[__FILE__]
+    
+    glob              = path.dir + "/*spec.rb"
+    specs             = Path.glob(glob)
     Path[glob].should == specs
   end
 
@@ -148,16 +149,16 @@ describe Path do
     path = Path['/spam/spam/spam/']
     path.dirs.should == %w[ spam spam spam ]
     path.dirs << 'humbug'
-    path.dir.should == '/spam/spam/spam/humbug'
+    path.dir.should  == '/spam/spam/spam/humbug'
     path.path.should == '/spam/spam/spam/humbug/'
   end
   
   it "handles URLs" do
     path = Path["http://google.com/?search=blah"]
-    path.host.should == "google.com"
-    path.port.should == 80
+    path.host.should  == "google.com"
+    path.port.should  == 80
     path.query.should == {"search" => "blah"}
-    path.uri?.should == true
+    path.uri?.should  == true
   end
   
   it "tempfiles" do
@@ -201,7 +202,7 @@ describe Path do
     path = Path.tmpfile
     path << "data"
     path.exists?.should == true
-    path.rm.should == true
+    path.rm.should      == true
     path.exists?.should == false
   end
   
@@ -259,7 +260,7 @@ describe Path do
     
     gunzipped = gzipped.gunzip
     gunzipped.size.should == before
-    gunzipped.should == path
+    gunzipped.should      == path
   end
   
   it "exts" do
@@ -304,7 +305,6 @@ describe Path do
     #  => ["../../.ssh/id_rsairb.pub"]
     
     Path["~/.ssh/id_{dsa,rsa}.pub"].size.should > 0
-  
   end
   
   it "modes" do
@@ -345,11 +345,11 @@ describe Path do
   end
   
   it 'parents and childs properly' do
-    root = Path["/"]
-    parent = Path["/blah/stuff"]
-    child = Path["/blah/stuff/what"]
+    root    = Path["/"]
+    parent  = Path["/blah/stuff"]
+    child   = Path["/blah/stuff/what"]
     neither = Path["/whee/yay"]
-
+    
     # Table of parent=>child relationships    
     {
       parent => child,

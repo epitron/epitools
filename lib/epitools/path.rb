@@ -439,16 +439,17 @@ class Path
   def read_json
     JSON.load(io)
   end
-  alias_method :from_json, :read_json
   
   # Convert the object to JSON and write it to the file (overwriting the existing file).
   def write_json(object)
     write object.to_json
   end
 
+
   def read_html
     Nokogiri::HTML(io)
   end
+
 
   # Convert the object to YAML and write it to the file (overwriting the existing file).
   def write_yaml(object)
@@ -459,19 +460,30 @@ class Path
   def read_yaml
     YAML.load(io)
   end
-  alias_method :from_yaml, :read_yaml
+
 
   def read_xml
     Nokogiri::XML(io)
   end
 
+
   def read_marshal
     Marshal.load(io)
   end
 
+  def write_marshal(object)
+    write object.marshal
+  end
+
+
   def read_bson
     BSON.deserialize(read)
   end
+  
+  def write_bson(object)
+    write BSON.serialize(object)
+  end
+
   
   #
   # Examples:
