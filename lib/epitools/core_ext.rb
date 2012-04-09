@@ -196,3 +196,12 @@ class Struct
   end
 
 end
+
+
+module URI
+
+  def params
+    query.to_params
+  end
+
+end

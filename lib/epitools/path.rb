@@ -385,12 +385,16 @@ class Path
   ## modifying files
 
   #
-  # Append
+  # Append data to this file (accepts a string, an IO, or it can yield the file handle to a block.)
   #
   def append(data=nil)
     self.open("ab") do |f|
       if data and not block_given?
-        f.write(data)
+        if data.is_an? IO
+          IO.copy_stream(data, f)
+        else
+          f.write(data)
+        end
       else
         yield f
       end
@@ -400,12 +404,16 @@ class Path
   alias_method :<<, :append
   
   #
-  # Write a string, truncating the file
+  # Overwrite the data in this file (accepts a string, an IO, or it can yield the file handle to a block.)
   #
   def write(data=nil)
     self.open("wb") do |f|
       if data and not block_given?
-        f.write(data)
+        if data.is_an? IO
+          IO.copy_stream(data, f)
+        else
+          f.write(data)
+        end
       else
         yield f
       end
@@ -414,7 +422,7 @@ class Path
 
   #
   # Parse the file based on the file extension.
-  # (Handles json, html, yaml, marshal.)
+  # (Handles json, html, yaml, xml, bson, and marshal.)
   #
   def parse
     case ext.downcase
@@ -715,14 +723,6 @@ raise "Broken!"
     self.path = gunzipped.path
   end
 
-  #
-  # Return the IO object for this file.
-  #
-  def io
-    open
-  end
-  alias_method :stream, :io
-  
   def =~(pattern)
     to_s =~ pattern
   end

@@ -165,6 +165,23 @@ class Integer
   end
   alias_method :fibonacci, :fib
 
+  #
+  # Convert seconds to hours:minutes:seconds (hours is dropped if it's zero)
+  #
+  def to_hms
+    seconds = self
+
+    days, seconds    = seconds.divmod(86400)
+    hours, seconds   = seconds.divmod(3600)
+    minutes, seconds = seconds.divmod(60)
+
+    result = "%0.2d:%0.2d" % [minutes,seconds]
+    result = ("%0.2d:" % hours) + result   if hours > 0 or days > 0
+    result = ("%0.2d:" % days) + result    if days > 0
+
+    result
+  end
+
 end
 
 #

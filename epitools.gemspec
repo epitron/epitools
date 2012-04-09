@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "epitools"
-  s.version = "0.5.1"
+  s.version = "0.5.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["epitron"]
-  s.date = "2011-11-23"
+  s.date = "2012-04-05"
   s.description = "Miscellaneous utility libraries to make my life easier."
   s.email = "chris@ill-logic.com"
   s.extra_rdoc_files = [
@@ -19,6 +19,7 @@ Gem::Specification.new do |s|
   ]
   s.files = [
     ".document",
+    "Guardfile",
     "LICENSE",
     "README.rdoc",
     "Rakefile",
@@ -27,12 +28,19 @@ Gem::Specification.new do |s|
     "epitools.gemspec",
     "lib/epitools.rb",
     "lib/epitools/autoloads.rb",
-    "lib/epitools/basetypes.rb",
     "lib/epitools/browser.rb",
     "lib/epitools/browser/cache.rb",
     "lib/epitools/browser/mechanize_progressbar.rb",
     "lib/epitools/clitools.rb",
     "lib/epitools/colored.rb",
+    "lib/epitools/core_ext.rb",
+    "lib/epitools/core_ext/array.rb",
+    "lib/epitools/core_ext/enumerable.rb",
+    "lib/epitools/core_ext/hash.rb",
+    "lib/epitools/core_ext/numbers.rb",
+    "lib/epitools/core_ext/object.rb",
+    "lib/epitools/core_ext/string.rb",
+    "lib/epitools/core_ext/truthiness.rb",
     "lib/epitools/ezdb.rb",
     "lib/epitools/hexdump.rb",
     "lib/epitools/iter.rb",
@@ -49,16 +57,15 @@ Gem::Specification.new do |s|
     "lib/epitools/rails.rb",
     "lib/epitools/rash.rb",
     "lib/epitools/ratio.rb",
-    "lib/epitools/string_to_proc.rb",
     "lib/epitools/sys.rb",
     "lib/epitools/term.rb",
     "lib/epitools/trie.rb",
     "lib/epitools/zopen.rb",
     "spec/autoreq_spec.rb",
-    "spec/basetypes_spec.rb",
     "spec/browser_spec.rb",
     "spec/clitools_spec.rb",
     "spec/colored_spec.rb",
+    "spec/core_ext_spec.rb",
     "spec/ezdb_spec.rb",
     "spec/iter_spec.rb",
     "spec/lcs_spec.rb",
@@ -76,7 +83,7 @@ Gem::Specification.new do |s|
   s.homepage = "http://github.com/epitron/epitools"
   s.licenses = ["WTFPL"]
   s.require_paths = ["lib"]
-  s.rubygems_version = "1.8.10"
+  s.rubygems_version = "1.8.21"
   s.summary = "NOT UTILS... METILS!"
 
   if s.respond_to? :specification_version then
