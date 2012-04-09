@@ -74,12 +74,12 @@ class Path
     
       if path =~ %r{^[a-z\-]+://}i # URL?
         Path::URL.new(path)
+
       elsif path =~ /^javascript:/
         Path::JS.new(path)
+
       else
-      
         # todo: highlight backgrounds of codeblocks to show indent level & put boxes (or rules?) around (between?) double-spaced regions
-        
         path = Path.expand_path(path)
         if path =~ /(^|[^\\])[\?\*\{\}]/ # contains unescaped glob chars? 
           glob(path)
@@ -137,7 +137,10 @@ class Path
   end
    
   def dir=(newdir)
-    @dirs = File.expand_path(newdir).split(File::SEPARATOR)[1..-1]
+    dirs  = File.expand_path(newdir).split(File::SEPARATOR)
+    dirs  = dirs[1..-1] if dirs.size > 0
+    
+    @dirs = dirs
   end
   
   # TODO: Figure out how to fix the 'path.with(:ext=>ext+".other")' problem (when 'ext == nil')...
