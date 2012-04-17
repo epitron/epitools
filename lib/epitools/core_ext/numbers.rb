@@ -41,7 +41,7 @@ class Numeric
     if block_given?
       Array.new(self, &block)
     else
-      Array.new(self)
+      (0...self).to_a
     end
   end
 

@@ -178,7 +178,7 @@ module Enumerable
 
     end
   end
-  
+
   alias_method :recursive_map,    :deep_map
   alias_method :map_recursively,  :deep_map
   alias_method :map_recursive,    :deep_map 
@@ -188,16 +188,26 @@ module Enumerable
   # recursively on that element.
   #
   # Example:
-  #   [ [1,2], [3,4] ].deep_map{|e| e ** 2 } #=> [ [1,4], [9,16] ] 
+  #   [ [1,2], [3,4] ].deep_select{|e| e % 2 == 0 } #=> [ [2], [4] ] 
   #
   def deep_select(depth=nil, &block)
-    select do |e|
-      if (e.is_a? Array or e.is_a? Enumerable) and (depth && depth > 0)
-        e.select(depth-1, &block)
+    map do |obj|
+
+      if depth.nil? or depth > 0
+
+        case obj
+        when Hash
+          
+        when Array, Enumerable
+          result = obj.deep_select(depth ? depth-1 : nil, &block)
+          result.any? ? result : nil
+        end
+
       else
-        block.call(e)
+        obj if block.call(obj)
       end
-    end
+
+    end.compact
   end
   
   alias_method :recursive_select, :deep_select

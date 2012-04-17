@@ -388,7 +388,7 @@ describe Enumerable do
   end
   
   it "selects deeply" do
-    [[1,2],[3,4]].deep_select {|e| e % 2 == 0 }.should == [2,4] 
+    [[1,2],[3,4]].deep_select {|e| e % 2 == 0 }.should == [[2],[4]]
     {1=>2, 3=>{4=>5, 6=>7}}.deep_select {|k,v| k == 1 }.should == {1=>2} 
     #[1,2,3,4].deep_select {|e| e ** 2}.should == [1,4,9,16] 
     #[[],[],1,2,3,4].deep_select {|e| e ** 2}.should == [[], [], 1, 4, 9, 16] 

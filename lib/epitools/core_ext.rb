@@ -169,9 +169,7 @@ class Range
   # Pick a random number from the range.
   #
   def rand
-    magnitude = last-first
-    magnitude += 1 if not exclude_end?
-    Kernel.rand(magnitude)+first
+    Kernel.rand(self)
   end
 
 end
