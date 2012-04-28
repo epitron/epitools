@@ -257,6 +257,15 @@ class String
     end
   end
   
+  #
+  # Converts time duration strings (mm:ss, hh:mm:ss, or dd:hh:mm:ss) to seconds.
+  # (The reverse of Integer#to_hms)
+  #
+  def from_hms
+    nums = split(':').map(&:to_i)
+    nums = nums.reverse.zip(%w[seconds minutes hours days])
+    nums.map { |n, units| n.send(units) }.sum
+  end
   
   unless public_method_defined? :to_proc
   
