@@ -613,3 +613,9 @@ describe "to_jsons and to_yamls" do
   data.to_yaml.from_yaml.should == data  
 end
 
+describe "to_hms and from_hms" do
+  60.to_hms.should == "01:00"
+  60.to_hms.from_hms.should == 60
+  "1:20:33".from_hms.to_hms.should == "01:20:33"
+  "5:01:20:33".from_hms.to_hms.should == "05:01:20:33"
+end

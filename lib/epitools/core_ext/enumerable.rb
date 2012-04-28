@@ -193,6 +193,8 @@ module Enumerable
   def deep_select(depth=nil, &block)
     map do |*args|
 
+      obj = args.last
+
       if depth.nil? or depth > 0
 
         case obj

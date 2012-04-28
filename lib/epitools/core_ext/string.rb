@@ -263,8 +263,8 @@ class String
   #
   def from_hms
     nums = split(':').map(&:to_i)
-    nums = nums.reverse.zip(%w[seconds minutes hours days])
-    nums.map { |n, units| n.send(units) }.sum
+    nums_and_units = nums.reverse.zip %w[seconds minutes hours days]
+    nums_and_units.map { |num, units| num.send(units) }.sum
   end
   
   unless public_method_defined? :to_proc
