@@ -91,12 +91,14 @@ module Colored
     15  => :light_white,
   }
 
-  VALID_COLORS = Set.new(
-    COLORS.keys +
-    COLORS.map { |k,v| "light_#{k}" } +
-    COLORS.map { |k,v| "bright_#{k}"  } +
-    ["grey", "gray"]
-  )
+  VALID_COLORS = begin
+    normal         = COLORS.keys
+    lights         = normal.map { |fore| "light_#{fore}" }
+    brights        = normal.map { |fore| "bright_#{fore}" }
+    on_backgrounds = normal.map { |fore| normal.map { |back| "#{fore}_on_#{back}" } }.flatten
+
+    Set.new(normal + lights + brights + on_backgrounds + ["grey", "gray"])
+  end
   
   COLORS.each do |color, value|
     define_method(color) do 
@@ -248,10 +250,7 @@ module Colored
   #     
   def valid_tag?(tag)
     VALID_COLORS.include?(tag) or
-    (
-      tag =~ /^\d+$/ and
-      BBS_COLOR_TABLE.include?(tag.to_i)
-    )
+      (tag =~ /^\d+$/ and BBS_COLOR_TABLE.include?(tag.to_i) )
   end
     
   #

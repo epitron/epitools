@@ -23,7 +23,8 @@ describe "Colored strings" do
     "<magenta>hello".colorize.should == "<purple>hello".colorize
     "<gray>hello".colorize.should == "<light_black>hello".colorize
     lambda { "</blue>".colorize }.should raise_error
-  end    
+    "<black_on_yellow>hello".colorize.should == "hello".black_on_yellow
+  end
   
 end
 
