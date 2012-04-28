@@ -191,13 +191,13 @@ module Enumerable
   #   [ [1,2], [3,4] ].deep_select{|e| e % 2 == 0 } #=> [ [2], [4] ] 
   #
   def deep_select(depth=nil, &block)
-    map do |obj|
+    map do |*args|
 
       if depth.nil? or depth > 0
 
         case obj
         when Hash
-          
+
         when Array, Enumerable
           result = obj.deep_select(depth ? depth-1 : nil, &block)
           result.any? ? result : nil

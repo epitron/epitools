@@ -1,4 +1,4 @@
-#require 'epitools'
+require 'epitools/colored'
 
 class String
 
@@ -8,9 +8,14 @@ class String
   #
   # The pattern can be a string or a regular expression.
   #
-  def highlight(pattern, color=:light_yellow)
+  def highlight(pattern, color=:light_yellow, &block)
     pattern = Regexp.new(Regexp.escape(pattern)) if pattern.is_a? String
-    gsub(pattern) { |match| match.send(color) }
+
+    if block_given?
+      gsub(pattern, &block)
+    else
+      gsub(pattern) { |match| match.send(color) }
+    end
   end
 
 end

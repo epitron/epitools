@@ -11,6 +11,11 @@ describe String do
     "xxxmatchzzz".highlight(/m.+h/, color).should    == highlighted
     "xxxmatchzzz".highlight(/MATCH/i, color).should  == highlighted
   end
+
+  it "highlights with a block" do
+    result = "xxxmatchxxx".highlight(/match/) { |match| "<8>#{match}</8>" }
+    result.should == "xxx<8>match</8>xxx"
+  end
   
   it "cmds" do
     cmd( ['test -f ?', __FILE__] ).should == true
