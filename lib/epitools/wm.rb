@@ -5,7 +5,8 @@ module WM
   def self.windows;           @windows    ||= Window.all; end
   def self.desktops;          @desktops   ||= Desktop.all; end
   def self.processes;         @processes  ||= Hash[ Sys.ps.map { |process| [process.pid, process] } ] ; end
-  def self.current_desktop;   @current    = desktops.find { |d| d.current? }; end
+  def self.current_desktop;   @current    ||= desktops.find { |d| d.current? }; end
+  def self.sticky;            @sticky     ||= windows.select { |w| w.sticky? }; end
 
   class Desktop < TypedStruct["num:int current:bool resolution viewport desktop_geometry name"]
     def self.all
@@ -21,8 +22,8 @@ module WM
 
     def self.from_line(line)
       fields = line.split
-      fields[1] = (fields[1] == "*")
-      fields[5] = nil if fields[5] == "N/A"
+      fields[1] = (fields[1] == "*") # cast to boolean
+      fields[5] = nil if fields[5] == "N/A" # N/A becomes nil
       
       name = fields[9..-1].join(" ")
       
@@ -34,7 +35,6 @@ module WM
     end
 
     def windows
-      #binding.pry
       @windows ||= WM.windows.select { |w| w.desktop_id == num }
     end
   end
@@ -66,7 +66,7 @@ module WM
     end
 
     def sticky?
-      desktop == -1
+      desktop_id == -1
     end
 
     alias_method :name, :title
