@@ -1,6 +1,7 @@
 #require 'epitools/core_ext'
 #require 'epitools/permutations'
 require 'epitools'
+require 'epitools/permutations'
 
 describe "Permutations" do
   

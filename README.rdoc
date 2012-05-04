@@ -1,17 +1,24 @@
 = epitools
 
 Useful miscellaneous improvements for base Ruby objects, plus some extra
-data structures and handy wrappers.
+data structures and handy wrappers. (Think of it as a light-weight version
+of ActiveSupport. All modules are loaded on demand with `autoload`.)
 
-Base classess have been enhanced: {Enumerable}[http://rdoc.info/github/epitron/epitools/master/Enumerable], {Hash}[http://rdoc.info/github/epitron/epitools/master/Hash], {String}[http://rdoc.info/github/epitron/epitools/master/String], {Array}[http://rdoc.info/github/epitron/epitools/master/Array], {Object}[http://rdoc.info/github/epitron/epitools/master/Object], {Integer}[http://rdoc.info/github/epitron/epitools/master/Integer], etc.
+Enhanced base classes: {Enumerable}[http://rdoc.info/github/epitron/epitools/master/Enumerable], {Hash}[http://rdoc.info/github/epitron/epitools/master/Hash], {String}[http://rdoc.info/github/epitron/epitools/master/String], {Array}[http://rdoc.info/github/epitron/epitools/master/Array], {Object}[http://rdoc.info/github/epitron/epitools/master/Object], {Integer}[http://rdoc.info/github/epitron/epitools/master/Integer], etc.
 
 Extras:
 
 * {Colored}[http://rdoc.info/github/epitron/epitools/master/Colored] (enhanced version of defunkt's colored -- adds ANSI colouring methods to String, eg: #red, #green, #light_blue, etc.)
 * {Path}[http://rdoc.info/github/epitron/epitools/master/Path] (a better Pathname)
-* {Rash}[http://rdoc.info/github/epitron/epitools/master/Rash] (a hash which can have Regexps as keys, allowing a single (key,value) pair to match many keys.)
+* {Rash}[http://rdoc.info/github/epitron/epitools/master/Rash] (a hash which can have Regexps as keys, so that many input keys can map to a single value.)
 * {Progressbar}[http://rdoc.info/github/epitron/epitools/master/Progressbar] (better than the progressbar gem)
 * {Browser}[http://rdoc.info/github/epitron/epitools/master/Browser] (a fake browser, using mechanize, Progressbar, and CacheDB)
+* {WM}[http://rdoc.info/github/epitron/epitools/master/WM] (control/query desktop windows in X. Note: `wmctrl` must be installed)
+* {TypedStruct}[http://rdoc.info/github/epitron/epitools/master/TypedStruct] (like Struct, but setters always coerce input to a certain type, eg: boolean, integer, etc.)
+* {MimeMagic}[http://rdoc.info/github/epitron/epitools/master/MimeMagic] (a port of the Unix `file` utility for automatically recognizing files based on their contents; faster than running `file` on every file if you have to process large batches of files)
+* {Term}[http://rdoc.info/github/epitron/epitools/master/Term] (a toolbox for making terminal-based scripts -- get terminal size, create tables, etc.)
+* {Iter}[http://rdoc.info/github/epitron/epitools/master/Iter] (a "stable iterator" -- lets you write algorithms that modify the array as you're iterating; good for clustering.)
+* {Sys}[http://rdoc.info/github/epitron/epitools/master/Sys] (system tools -- determine operating system, list processes, view network statistics, etc.)
 
 == Installing
 
@@ -25,7 +32,7 @@ or check out the rdoc: http://rdoc.info/github/epitron/epitools/master/frames
 
 == Copyright
 
-Copyright (c) 2009-2011 epitron
+Copyright (c) 2009-2012 epitron
 
 == License
 

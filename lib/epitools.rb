@@ -1,5 +1,4 @@
 require 'pp'
-require 'set'
 
 class Object
 
@@ -134,7 +133,6 @@ end
   zopen
   colored
   clitools
-  permutations
   numwords
 ].each do |mod|
   require_wrapper.call mod
