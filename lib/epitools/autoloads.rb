@@ -16,6 +16,7 @@ autoload :Open3,      'open3'
 autoload :Timeout,    'timeout'
 autoload :Find,       'find'
 autoload :Benchmark,  'benchmark'
+autoload :Tracer,     'tracer'
 #autoload :DelegateClass, 'delegate'
 
 # YAML is sometimes loaded improperly.

@@ -78,6 +78,10 @@ module WM
     def inspect
       "{ ::#{name}:: [#{desktop_id}]}"
     end
+
+    def activate!
+      system "wmctrl", "-i", "-a", addr
+    end
   end
 
 end

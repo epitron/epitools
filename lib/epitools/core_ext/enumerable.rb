@@ -316,3 +316,30 @@ module Enumerable
 end
 
 
+class Enumerator
+
+  SPINNER = ['-', '\\', '|', '/']
+
+  #
+  # Display a spinner every `every` elements that pass through the Enumerator.
+  #
+  def with_spinner(every=37)
+    Enumerator.new do |yielder|
+      spins = 0
+
+      each.with_index do |e, i|
+        if i % every == 0
+          print "\b" unless spins == 0
+          print SPINNER[spins % 4]
+
+          spins += 1
+        end
+
+        yielder << e
+      end
+
+      print "\b \b" # erase the spinner when done
+    end
+  end
+
+end

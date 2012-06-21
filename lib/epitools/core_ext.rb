@@ -3,13 +3,13 @@ require 'epitools'
 ## Alias "Enumerator" to "Enum"
 
 if RUBY_VERSION["1.8"]
-  require 'enumerator' 
+  require 'enumerator'
   Enumerator = Enumerable::Enumerator unless defined? Enumerator
 end
 
 unless defined? Enum
   if defined? Enumerator
-    Enum = Enumerator 
+    Enum = Enumerator
   else
     $stderr.puts "WARNING: Couldn't find the Enumerator class. Enum will not be available."
   end
@@ -25,7 +25,7 @@ class Object
   def self.alias_class_method(dest, src)
     metaclass.send(:alias_method, dest, src)
   end
-  
+
 end
 
 require 'epitools/core_ext/object'
@@ -45,22 +45,31 @@ class MatchData
   def to_hash
     Hash[ names.zip(captures) ]
   end
-  
+
 end
 
 
 class Binding
 
+  #
+  # Get a variables in this binding
+  #
   def [](key)
     eval(key.to_s)
   end
-  
+
+  #
+  # Set a variable in this binding
+  #
   def []=(key, val)
     Thread.current[:_alter_binding_local_] = val
     eval("#{key} = Thread.current[:_alter_binding_local_]")
     Thread.current[:_alter_binding_local_] = nil
   end
 
+  #
+  # Return all the local variables in the binding
+  #
   def local_variables
     eval("local_variables")
   end
@@ -72,9 +81,14 @@ end
 class Proc
 
   #
-  # Joins two procs together, returning a new proc.
+  # Chain two procs together, returning a new proc. Each proc is executed one after the other,
+  # with the same input arguments. The return value is an array of all the procs' return values.
   #
-  # Example:
+  # You can use either the .join method, or the overloaded & operator.
+  #
+  # Examples:
+  #   joined = proc1 & proc2
+  #   joined = proc1.join proc2
   #   newproc = proc { 1 } & proc { 2 }
   #   newproc.call #=> [1, 2]
   #
@@ -83,7 +97,7 @@ class Proc
     proc { |*args| [self.call(*args), other.call(*args)] }
   end
   alias_method :&, :join
-  
+
   #
   # Chains two procs together, returning a new proc. The output from each proc is passed into
   # the input of the next one.
@@ -96,14 +110,14 @@ class Proc
     other ||= block
     proc { |*args| other.call( self.call(*args) ) }
   end
-  alias_method :|, :chain 
-  
+  alias_method :|, :chain
+
 end
 
 
 unless defined?(BasicObject)
   #
-  # A BasicObject class for Ruby 1.8  
+  # Backported BasicObject for Ruby 1.8
   #
   class BasicObject
     instance_methods.each { |m| undef_method m unless m =~ /^__/ }
@@ -112,27 +126,8 @@ end
 
 
 
-class NotWrapper < BasicObject # :nodoc:
-  def initialize(orig)
-    @orig = orig
-  end
-  
-  def inspect
-    "{NOT #{@orig.inspect}}"
-  end
-  
-  def method_missing(meth, *args, &block)
-    result = @orig.send(meth, *args, &block)
-    if result.is_a? ::TrueClass or result.is_a? ::FalseClass
-      !result
-    else
-      raise "Sorry, I don't know how to invert #{result.inspect}"
-    end
-  end
-end
-
 class Object
-  
+
   #
   # Negates a boolean, chained-method style.
   #
@@ -145,21 +140,49 @@ class Object
   def not
     NotWrapper.new(self)
   end
-  
+
 end
 
+class NotWrapper < BasicObject # :nodoc:
+  def initialize(orig)
+    @orig = orig
+  end
+
+  def inspect
+    "{NOT #{@orig.inspect}}"
+  end
+
+  def is_a?(other)
+    other === self
+  end
+
+  def method_missing(meth, *args, &block)
+    result = @orig.send(meth, *args, &block)
+    if result.is_a? ::TrueClass or result.is_a? ::FalseClass
+      !result
+    else
+      raise "Sorry, I don't know how to invert #{result.inspect}"
+    end
+  end
+end
+
+
+
 unless IO.respond_to? :copy_stream
-  
+
   class IO
-    
+
+    #
+    # IO.copy_stream backport
+    #
     def self.copy_stream(input, output)
       while chunk = input.read(8192)
         output.write(chunk)
       end
     end
-    
+
   end
-  
+
 end
 
 
@@ -198,8 +221,37 @@ end
 
 module URI
 
+  #
+  # Return a Hash of the variables in the query string
+  #
   def params
     query.to_params
   end
+
+end
+
+
+class Time
+
+  #
+  # Which "quarter" of the year does this date fall into?
+  #
+  def quarter
+    (month / 3.0).ceil
+  end
+
+end
+
+
+#
+# Give ObjectSpace Enumerable powers (select, map, etc.)
+#
+module ObjectSpace
+
+  include Enumerable
+
+  alias_method :each, :each_object
+
+  extend self
 
 end

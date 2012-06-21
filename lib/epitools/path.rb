@@ -21,7 +21,7 @@ require 'epitools'
 #
 # Note: all of the above attributes can be modified to produce new paths!
 # Here's a useful example:
-#   
+#
 #   # Check if there's a '.git' directory in the current or parent directories.
 #   def inside_a_git_repository?
 #     path = Path.pwd # get the current directory
@@ -31,7 +31,7 @@ require 'epitools'
 #     end
 #     false
 #   end
-#    
+#
 # More examples:
 #
 #   Path["*.jpeg"].each { |path| path.rename(:ext=>"jpg") }
@@ -55,7 +55,7 @@ require 'epitools'
 #
 #
 class Path
-  
+
   ## initializers
 
   def initialize(newpath, hints={})
@@ -65,13 +65,13 @@ class Path
   def self.glob(str)
     Dir[str].map { |entry| new(entry) }
   end
-  
+
   def self.[](path)
     case path
     when Path
       path
     when String
-    
+
       if path =~ %r{^[a-z\-]+://}i # URL?
         Path::URL.new(path)
 
@@ -81,27 +81,27 @@ class Path
       else
         # todo: highlight backgrounds of codeblocks to show indent level & put boxes (or rules?) around (between?) double-spaced regions
         path = Path.expand_path(path)
-        if path =~ /(^|[^\\])[\?\*\{\}]/ # contains unescaped glob chars? 
+        if path =~ /(^|[^\\])[\?\*\{\}]/ # contains unescaped glob chars?
           glob(path)
         else
           new(path)
         end
-        
+
       end
-      
+
     end
   end
 
   ## setters
-  
+
   attr_writer :base
   attr_writer :dirs
-  
+
   #
   # This is the core that initializes the whole class.
   #
   # Note: The `hints` parameter contains options so `path=` doesn't have to touch the filesytem as much.
-  # 
+  #
   def path=(newpath, hints={})
     if hints[:type] or File.exists? newpath
       if hints[:type] == :dir or File.directory? newpath
@@ -112,18 +112,18 @@ class Path
     else
       if newpath.endswith(File::SEPARATOR) # ends in '/'
         self.dir = newpath
-      else 
+      else
         self.dir, self.filename = File.split(newpath)
       end
     end
   end
-  
+
   def filename=(newfilename)
     if newfilename.nil?
       @ext, @base = nil, nil
     else
       ext = File.extname(newfilename)
-      
+
       if ext.blank?
         @ext = nil
         @base = newfilename
@@ -135,16 +135,16 @@ class Path
       end
     end
   end
-   
+
   def dir=(newdir)
     dirs  = File.expand_path(newdir).split(File::SEPARATOR)
     dirs  = dirs[1..-1] if dirs.size > 0
-    
+
     @dirs = dirs
   end
-  
+
   # TODO: Figure out how to fix the 'path.with(:ext=>ext+".other")' problem (when 'ext == nil')...
-  
+
   def ext=(newext)
     if newext.blank?
       @ext = nil
@@ -156,17 +156,17 @@ class Path
   end
 
   ## getters
-   
+
   # The directories in the path, split into an array. (eg: ['usr', 'src', 'linux'])
-  attr_reader :dirs   
-  
-  # The filename without an extension 
+  attr_reader :dirs
+
+  # The filename without an extension
   attr_reader :base
-  
-  # The file extension, including the . (eg: ".mp3") 
+
+  # The file extension, including the . (eg: ".mp3")
   attr_reader :ext
 
-  # Joins and returns the full path  
+  # Joins and returns the full path
   def path
     if d = dir
       File.join(d, (filename || "") )
@@ -193,38 +193,38 @@ class Path
     fname = from.pop
     join(*(from.map { RELATIVE_PARENTDIR } + to))
   end
-  
+
   def relative_to2(anchor=nil)
-    anchor ||= Path.pwd 
-    
+    anchor ||= Path.pwd
+
     # operations to transform anchor into self
-    
+
     # stage 1: go ".." until we find a common dir prefix
     #          (discard everything and go '/' if there's no common dir)
-    # stage 2: append the rest of the other path 
-    
+    # stage 2: append the rest of the other path
+
     # find common prefix
     smaller, bigger = [ anchor.dirs, self.dirs ].sort_by(&:size)
     common_prefix_end = bigger.zip(smaller).index { |a,b | a != b }
-    common_prefix = bigger[0...common_prefix_end] 
-    
+    common_prefix = bigger[0...common_prefix_end]
+
     if common_prefix.any?
       dots = nil
     end
-    
+
     self.dirs & anchor.dirs
-    
+
   end
-  
+
   # The current directory (with a trailing /)
   def dir
-    if dirs 
+    if dirs
       File::SEPARATOR + File.join(*dirs)
     else
       nil
     end
   end
-  
+
   def filename
     if base
       if ext
@@ -237,14 +237,16 @@ class Path
     end
   end
 
+  alias_method :name, :filename
+
   def exts
     extensions = basename.split('.')[1..-1]
     extensions += [@ext] if @ext
     extensions
   end
-  
+
   ## fstat info
-  
+
   def exists?
     File.exists? path
   end
@@ -252,61 +254,88 @@ class Path
   def size
     File.size path
   end
-  
+
+  def lstat
+    @lstat ||= File.lstat self    # to cache or not to cache -- that is the question.
+    #File.lstat self
+  end
+
+  def mode
+    lstat.mode
+  end
+
   def mtime
     lstat.mtime
   end
-  
+
   def ctime
-    lstat.ctime path
+    lstat.ctime
   end
-  
+
   def atime
-    lstat.atime path
+    lstat.atime
   end
-  
+
+  # FIXME: Does the current user own this file?
+  def owner?
+    raise "STUB"
+  end
+
+  def executable?
+    mode & 0o111 > 0
+  end
+  alias_method :exe?, :executable?
+
+  def writable?
+    mode & 0o222 > 0
+  end
+
+  def readable?
+    mode & 0o444 > 0
+  end
+
   def dir?
     File.directory? path
   end
-  
+
   def file?
     File.file? path
   end
-  
+
   def symlink?
     File.symlink? path
   end
-  
+
   def broken_symlink?
     File.symlink?(path) and not File.exists?(path)
   end
-  
+
   def symlink_target
-    Path.new File.readlink(path) 
+    Path.new File.readlink(path)
   end
   alias_method :readlink, :symlink_target
-  
+
   def uri?
     false
   end
-  
+
   def url?
     uri?
   end
-  
+
   def child_of?(parent)
     parent.parent_of? self
   end
-  
+
   def parent_of?(child)
     # If `self` is a parent of `child`, it's a prefix.
     child.path[/^#{Regexp.escape self.path}\/.+/] != nil
   end
-  
+
   ## comparisons
 
   include Comparable
-  
+
   def <=>(other)
     case other
     when Path
@@ -317,26 +346,33 @@ class Path
       raise "Invalid comparison: Path to #{other.class}"
     end
   end
-  
+
   def ==(other)
     self.path == other.to_s
   end
 
-  
+
   ## appending
-  
+
+  #
+  # Path["/etc"].join("anything{}").path == "/etc/anything{}"
+  #
+  def join(other)
+    Path.new File.join(self, other)
+  end
+
   #
   # Path["/etc"]/"passwd" == Path["/etc/passwd"]
   #
   def /(other)
     # / <- fixes jedit syntax highlighting bug.
-    # TODO: make it work for "/dir/dir"/"/dir/file" 
+    # TODO: make it work for "/dir/dir"/"/dir/file"
     #Path.new( File.join(self, other) )
     Path[ File.join(self, other) ]
-  end  
-  
+  end
+
   ## opening/reading files
-  
+
   def open(mode="rb", &block)
     if block_given?
       File.open(path, mode, &block)
@@ -346,31 +382,31 @@ class Path
   end
   alias_method :io, :open
   alias_method :stream, :open
-  
+
   def read(length=nil, offset=nil)
     File.read(path, length, offset)
   end
-  
+
   #
   # All the lines in this file, chomped.
-  #  
+  #
   def lines
     io.lines.map(&:chomp)
   end
-  
+
   def unmarshal
     read.unmarshal
   end
-  
+
   def ls; Path[File.join(path, "*")]; end
 
   def ls_r; Path[File.join(path, "**/*")]; end
-  
+
   def ls_dirs
     ls.select(&:dir?)
     #Dir.glob("#{path}*/", File::FNM_DOTMATCH).map { |s| Path.new(s, :type=>:dir) }
   end
-  
+
   def ls_files
     ls.select(&:file?)
     #Dir.glob("#{path}*", File::FNM_DOTMATCH).map { |s| Path.new(s, :type=>:file) }
@@ -379,12 +415,12 @@ class Path
   def siblings
     ls - [self]
   end
-  
+
   def touch
     open("a") { }
     self
   end
-  
+
   ## modifying files
 
   #
@@ -405,7 +441,7 @@ class Path
     self
   end
   alias_method :<<, :append
-  
+
   #
   # Overwrite the data in this file (accepts a string, an IO, or it can yield the file handle to a block.)
   #
@@ -420,7 +456,7 @@ class Path
       else
         yield f
       end
-    end    
+    end
   end
 
   #
@@ -450,7 +486,7 @@ class Path
   def read_json
     JSON.load(io)
   end
-  
+
   # Convert the object to JSON and write it to the file (overwriting the existing file).
   def write_json(object)
     write object.to_json
@@ -490,64 +526,64 @@ class Path
   def read_bson
     BSON.deserialize(read)
   end
-  
+
   def write_bson(object)
     write BSON.serialize(object)
   end
 
-  
+
   #
   # Examples:
   #   Path["SongySong.mp3"].rename(:basename=>"Songy Song")
   #   Path["Songy Song.mp3"].rename(:ext=>"aac")
   #   Path["Songy Song.aac"].rename(:dir=>"/music2")
   #   Path["/music2/Songy Song.aac"].exists? #=> true
-  #  
+  #
   def rename!(options)
 raise "Broken!"
-    
+
     dest = rename(options)
     self.path = dest.path # become dest
     self
   end
-  
+
   def rename(options)
 raise "Broken!"
-    
+
     raise "Options must be a Hash" unless options.is_a? Hash
     dest = self.with(options)
-    
+
     raise "Error: destination (#{dest.inspect}) already exists" if dest.exists?
     File.rename(path, dest)
-    
+
     dest
   end
 
   #
   # Renames the file the specified full path (like Dir.rename.)
-  #  
+  #
   def rename_to(path)
 raise "Broken!"
-  
+
     rename :path=>path.to_s
   end
   alias_method :mv,       :rename_to
-  
+
   def rename_to!(path)
 raise "Broken!"
     rename! :path=>path.to_s
   end
   alias_method :mv!,       :rename_to!
-  
+
   def reload!
     self.path = to_s
   end
-  
+
   #
-  # Generate two almost identical methods: mkdir and mkdir_p 
+  # Generate two almost identical methods: mkdir and mkdir_p
   #
   {
-    :mkdir => "Dir.mkdir", 
+    :mkdir => "Dir.mkdir",
     :mkdir_p =>"FileUtils.mkdir_p"
   }.each do |method, command|
     class_eval %{
@@ -573,7 +609,7 @@ raise "Broken!"
   def cp_r(dest)
     FileUtils.cp_r(path, dest) #if Path[dest].exists?
   end
-  
+
   def mv(dest)
     FileUtils.mv(path, dest)
   end
@@ -588,22 +624,22 @@ raise "Broken!"
 
   def ln_s(dest)
     dest = Path[dest]
-    FileUtils.ln_s self, dest 
+    FileUtils.ln_s self, dest
   end
 
   ## Owners and permissions
-  
+
   def chmod(mode)
     FileUtils.chmod(mode, self)
     self
   end
-  
+
   def chown(usergroup)
     user, group = usergroup.split(":")
     FileUtils.chown(user, group, self)
     self
   end
-  
+
   def chmod_R(mode)
     if directory?
       FileUtils.chmod_R(mode, self)
@@ -612,7 +648,7 @@ raise "Broken!"
       raise "Not a directory."
     end
   end
-  
+
   def chown_R(usergroup)
     user, group = usergroup.split(":")
     if directory?
@@ -622,36 +658,9 @@ raise "Broken!"
       raise "Not a directory."
     end
   end
-  
-  def lstat
-    @lstat ||= File.lstat self    # to cache or not to cache -- that is the question.
-    #File.lstat self
-  end
-  
-  def mode
-    lstat.mode
-  end
-
-  # TODO: Unstub
-  def owner?
-    raise "STUB"
-  end
-  
-  def executable?
-    mode & 0o111 > 0 
-  end
-  alias_method :exe?, :executable?
-  
-  def writable?
-    mode & 0o222 > 0
-  end
-
-  def readable?
-    mode & 0o444 > 0
-  end
 
   ## Dangerous methods.
-  
+
   def rm
     if directory? and not symlink?
       Dir.rmdir(self) == 0
@@ -662,61 +671,61 @@ raise "Broken!"
   alias_method :"delete!", :rm
   alias_method :"unlink!", :rm
   alias_method :"remove!", :rm
-  
+
   def truncate(offset=0)
     File.truncate(self, offset) if exists?
   end
 
-  
+
   ## Checksums
-  
+
   def sha1
     Digest::SHA1.file(self).hexdigest
   end
-  
+
   def sha2
     Digest::SHA2.file(self).hexdigest
   end
-  
+
   def md5
     Digest::MD5.file(self).hexdigest
   end
   alias_method :md5sum, :md5
 
-  
+
   # http://ruby-doc.org/stdlib/libdoc/zlib/rdoc/index.html
-  
+
   def gzip(level=nil)
     gz_filename = self.with(:filename=>filename+".gz")
-    
-    raise "#{gz_filename} already exists" if gz_filename.exists? 
-  
-    open("rb") do |input|    
+
+    raise "#{gz_filename} already exists" if gz_filename.exists?
+
+    open("rb") do |input|
       Zlib::GzipWriter.open(gz_filename) do |gzip|
         IO.copy_stream(input, gzip)
       end
     end
-    
+
     gz_filename
   end
-  
+
   def gzip!(level=nil)
     gzipped = self.gzip(level)
     self.rm
     self.path = gzipped.path
   end
-  
+
   def gunzip
     raise "Not a .gz file" unless ext == "gz"
 
     gunzipped = self.with(:ext=>nil)
-    
+
     gunzipped.open("wb") do |out|
       Zlib::GzipReader.open(self) do |gunzip|
         IO.copy_stream(gunzip, out)
       end
     end
-    
+
     gunzipped
   end
 
@@ -740,7 +749,7 @@ raise "Broken!"
       with(:dirs=>dirs[0...-1])
     end
   end
-  
+
   #
   # Follows all symlinks to give the true location of a path.
   #
@@ -755,29 +764,29 @@ raise "Broken!"
     end
   end
 
-  
+
   #
   # Find the file's mimetype (first from file extension, then by magic)
-  #  
+  #
   def mimetype
     mimetype_from_ext || magic
   end
   alias_method :identify, :mimetype
-    
+
   #
   # Find the file's mimetype (only using the file extension)
-  #  
+  #
   def mimetype_from_ext
     MimeMagic.by_extension(ext)
   end
 
   #
   # Find the file's mimetype (by magic)
-  #  
+  #
   def magic
     open { |io| MimeMagic.by_magic(io) }
   end
-  
+
   #
   # Returns the filetype (as a standard file extension), verified with Magic.
   #
@@ -787,15 +796,15 @@ raise "Broken!"
   # Note: Prefers long extensions (eg: jpeg over jpg)
   #
   # TODO: rename type => magicext?
-  #  
+  #
   def type
     @cached_type ||= begin
-      
+
       if file? or symlink?
-      
+
         ext   = self.ext
         magic = self.magic
-        
+
         if ext and magic
           if magic.extensions.include? ext
             ext
@@ -809,17 +818,17 @@ raise "Broken!"
         else # !ext and !magic
           :unknown
         end
-        
+
       elsif dir?
         :directory
       end
-      
+
     end
   end
 
 
   ## aliases
-  
+
   alias_method :to_path,    :path
   alias_method :to_str,     :path
   alias_method :to_s,       :path
@@ -837,9 +846,9 @@ raise "Broken!"
   alias_method :directory=, :dir=
 
   alias_method :directory?, :dir?
-  
+
   alias_method :exist?,     :exists?
-  
+
   ############################################################################
   ## Class Methods
 
@@ -852,9 +861,9 @@ raise "Broken!"
   #
   AUTOGENERATED_CLASS_METHODS = %w[
     mkdir
-    mkdir_p 
-    sha1 
-    sha2 
+    mkdir_p
+    sha1
+    sha2
     md5
     rm
     truncate
@@ -868,7 +877,7 @@ raise "Broken!"
   ].each do |spec|
     method, cardinality = spec.split("/")
     cardinality = cardinality.to_i
-  
+
     class_eval %{
       def self.#{method}(path#{", *args" if cardinality > 0})
         Path[path].#{method}#{"(*args)" if cardinality > 0}
@@ -885,7 +894,7 @@ raise "Broken!"
     new_path << "/" if orig_path.endswith "/"
     new_path
   end
-  
+
   #
   # TODO: Remove the tempfile when the Path object is garbage collected or freed.
   #
@@ -894,39 +903,39 @@ raise "Broken!"
     yield path if block_given?
     path
   end
-  alias_class_method :tempfile, :tmpfile  
-  alias_class_method :tmp,      :tmpfile  
-  
+  alias_class_method :tempfile, :tmpfile
+  alias_class_method :tmp,      :tmpfile
+
   def self.home
     Path[ENV['HOME']]
   end
-  
+
   def self.pwd
     Path.new expand_path(Dir.pwd)
   end
-  
+
   def self.pushd
     @@dir_stack ||= []
     @@dir_stack.push pwd
   end
-  
+
   def self.popd
     @@dir_stack ||= [pwd]
     @@dir_stack.pop
   end
-  
+
   def self.cd(dest); Dir.chdir(dest); end
-  
+
   def self.ls(path); Path[path].ls  end
-  
+
   def self.ls_r(path); Path[path].ls_r; end
-  
+
   def self.ln_s(src, dest); Path[src].ln_s(dest); end
 
   ## TODO: Verbose mode
   #def self.verbose=(value); @@verbose = value; end
   #def self.verbose; @@verbose ||= false; end
-  
+
   if Sys.windows?
     PATH_SEPARATOR    = ";"
     BINARY_EXTENSION  = ".exe"
@@ -941,7 +950,7 @@ raise "Broken!"
   #
   # (Note: If you pass more than one argument, it'll return an array of `Path`s instead of
   #        a single path.)
-  #  
+  #
   def self.which(bin, *extras)
     if extras.empty?
       ENV["PATH"].split(PATH_SEPARATOR).find do |path|
@@ -952,8 +961,8 @@ raise "Broken!"
     else
       ([bin] + extras).map { |bin| which(bin) }
     end
-  end  
-  
+  end
+
 end
 
 
@@ -967,12 +976,12 @@ class Path::URL < Path
   #
   # TODO: only include certain methods from Path (delegate style)
   #       (eg: remove commands that write)
-  
+
   def initialize(uri, hints={})
     @uri = URI.parse(uri)
     self.path = @uri.path
   end
-  
+
   def uri?
     true
   end
@@ -985,30 +994,30 @@ class Path::URL < Path
   def to_s
     uri.to_s
   end
-  
+
 
   #
   # ...this is: 'http'
-  #  
+  #
   def scheme
     uri.scheme
   end
   alias_method :protocol, :scheme
-  
+
   #
   # ...and this is: 'host.com'
   #
   def host
     uri.host
   end
-  
+
   #
   # ...and this is: 80
   #
   def port
     uri.port
   end
-  
+
   #
   # ...and this is: {param1: value1, param2: value2, ...etc... }
   #
@@ -1019,8 +1028,29 @@ class Path::URL < Path
       nil
     end
   end
-  
+
   # ...and `path` is /path/filename.ext
+
+  def open(mode="r", &block)
+    require 'open-uri'
+    if block_given?
+      open(to_s, mode, &block)
+    else
+      open(to_s, mode)
+    end
+  end
+
+  # Note: open is already aliased to io in parent class.
+  def read(*args)
+    require 'open-uri'
+    case scheme
+    when /https?/i
+      io.read(*args)
+    else
+      raise "No connector for #{scheme} yet. Please fix!"
+    end
+  end
+
 end
 
 
@@ -1035,6 +1065,6 @@ class String
   def to_Path
     Path.new self
   end
-  
+
   alias_method :to_P, :to_Path
 end

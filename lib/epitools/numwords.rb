@@ -1,4 +1,4 @@
-require 'epitools'
+#require 'epitools'
 
 #
 # Allow numbers to be converted into words, or exprssed more easily with words.

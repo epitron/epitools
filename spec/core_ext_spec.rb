@@ -162,7 +162,7 @@ describe Numeric do
     1.5.exp.should == Math.exp(1.5)
 
     253.log(5).should == Math.log(253,5)
-    (2**(4212.log(2))).should == 4212.0
+    (2**(4212.log(2))).round.should == 4212.0
   end
 
 end
@@ -424,6 +424,17 @@ describe Enumerable do
   
 end
 
+describe Enumerator do
+
+  it "spins" do
+    lambda { 
+      (1..20).each.with_spinner(1).each { }
+    }.should_not raise_error
+  end
+
+end
+
+
 describe Hash do
 
   before :each do
@@ -538,6 +549,14 @@ describe Range do
   it "generates random numbers" do
     r = 1..10
     50.times { r.includes?(r.rand).should == true }
+  end
+
+end
+
+describe ObjectSpace do
+
+  it "is Enumerable" do
+    ObjectSpace.select { |o| o.is_a? String }.map { |o| o.class.name }.uniq.should == ["String"]
   end
 
 end

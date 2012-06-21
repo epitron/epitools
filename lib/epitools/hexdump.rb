@@ -16,51 +16,60 @@ ASCII_PRINTABLE = (33..126)
 # 48:  d2 b1 6d 31 3e 67 e1 88  99 8b 4b 34 1d 61 05 15  |..m1g....K4.a..|
 #
 
-def hexdump(data, options={})
-  base_offset   = options[:base_offset] || 0
-  color         = options[:color].nil? ? true : options[:color] 
-  highlight     = options[:highlight]
 
-  p options
-  p color
-  
-  lines               = data.scan(/.{1,16}/m)
-  max_offset          = (base_offset + data.size) / 16 * 16
-  max_offset_width    = max_offset.to_s.size
-  max_hex_width       = 3 * 16 + 1
-  
-  p [max_offset, max_offset_width]
-  lines.each_with_index do |line,n|
-    offset    = base_offset + n*16
-    bytes     = line.unpack("C*")
-    hex       = bytes.map { |c| "%0.2x" % c }.insert(8, '').join(' ')
+module Hex
 
-    plain = bytes.map do |c|
-      if ASCII_PRINTABLE.include?(c)
-        c = c.chr
-      else
-        color ? '<9>.</9>' : '.' 
-      end
-    end.join('')
+  DUMP_COLORS = Rash.new(
+    /\d/ => 13,
+    /\w/ => 3,
+    nil => 9,
+    :default => 7
+  )
 
-    if color
-      outstring = "<light_cyan>%s<cyan>:  <light_yellow>%s <default>|<light_white>%s<default>|" % [offset.to_s.ljust(max_offset_width), hex.ljust(max_hex_width), plain]
-      outstring = outstring.colorize
-    else
-      outstring = "%s:  %s |%s|" % [offset.to_s.ljust(max_offset_width), hex.ljust(max_hex_width), plain]
+  def self.dump(data, options={})
+    base_offset   = options[:base_offset] || 0
+    color         = options[:color].nil? ? true : options[:color]
+    highlight     = options[:highlight]
+
+    p options
+    p color
+
+    lines               = data.scan(/.{1,16}/m)
+    max_offset          = (base_offset + data.size) / 16 * 16
+    max_offset_width    = max_offset.to_s.size
+    max_hex_width       = 3 * 16 + 1
+
+    p [max_offset, max_offset_width]
+    lines.each_with_index do |line,n|
+      offset    = base_offset + n*16
+      bytes     = line.unpack("C*")
+      hex       = bytes.map { |c| "%0.2x" % c }.insert(8, '').join(' ')
+
+      plain = bytes.map do |c|
+        if ASCII_PRINTABLE.include?(c)
+          c = c.chr
+        else
+          color ? '<9>.</9>' : '.'
+        end
+      end.join('')
+
+      puts "<11>#{offset.to_s.ljust(max_offset_width)}<3>:  <14>#{hex.ljust(max_hex_width)} <8>|<15>#{plain}<8>|".colorize
     end
-    puts outstring
-  end      
+  end
+
 end
 
+def hexdump(*args)
+  Hex.dump(*args)
+end
 
 if $0 == __FILE__
   data = (0..64).map{ rand(255).chr }.join('')
-  hexdump(data)
+  Hex.dump(data)
   puts
-  hexdump(data, :color=>false)
+  Hex.dump(data, :color=>false)
   puts
-  
+
   data = "1234567890"*10
-  hexdump(data)
+  Hex.dump(data)
 end
