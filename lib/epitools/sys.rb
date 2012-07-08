@@ -65,6 +65,7 @@ module Sys
 
   PS_FIELD_TABLE = [
     [:pid,    :to_i],
+    [:ppid,   :to_i],
     [:pcpu,   :to_f],
     [:pmem,   :to_f],
     [:stat,   :to_s],
@@ -147,6 +148,15 @@ module Sys
       super(*args)
     end
 
+    def parent
+      Sys.ps(ppid).first unless ppid < 1
+    end
+
+    def children
+      @@parents ||= Sys.ps.group_by(&:ppid)
+      @@parents[pid]
+    end
+
     #
     # Convert all the process information to a hash.
     #    
@@ -217,11 +227,21 @@ module Sys
 
   #-----------------------------------------------------------------------------
   
+  def self.tree
+    tree = Sys.ps.group_by(&:ppid)
+    Hash[tree.map do |ppid, children|
+      kvs = children.map { |child| [child.pid, tree.delete(child.pid)] }
+      [ppid, Hash[kvs]]
+    end]
+  end
+
   #
   # List all (or specified) processes, and return ProcessInfo objects.
   # (Takes an optional list of pids as arguments.) 
   #
   def self.ps(*pids)
+    #return @@cache if @@cache
+
     options = PS_FIELDS.join(',')
     
     pids = pids.map(&:to_i)
@@ -229,7 +249,7 @@ module Sys
     if pids.any?
       command = "ps -p #{pids.join(',')} -o #{options}"
     else
-      command = "ps ax -o #{options}"
+      command = "ps awx -o #{options}"
     end
 
     lines = `#{command}`.lines.to_a        
@@ -247,6 +267,10 @@ module Sys
   end
   
   #-----------------------------------------------------------------------------
+
+  def self.refresh
+    @@cache = nil
+  end
 
   #
   # Trap signals!
