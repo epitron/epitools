@@ -7,9 +7,13 @@ class Array
   def squash
     flatten.compact.uniq
   end
-  
+
+  #def to_hash
+  #  Hash[self]
+  #end
+
   #
-  # Removes the elements from the array for which the block evaluates to true. 
+  # Removes the elements from the array for which the block evaluates to true.
   # In addition, return the removed elements.
   #
   # For example, if you wanted to split an array into evens and odds:
@@ -20,7 +24,7 @@ class Array
   #
   def remove_if(&block)
     removed = []
-    
+
     delete_if do |x|
       if block.call(x)
         removed << x
@@ -29,29 +33,29 @@ class Array
         false
       end
     end
-    
+
     removed
   end
-  
+
   #
   # zip from the right (or reversed zip.)
   #
   # eg:
-  #   >> [5,39].rzip([:hours, :mins, :secs]) 
+  #   >> [5,39].rzip([:hours, :mins, :secs])
   #   => [ [:mins, 5], [:secs, 39] ]
   #
   def rzip(other)
     # That's a lotta reverses!
     reverse.zip(other.reverse).reverse
-  end  
-  
+  end
+
   #
   # Pick the middle element.
   #
   def middle
     self[(size-1) / 2]
   end
-  
+
   #
   # XOR operator
   #
@@ -67,7 +71,7 @@ class Array
       sort_by{rand}
     end
   end
-  
+
   #
   # Pick (a) random element(s).
   #
@@ -81,15 +85,14 @@ class Array
     end
   end
   alias_method :pick, :sample
-  
+
   #
   # Divide the array into n pieces.
   #
-  def / pieces 
+  def / pieces
     piece_size = (size.to_f / pieces).ceil
     each_slice(piece_size).to_a
   end
-  
 
   alias_method :unzip, :transpose
 
