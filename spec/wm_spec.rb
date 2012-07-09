@@ -11,9 +11,16 @@ describe WM do
     WM.current_desktop.nil? == false
   end    
 
+  def to_events(keys)
+  	WM::Window.new.keys_to_events(keys)
+  end
+
   it "parses X keys-string" do
-  	events = WM::Window.new.keys_to_events "Hello<Ctrl-T><Ctrl-L><Return>!!!"
-  	events.should == ["<Shift><Key>H", "<Key>e", "<Key>l", "<Key>l", "<Key>o", "Ctrl<Key>T", "Ctrl<Key>L", "<Key>Return", "<Shift><Key>!", "<Shift><Key>!", "<Shift><Key>!"]
+  	events = to_events "Hello<Ctrl-T><Ctrl-L><Return>!!!"
+  	events.should == ["Shift<Key>H", "<Key>e", "<Key>l", "<Key>l", "<Key>o", "Ctrl<Key>t", "Ctrl<Key>l", "<Key>Return", "Shift<Key>0x21", "Shift<Key>0x21", "Shift<Key>0x21"]
+  end
+
+  it "handles something weird" do
   end
 
   it "sends keys to this window" do

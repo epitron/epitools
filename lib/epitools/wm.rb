@@ -1,3 +1,6 @@
+require 'epitools/path'
+require 'epitools/typed_struct'
+
 module WM
 
   raise "Error: wmctrl not found." unless Path.which("wmctrl")
@@ -332,8 +335,10 @@ module WM
           specials = $1.split("-")
           key = specials.pop
 
+          key.downcase! if key =~ /^[A-Z]$/
+
           specials.each do |special|
-            if special =~ /^(Ctrl|Shift|Alt)$/
+            if special =~ /^(Ctrl|Shift|Alt)$/i
               mods << $1
             else
               raise "Error: unknown modifier #{special}"
@@ -363,8 +368,12 @@ module WM
 
       temp.write eventstring 
       temp.flush
+      temp.seek 0
+      p [:temp, temp.read]
 
-      unless system("xse", "-window", window_id, "-file", temp.path)
+      cmd = "xse", "-window", window_id, "-file", temp.path
+      p [:cmd, cmd]
+      unless system(*cmd)
         raise "Error: couldn't send key commands to 'xse'. (Is xsendevents installed?)"
       end
     end

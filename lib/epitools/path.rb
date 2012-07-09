@@ -5,7 +5,9 @@
 #   tmp bugs
 #
 
-require 'epitools'
+require 'epitools/minimal'
+require 'epitools/core_ext/enumerable'
+require 'epitools/core_ext/string'
 
 #
 # Path: An object-oriented wrapper for files. (Combines useful methods from FileUtils, File, Dir, and more!)

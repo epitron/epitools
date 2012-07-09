@@ -1,5 +1,10 @@
 #
+# Like a Stuct, but automatically casts input to specific types.
 #
+# Example:
+#
+#   class SomeRecord < TypedStruct["some_id:int amount:float x:string a,b,c:bool"]; end
+#   record = SomeRecord.new(69, 12348.871, "stringy", true, 1, "no")
 #
 class TypedStruct < Struct
 
@@ -11,11 +16,12 @@ class TypedStruct < Struct
   # A perhaps-too-clever table of { "typename" => convert_proc } mappings.
   #
   CONVERTERS = Hash[ *{
-
-    ["str", "string"]  => :passthru,
-    ["int", "integer"] => proc { |me| me.to_i },
-    ["hex"]            => proc { |me| me.to_i(16) },
-    ["bool", "boolean"] => proc { |me| 
+    ["str", "string"]            => :passthru,
+    ["int", "integer"]           => proc { |me| me.to_i },
+    ["hex"]                      => proc { |me| me.to_i(16) },
+    ["date", "time", "datetime"] => proc { |me| DateTime.parse me },
+    ["timestamp"]                => proc { |me| Time.at me },
+    ["bool", "boolean"]          => proc do |me| 
       case me
       when false, 0, "0", "off", "no",  "false", nil
         false
@@ -24,10 +30,7 @@ class TypedStruct < Struct
       else
         raise "Invalid boolean type: #{me.inspect}"
       end
-    },
-    ["date", "time", "datetime"] => proc { |me| DateTime.parse me },
-    ["timestamp"] => proc { |me| Time.at me },
-
+    end
   }.map { |names, converter| names.map { |n| [n, converter] } }.flatten ]
 
   #

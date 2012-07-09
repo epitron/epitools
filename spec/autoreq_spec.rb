@@ -1,4 +1,4 @@
-require 'epitools'
+require 'epitools/minimal'
 
 describe "autoreq" do
 
