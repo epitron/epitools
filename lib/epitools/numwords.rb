@@ -53,6 +53,8 @@ class Numeric
     num_triplets = triplets.size
     
     triplets.each_with_index do |triplet, i|
+      next if triplet.to_i == 0
+      
       result = []
       
       tens, hunds = nil, nil

@@ -31,5 +31,9 @@ describe Numeric do
   it "handles 1.thousand.to_words properly" do
     1.thousand.to_words.should == "one thousand"
   end
+
+  it "handles 1.quadrillion.to_words properly" do
+    1.quadrillion.to_words.should == "one quadrillion"
+  end
   
 end
