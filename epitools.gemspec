@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "epitools"
-  s.version = "0.5.9"
+  s.version = "0.5.10"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["epitron"]
-  s.date = "2012-07-09"
+  s.date = "2012-08-26"
   s.description = "Miscellaneous utility libraries to make my life easier."
   s.email = "chris@ill-logic.com"
   s.extra_rdoc_files = [
@@ -89,7 +89,7 @@ Gem::Specification.new do |s|
   s.homepage = "http://github.com/epitron/epitools"
   s.licenses = ["WTFPL"]
   s.require_paths = ["lib"]
-  s.rubygems_version = "1.8.24"
+  s.rubygems_version = "1.8.23"
   s.summary = "NOT UTILS... METILS!"
 
   if s.respond_to? :specification_version then
