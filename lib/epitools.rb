@@ -12,7 +12,7 @@ require_wrapper = proc do |mod|
 end
 
 #
-# Make all the modules autoload, and require all the monkeypatches
+# Load the things that can't be autoloaded
 #
 %w[
   core_ext 

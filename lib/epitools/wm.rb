@@ -92,7 +92,7 @@ module WM
     end
 
     def command
-      process.command
+      process && process.command
     end
 
     def inspect
