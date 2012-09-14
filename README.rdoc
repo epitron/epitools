@@ -18,7 +18,7 @@ Extras:
 * {Browser}[http://rdoc.info/github/epitron/epitools/master/Browser] (a fake browser, with a cache, cookies, download progress bars, plus the rest of the mechanize/nokogiri API you know and love)
 * {Rash}[http://rdoc.info/github/epitron/epitools/master/Rash] (a hash which can have Regexps as keys, so that many input keys can map to a single value.)
 * {Progressbar}[http://rdoc.info/github/epitron/epitools/master/Progressbar] (better than the progressbar gem)
-* {MimeMagic}[http://rdoc.info/github/epitron/epitools/master/MimeMagic] (a port of the Unix `file` utility for automatically recognizing files based on their contents; faster than running `file` on every file if you have to process large batches of files)
+* {MimeMagic}[http://rdoc.info/github/epitron/epitools/master/MimeMagic] (a port of the Unix `file` utility for automatically recognizing files based on their contents; faster than running `file` on every file if you have to process large batches of files. This is originally from the mimemagic gem by {Daniel Mendler}[https://github.com/minad], and has been slightly modified and enhanced.)
 
 == Installing
 
