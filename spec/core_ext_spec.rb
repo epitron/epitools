@@ -235,6 +235,12 @@ describe String do
     "dollar".amount(-10).should == "-10 dollars"
     "love".amount(1).should == "1 love"
   end
+
+  it "slices" do
+    e = "hellothere!".each_slice(2)
+    e.should be_an Enumerator
+    e.to_a.should == %w[he ll ot he re !]
+  end
   
 end
 

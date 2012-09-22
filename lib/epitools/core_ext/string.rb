@@ -68,6 +68,20 @@ class String
   alias_method :nicelines,   :nice_lines
   alias_method :clean_lines, :nice_lines
 
+
+  #
+  # Iterate over slices of the string of size `slice_width`.
+  #
+  def each_slice(slice_width, &block)
+    max = size
+    p = 0
+    while p < max
+      yield self[p...p+slice_width]
+      p += slice_width
+    end
+  end
+  enumerable :each_slice
+
   #
   # The Infamous Caesar-Cipher. Unbreakable to this day.
   #
