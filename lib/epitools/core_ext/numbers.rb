@@ -9,6 +9,24 @@ class Numeric
   end
 
   #
+  # Clamp the number to a specific range
+  #
+  # Examples:
+  #    234234234523.clamp(0..100)   #=> 100
+  #    12.clamp(0..100)             #=> 12  
+  #    -38817112.clamp(0..100)      #=> 0
+  #
+  def clamp(range)
+    if self < range.first
+      range.first
+    elsif self > range.last 
+      range.last
+    else
+      self
+    end
+  end
+
+  #
   # Time methods
   #
   {
