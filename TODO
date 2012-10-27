@@ -2,6 +2,16 @@
  TODOs
 ===========================
 
++ Path
+  |_ Fix rename/mv
+  |_ Full README with more real-world examples (grep scripts/)
+     - compare folders using Path#ls_r and Path#md5
+  |_ Group methods by type, like Pathname (does YARD have groups?)
+  |_ String#{to_p,to_P,to_Path} ?
+  |_ Relative Path class
+  |_ Class hierarchy (Path, FilePath, URLPath)
+  |_ (Un)Archivers (zip, rar, etc.)
+
 + Logger
   |_ colourized ("ramaze" has a nice style)
   |_ output to STDERR (default)
