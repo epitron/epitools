@@ -165,6 +165,13 @@ describe Numeric do
     (2**(4212.log(2))).round.should == 4212.0
   end
 
+  it "human_sizes" do
+    1024.human_size.should == "1KB"
+    23984.human_size.should == "23KB"
+    12983128.human_size.should == "12MB"
+    32583128.human_size(2).should == "31.07MB"
+  end
+
 end
 
 describe String do

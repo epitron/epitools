@@ -363,16 +363,16 @@ module WM
       temp   = Tempfile.new("xse")
       events = keys_to_events(keys)
 
-      p events
-      p eventstring = events.map { |e| e + "\n" }.join("")
+      # p events
+      eventstring = events.map { |e| e + "\n" }.join("")
 
       temp.write eventstring 
       temp.flush
       temp.seek 0
-      p [:temp, temp.read]
+      # p [:temp, temp.read]
 
       cmd = "xse", "-window", window_id, "-file", temp.path
-      p [:cmd, cmd]
+      # p [:cmd, cmd]
       unless system(*cmd)
         raise "Error: couldn't send key commands to 'xse'. (Is xsendevents installed?)"
       end

@@ -45,55 +45,6 @@ class Object
   end
   
   #
-  # Turns block-accepting iterator methods (eg: each) into methods that return an
-  # Enumerator when they're called called without a block.
-  #
-  # It can transform many methods at once (eg: `enumerable :each, :all_people`).
-  #
-  # Example:
-  #
-  #   def lots_of_stuff
-  #     @stuff.each { |thing| yield thing }
-  #   end
-  #
-  #   enumerable :lots_of_stuff
-  #
-  # Now you can use it like an Enumerator: object.lots_of_stuff.with_index.sort.zip(99..1000)
-  #
-  def self.enumerable *meths
-    meths.each do |meth|
-      alias_method "#{meth}_without_enumerator", meth
-      class_eval %{
-        def #{meth}(*args, &block)
-          return Enum.new(self, #{meth.inspect}, *args, &block) unless block_given?
-          #{meth}_without_enumerator(*args, &block)
-        end
-      }
-    end
-  end
-  alias_class_method :enumerator, :enumerable
-
-  #
-  # Instead of:
-  #   if cookie_jar.include? cookie
-  # Now you can do:
-  #   if cookie.in? cookie_jar
-  #
-  def in?(enum)
-    enum.include? self
-  end
-
-  #
-  # Instead of:
-  #   @person ? @person.name : nil
-  # Now you can do:
-  #   @person.try(:name)
-  #
-  def try(method, *args, &block)
-    send(method, *args, &block) if respond_to? method
-  end
-
-  #
   # Serialize this object to a binary String, using Marshal.dump.
   #
   def marshal
