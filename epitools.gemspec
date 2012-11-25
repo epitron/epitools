@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "epitools"
-  s.version = "0.5.13"
+  s.version = "0.5.14"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["epitron"]
-  s.date = "2012-11-13"
+  s.date = "2012-11-25"
   s.description = "Miscellaneous utility libraries to make my life easier."
   s.email = "chris@ill-logic.com"
   s.extra_rdoc_files = [
