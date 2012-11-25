@@ -96,6 +96,17 @@ class Array
 
   alias_method :unzip, :transpose
 
+  #
+  # Convert the array to a hash
+  #
+  def to_h
+    if self.first.is_a? Array
+      Hash[self]
+    else
+      Hash[*self]
+    end
+  end
+
 end
 
 

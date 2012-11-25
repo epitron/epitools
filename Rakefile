@@ -1,22 +1,20 @@
-### Require all gems...
-%w[
+# encoding: utf-8
 
-  rubygems
-  
-  rake
-  rake/rdoctask
-  rspec/core
-  rspec/core/rake_task
-  jeweler
-  
-].each { |mod| require mod }
-
-desc 'Default: specs.'
-task :default => :spec
+require 'rubygems'
+#require 'bundler'
+# begin
+#   Bundler.setup(:default, :development)
+# rescue Bundler::BundlerError => e
+#   $stderr.puts e.message
+#   $stderr.puts "Run `bundle install` to install missing gems"
+#   exit e.status_code
+# end
+require 'rake'
 
 #
 # Jewelerrrr
 #
+require 'jeweler'
 Jeweler::Tasks.new do |gem|
   # gem is a Gem::Specification... see http://docs.rubygems.org/read/chapter/20 for more options
   gem.name = "epitools"
@@ -36,25 +34,3 @@ Jeweler::Tasks.new do |gem|
   gem.add_development_dependency "sqlite3-ruby"
 end
 Jeweler::RubygemsDotOrgTasks.new
-
-desc 'Run all the specs.'
-RSpec::Core::RakeTask.new(:spec) do |spec|
-  spec.pattern = FileList['spec/**/*_spec.rb']
-end
-
-desc 'Run rcov code coverage'
-RSpec::Core::RakeTask.new(:rcov) do |spec|
-  spec.pattern = 'spec/**/*_spec.rb'
-  spec.rcov = true
-end
-
-
-desc 'Generate documentation for rdoc.'
-Rake::RDocTask.new do |rdoc|
-  version = File.exist?('VERSION') ? File.read('VERSION') : ""
-
-  rdoc.rdoc_dir = 'rdoc'
-  rdoc.title = "epitools #{version}"
-  rdoc.rdoc_files.include('README*')
-  rdoc.rdoc_files.include('lib/**/*.rb')
-end

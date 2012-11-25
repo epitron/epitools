@@ -12,6 +12,14 @@ describe Path do
     path.base.should     == "hello"
   end
 
+  it "dups itself" do
+    path = Path.new "/whatever/blah/stuff.ext"
+    path2 = path.dup
+    path2.path.should == path.path
+    path.dirs.pop
+    path2.path.should_not == path.path
+  end
+
   it "works with relative paths" do
     path = Path.new("../hello.mp3/blah")
 
@@ -187,6 +195,14 @@ describe Path do
     path.read.should == "rawr"
   end
 
+  it "cds into directories" do
+    path = Path["/etc"]
+    start = Path.pwd
+    path.should_not == Path.pwd
+    path.cd { path.should == Path.pwd }
+    Path.pwd.should == start
+  end
+
   it "renames" do
     path = Path.tmpfile
 
@@ -288,7 +304,7 @@ describe Path do
     Path.which("ruby").should_not be_nil
     Path.which("asdfasdfhkajlsdhfkljashdf").should be_nil
     Path.which("ruby").class.should == Path
-    Path.which("cat", "ls", "rm").should == ["/bin/cat", "/bin/ls", "/bin/rm"]
+    Path.which("ps", "sh", "tar").should == ["/bin/ps", "/bin/sh", "/bin/tar"]
   end
 
   it "Path[]s another path" do

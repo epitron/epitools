@@ -58,10 +58,25 @@ require 'epitools/core_ext/string'
 #
 class Path
 
+  # The directories in the path, split into an array. (eg: ['usr', 'src', 'linux'])
+  attr_reader :dirs
+
+  # The filename without an extension
+  attr_reader :base
+
+  # The file extension, including the . (eg: ".mp3")
+  attr_reader :ext
+
   ## initializers
 
   def initialize(newpath, hints={})
     self.send("path=", newpath, hints)
+  end
+
+  def initialize_copy(other)
+    @dirs = other.dirs.dup
+    @base = other.base.dup
+    @ext  = other.ext.dup
   end
 
   def self.glob(str)
@@ -98,6 +113,26 @@ class Path
 
   attr_writer :base
   attr_writer :dirs
+
+  #
+  # Clear out the internal state of this object, so that it can be reinitialized.
+  #
+  def reset!
+    [:@dirs, :@base, :@ext].each { |var| remove_instance_variable var }
+    self
+  end
+
+
+  #
+  # Reload this path (update cached values.)
+  #
+  def reload!
+    temp = path
+    reset!
+    self.path = temp
+    self
+  end
+
 
   #
   # This is the core that initializes the whole class.
@@ -158,15 +193,6 @@ class Path
   end
 
   ## getters
-
-  # The directories in the path, split into an array. (eg: ['usr', 'src', 'linux'])
-  attr_reader :dirs
-
-  # The filename without an extension
-  attr_reader :base
-
-  # The file extension, including the . (eg: ".mp3")
-  attr_reader :ext
 
   # Joins and returns the full path
   def path
@@ -488,6 +514,7 @@ class Path
   def read_json
     JSON.load(io)
   end
+  alias_method :from_json, :read_json
 
   # Convert the object to JSON and write it to the file (overwriting the existing file).
   def write_json(object)
@@ -498,6 +525,7 @@ class Path
   def read_html
     Nokogiri::HTML(io)
   end
+  alias_method :from_html, :read_html
 
 
   # Convert the object to YAML and write it to the file (overwriting the existing file).
@@ -509,6 +537,7 @@ class Path
   def read_yaml
     YAML.load(io)
   end
+  alias_method :from_yaml, :read_yaml
 
 
   def read_xml
@@ -533,6 +562,14 @@ class Path
     write BSON.serialize(object)
   end
 
+  #
+  # Change into the directory. If a block is given, it changes into
+  # the directory for the duration of the block, then puts you back where you
+  # came from once the block is finished.
+  #
+  def cd(&block)
+    Path.cd(path, &block)
+  end
 
   #
   # Examples:
@@ -577,10 +614,6 @@ raise "Broken!"
   end
   alias_method :mv!,       :rename_to!
 
-  def reload!
-    self.path = to_s
-  end
-
   #
   # Generate two almost identical methods: mkdir and mkdir_p
   #
@@ -592,16 +625,13 @@ raise "Broken!"
       def #{method}
         if exists?
           if directory?
-            Path[path]
+            reload!
           else
             raise "Error: A file by this name already exists."
           end
         else
-          #{command}(path)
-          #Path[path]
-          p [:path, path]
-          self.path = path # regenerate object
-          p [:path, path]
+          #{command} path   # Make the directory
+          reload!
           self
         end
       end
@@ -926,7 +956,26 @@ raise "Broken!"
     @@dir_stack.pop
   end
 
-  def self.cd(dest); Dir.chdir(dest); end
+  #
+  # Change into the directory "dest". If a block is given, it changes into
+  # the directory for the duration of the block, then puts you back where you
+  # came from once the block is finished.
+  #
+  def self.cd(dest, &block)
+    dest = Path[dest]
+
+    raise "Can't 'cd' into #{dest}" unless dest.dir?
+
+    if block_given?
+      orig = pwd
+
+      Dir.chdir(dest)
+      yield
+      Dir.chdir(orig)
+    else
+      Dir.chdir(dest)
+    end
+  end
 
   def self.ls(path); Path[path].ls  end
 
