@@ -686,9 +686,9 @@ class Path
       File.unlink(self) == 1
     end
   end
-  alias_method :"delete!", :rm
-  alias_method :"unlink!", :rm
-  alias_method :"remove!", :rm
+  alias_method :delete!, :rm
+  alias_method :unlink!, :rm
+  alias_method :remove!, :rm
 
   def truncate(offset=0)
     File.truncate(self, offset) if exists?
@@ -713,44 +713,32 @@ class Path
 
   # http://ruby-doc.org/stdlib/libdoc/zlib/rdoc/index.html
 
-  def gzip(level=nil)
-    gz_filename = self.with(:filename=>filename+".gz")
+  def gzip!(level=nil)
+    gz_file = self.with(:filename=>filename+".gz")
 
-    raise "#{gz_filename} already exists" if gz_filename.exists?
+    raise "#{gz_file} already exists" if gz_file.exists?
 
     open("rb") do |input|
-      Zlib::GzipWriter.open(gz_filename) do |gzip|
-        IO.copy_stream(input, gzip)
+      Zlib::GzipWriter.open(gz_file) do |output|
+        IO.copy_stream(input, output)
       end
     end
 
-    gz_filename
-  end
-
-  def gzip!(level=nil)
-    gzipped = self.gzip(level)
-    self.rm
-    self.path = gzipped.path
-  end
-
-  def gunzip
-    raise "Not a .gz file" unless ext == "gz"
-
-    gunzipped = self.with(:ext=>nil)
-
-    gunzipped.open("wb") do |out|
-      Zlib::GzipReader.open(self) do |gunzip|
-        IO.copy_stream(gunzip, out)
-      end
-    end
-
-    gunzipped
+    update(gz_file)
   end
 
   def gunzip!
-    gunzipped = self.gunzip
-    self.rm
-    self.path = gunzipped.path
+    raise "Not a .gz file" unless ext == "gz"
+
+    regular_file = self.with(:ext=>nil)
+
+    regular_file.open("wb") do |output|
+      Zlib::GzipReader.open(self) do |input|
+        IO.copy_stream(input, output)
+      end
+    end
+
+    update(regular_file)
   end
 
   def =~(pattern)

@@ -233,16 +233,20 @@ describe Path do
   end
 
   it "truncates" do
-    path = Path.tmpfile
+    tmp = Path.tmp
+    tmp.rm
+    tmp.touch
 
-    path << "1"*100
-    path.size.should == 100
+    tmp.exists?.should == true
 
-    path.truncate(50)
-    path.size.should == 50
+    tmp.write("1"*100)
+    tmp.size.should == 100
 
-    path.truncate
-    path.size.should == 0
+    tmp.truncate(50)
+    tmp.size.should == 50
+
+    tmp.truncate
+    tmp.size.should == 0
   end
 
   it "checksums" do
@@ -273,20 +277,26 @@ describe Path do
   end
 
   it "gzips and gunzips" do
-    path = Path.tmpfile
-    500.times { path << "whee" }
+    tmp = Path.tmp
 
-    path.ext.should_not == "gz"
-    gzipped = path.gzip
+    data = ""
+    500.times { data << "whee" }
 
-    before = path.size
-    after = gzipped.size
+    tmp.write data
+
+    tmp.size.should == data.size
+
+    tmp.ext.should_not == "gz"
+
+    before = tmp.size
+    tmp.gzip!
+    after = tmp.size
+
     before.should > after
-    gzipped.ext.should == "gz"
+    tmp.ext.should == "gz"
 
-    gunzipped = gzipped.gunzip
-    gunzipped.size.should == before
-    gunzipped.should      == path
+    tmp.gunzip!
+    tmp.size.should == before
   end
 
   it "exts" do
