@@ -5,5 +5,5 @@ task :build do
 end
  
 task :release => :build do
-  system "gem push epitools-#{VERSION}"
+  system "gem push epitools-#{VERSION}.gem"
 end
