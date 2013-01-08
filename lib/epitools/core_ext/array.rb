@@ -107,6 +107,50 @@ class Array
     end
   end
 
+  #
+  # Takes an array of numbers, puts them into equal-sized
+  # buckets, and counts the buckets (aka. A Histogram!)
+  #
+  # Examples:
+  #   [1,2,3,4,5,6,7,8,9].histogram(3) #=> [3,3,3]
+  #   [1,2,3,4,5,6,7,8,9].histogram(2) #=> [4,5]
+  #   [1,2,3,4,5,6,7,8,9].histogram(2, ranges: true)
+  #      #=> {
+  #            1.0...5.0 => 4,
+  #            5.0...9.0 => 5
+  #          }
+  #
+  def histogram(n_buckets=10, options={})
+    
+    use_ranges = options[:ranges] || options[:hash]
+
+    min_val     = min
+    max_val     = max
+    range       = (max_val - min_val)
+    bucket_size = range.to_f / n_buckets
+    buckets     = [0]*n_buckets
+
+    # p [range, bucket_size, buckets, min_val, max_val]
+
+    each do |e|
+      bucket = (e - min_val) / bucket_size
+      bucket = n_buckets - 1 if bucket >= n_buckets
+      # p [:e, e, :bucket, bucket]
+      buckets[bucket] += 1
+    end
+
+    if use_ranges
+      ranges = (0...n_buckets).map do |n|
+        offset = n*bucket_size
+        (min_val + offset) ... (min_val + offset + bucket_size)
+      end
+      Hash[ ranges.zip(buckets) ]
+    else
+      buckets
+    end
+
+  end
+
 end
 
 
