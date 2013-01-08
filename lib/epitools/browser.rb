@@ -36,11 +36,11 @@ class Browser
   #
   def initialize(options={})
     @last_get     = Time.at(0)
-    @delay        = options[:delay]         || 1
-    @delay_jitter = options[:delay_jitter]  || 0.2
-    @use_cache    = options[:cache]         || true
-    @use_logs     = options[:logs]          || false
-    @cookie_file  = options[:cookiefile]    || "cookies.txt"
+    @delay        = options[:delay]          || 1
+    @delay_jitter = options[:delay_jitter]   || 0.2
+    @use_cache    = options[:cache] == false || true
+    @use_logs     = options[:logs]           || false
+    @cookie_file  = options[:cookiefile]     || "cookies.txt"
     
     # TODO: @progress, @user_agent, @logfile, @cache_file (default location: ~/.epitools?) 
 

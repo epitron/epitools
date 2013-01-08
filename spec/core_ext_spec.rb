@@ -471,6 +471,18 @@ describe Hash do
     h.map_values! { 1 }
     h.values.should == [1,1]
   end
+
+  it "slices" do
+    h = @h.dup
+
+    h.slice("key1").should == {"key1" => "val1"}
+    h.slice("key2").should == {"key2" => "val2"}
+
+    h.slice!("key1")
+    h.should == {"key1" => "val1"}
+
+    h.slice("nonexistant").should == {}
+  end
   
   it "mkdir_p's and trees" do
     h = {}
