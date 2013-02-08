@@ -24,12 +24,14 @@ module Sys
     case host_os
       when /darwin/
         @os = "Darwin"
+      when /bsd/
+        @os = "BSD"
       when /linux/
         @os = "Linux"
       when /mingw|mswin|cygwin/
         @os = 'Windows'
     else
-      raise "Unknown OS: #{host_os.inspect}"
+      #raise "Unknown OS: #{host_os.inspect}"
     end
 
     @os
@@ -60,6 +62,13 @@ module Sys
   # Is this a Mac? (aka. Darwin?)
   #
   def self.mac?; darwin?; end
+
+  #
+  # Is this BSD?
+  #
+  def self.bsd?
+    os == "BSD" or os == "Darwin"
+  end
 
   #-----------------------------------------------------------------------------
 
@@ -320,7 +329,7 @@ module Sys
         begin
           self.send(platform_method_name, *args)
         rescue NoMethodError
-          raise NotImplementedError.new("#{name} is not yet supported on this platform.")
+          raise NotImplementedError.new("#{name} is not yet supported on #{os}.")
         end
       end
     end
@@ -351,7 +360,7 @@ module Sys
   #
   # eg: {"en0"=>"192.168.1.101"}
   #
-  def self.interfaces_darwin
+  def self.interfaces_bsd
     sections = `ifconfig`.split(/^(?=[^\t])/)
     sections_with_relevant_ip = sections.select {|i| i =~ /inet/ }
 
@@ -364,6 +373,8 @@ module Sys
 
     device_ips
   end
+
+  def self.interfaces_darwin; interfaces_bsd; end
 
   #
   # Linux: Return a hash of (device, IP address) pairs.

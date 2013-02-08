@@ -7,12 +7,12 @@ describe Sys::ProcessInfo do
     proc { Sys.linux? }.should_not raise_error
     proc { Sys.mac? }.should_not raise_error
     proc { Sys.darwin? }.should_not raise_error
+    proc { Sys.bsd? }.should_not raise_error
     proc { Sys.windows? }.should_not raise_error
 
-    %w[Linux Windows Darwin].include?(Sys.os).should == true
+    %w[Linux Windows Darwin BSD].include?(Sys.os).should == true
     
-    truths = [:linux?, :mac?, :windows?].map{|sys| Sys.send(sys)}
-    truths.count(true).should == 1
+    [:linux?, :mac?, :windows?, :bsd?].any?{|os| Sys.send(os)}.should == true
   end
     
   
