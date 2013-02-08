@@ -37,6 +37,10 @@ module Term
   def goto(x,y); @x, @y = x, y; end
   def pos; [@x, @y]; end
 
+  def clear
+    print "\e[H\e[J"
+  end
+
   def color(fore, back=nil)
     @fore = fore
     @back = back if back
