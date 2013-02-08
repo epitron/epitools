@@ -1,4 +1,5 @@
 require 'epitools'
+require 'epitools/permutations'
 
 describe Path do
 
@@ -12,6 +13,14 @@ describe Path do
     path.base.should     == "hello"
   end
 
+  it "dups itself" do
+    path = Path.new "/whatever/blah/stuff.ext"
+    path2 = path.dup
+    path2.path.should == path.path
+    path.dirs.pop
+    path2.path.should_not == path.path
+  end
+
   it "works with relative paths" do
     path = Path.new("../hello.mp3/blah")
 
@@ -23,7 +32,11 @@ describe Path do
   end
 
   it "'relative_to's" do
-    Path["/etc"].relative_to(Path["/tmp"]).should == "../tmp"
+    Path["/etc"].relative_to(Path["/tmp"]).should == "../etc/"
+  end
+
+  it "should glob with relative paths" do
+    raise "not implemented"
   end
 
   it "handles directories" do
@@ -187,15 +200,28 @@ describe Path do
     path.read.should == "rawr"
   end
 
-  it "renames" do
-    path = Path.tmpfile
+  it "cds into directories" do
+    path = Path["/etc"]
+    start = Path.pwd
+    path.should_not == Path.pwd
+    path.cd { path.should == Path.pwd }
+    Path.pwd.should == start
+  end
 
-    str = path.to_s
+  it "renames" do
+    path = Path.tmp
+
+    path.rm
+    path.touch
+
+    path.exists?.should == true
+
+    old_name = path.to_s
 
     path.rename(:ext=>".dat")
 
-    path.to_s.should_not == str
-    path.to_s.should == str+".dat"
+    path.to_s.should == old_name+".dat"
+    path.to_s.should_not == old_name
   end
 
   it "rms" do
@@ -207,20 +233,24 @@ describe Path do
   end
 
   it "truncates" do
-    path = Path.tmpfile
+    tmp = Path.tmp
+    tmp.rm
+    tmp.touch
 
-    path << "1"*100
-    path.size.should == 100
+    tmp.exists?.should == true
 
-    path.truncate(50)
-    path.size.should == 50
+    tmp.write("1"*100)
+    tmp.size.should == 100
 
-    path.truncate
-    path.size.should == 0
+    tmp.truncate(50)
+    tmp.size.should == 50
+
+    tmp.truncate
+    tmp.size.should == 0
   end
 
   it "checksums" do
-    a, b = Path["*.rb"].take(2)
+    a, b = Path["**/*.rb"].take(2)
     [:sha1, :sha2, :md5].each do |meth|
       sum1 = a.send(meth)
       sum2 = b.send(meth)
@@ -247,20 +277,26 @@ describe Path do
   end
 
   it "gzips and gunzips" do
-    path = Path.tmpfile
-    500.times { path << "whee" }
+    tmp = Path.tmp
 
-    path.ext.should_not == "gz"
-    gzipped = path.gzip
+    data = ""
+    500.times { data << "whee" }
 
-    before = path.size
-    after = gzipped.size
+    tmp.write data
+
+    tmp.size.should == data.size
+
+    tmp.ext.should_not == "gz"
+
+    before = tmp.size
+    tmp.gzip!
+    after = tmp.size
+
     before.should > after
-    gzipped.ext.should == "gz"
+    tmp.ext.should == "gz"
 
-    gunzipped = gzipped.gunzip
-    gunzipped.size.should == before
-    gunzipped.should      == path
+    tmp.gunzip!
+    tmp.size.should == before
   end
 
   it "exts" do
@@ -288,7 +324,7 @@ describe Path do
     Path.which("ruby").should_not be_nil
     Path.which("asdfasdfhkajlsdhfkljashdf").should be_nil
     Path.which("ruby").class.should == Path
-    Path.which("cat", "ls", "rm").should == ["/bin/cat", "/bin/ls", "/bin/rm"]
+    Path.which("ps", "sh", "tar").should == ["/bin/ps", "/bin/sh", "/bin/tar"]
   end
 
   it "Path[]s another path" do
@@ -317,7 +353,8 @@ describe Path do
     tmp.touch
     tmp2.touch
 
-    newmode = tmp.mode
+    tmp.mode.should == tmp2.mode
+
     tmp.chmod("+x")
     system("chmod", "+x", tmp2)
     tmp.mode.should == tmp2.mode
@@ -334,14 +371,13 @@ describe Path do
     tmp = Path.tmpfile
     tmp.rm if tmp.exists?
     tmp.mkdir
-    p tmp
-    p tmp.dirs
+
     #tmp.to_s.endswith('/').should == true
     file = tmp/"file"
     file.touch
-    p file
+
     file.dirs.should == tmp.dirs
-    file.filename.should != tmp.filename
+    file.filename.should_not == tmp.filename
   end
 
   it 'parents and childs properly' do
@@ -356,12 +392,12 @@ describe Path do
       root   => parent,
       root   => child,
       root   => neither,
-    }.each do |p, c|
-      p.parent_of?(c).should == true
-      c.parent_of?(p).should == false
+    }.each do |parent, child|
+      parent.should be_parent_of child
+      child.should_not be_parent_of parent
 
-      c.child_of?(p).should == true
-      p.child_of?(c).should == false
+      child.should be_child_of parent
+      parent.should_not be_child_of child
     end
 
     neither.parent_of?(child).should == false
@@ -372,7 +408,7 @@ describe Path do
     path = Path.tmpfile
     path.exe?.should == false
     path.chmod(0o666)
-    p path.mode
+
     (path.mode & 0o666).should > 0
   end
 
@@ -391,8 +427,9 @@ describe Path do
   end
 
   it 'swaps two files' do
-    raise "errorn!"
     # swap two regular files
+
+
     # swap a symlink and a regular file
     # swap two symlinks
   end
@@ -410,7 +447,7 @@ describe Path do
 
   it "shouldn't glob with Path#join" do
     path = Path["/etc"].join("blah{}")
-    path.should == "/etc/blah{}"
+    path.path.should == "/etc/blah{}"
   end
 
   it "should glob with Path#/" do

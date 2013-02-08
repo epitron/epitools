@@ -63,6 +63,23 @@ class Hash
   end
 
   #
+  # Returns a hash containing only the keys passed as arguments.
+  #
+  def slice(*keys)
+    dup.slice!(*keys)
+  end
+
+
+  #
+  # Alters the hash so it contains only the keys passed as arguments.
+  #
+  def slice!(*keys)
+    keys = Set.new keys
+    delete_if { |k,v| not keys.include? k }
+    self
+  end
+
+  #
   # Returns a new Hash whose values default to empty arrays. (Good for collecting things!)
   #
   # eg:

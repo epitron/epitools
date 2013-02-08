@@ -165,6 +165,13 @@ describe Numeric do
     (2**(4212.log(2))).round.should == 4212.0
   end
 
+  it "human_sizes" do
+    1024.human_size.should == "1KB"
+    23984.human_size.should == "23KB"
+    12983128.human_size.should == "12MB"
+    32583128.human_size(2).should == "31.07MB"
+  end
+
 end
 
 describe String do
@@ -463,6 +470,18 @@ describe Hash do
     h.keys.should   == @h.keys
     h.map_values! { 1 }
     h.values.should == [1,1]
+  end
+
+  it "slices" do
+    h = @h.dup
+
+    h.slice("key1").should == {"key1" => "val1"}
+    h.slice("key2").should == {"key2" => "val2"}
+
+    h.slice!("key1")
+    h.should == {"key1" => "val1"}
+
+    h.slice("nonexistant").should == {}
   end
   
   it "mkdir_p's and trees" do

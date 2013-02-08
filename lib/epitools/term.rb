@@ -1,10 +1,23 @@
 #require 'epitools'
 
+require 'epitools/minimal'
+require 'epitools/core_ext/string'
+require 'io/console'
+
 #
 # Example usage:
 #   puts Term::Table[ (1..100).to_a ].horizontally #=> prints all the numbers, ordered across rows
 #   puts Term::Table[ (1..100).to_a ].vertically #=> prints all the numbers, ordered across columns
 #   puts Term::Table[ [[1,2], [3,4]] ] #=> prints the table that was supplied
+#
+#   Term::Table.new do |t|
+#     t.row [...]
+#     t.rows[5] = [...]
+#     t.rows << [...]
+#     t.col []
+#   end.to_s
+#
+#   table.compact.to_s #=> minimize the table's columns
 #
 module Term
 
@@ -16,10 +29,7 @@ module Term
   # Return the [width,height] of the terminal.
   #
   def size
-    Curses.init_screen
-    result = [Curses.cols, Curses.lines]
-    Curses.close_screen
-    result
+    STDIN.winsize.reverse
   end
 
   def width;  size[0]; end
@@ -52,7 +62,7 @@ module Term
     #   eg: Table.new(elements, :sort=>:vertical).to_s
     #
 
-    attr_accessor :border, :columns, :padding, :strip_color, :indent
+    attr_accessor :border, :columns, :padding, :strip_color, :indent, :width, :height
 
     def self.[](data)
       self.new(data)
@@ -72,13 +82,16 @@ module Term
       @border   = options[:border]
       @columns  = options[:columns]
       @padding  = options[:padding] || 1
+
+      # Update the terminal size
+      @width, @height = Term.size
     end
 
     def num_columns
       return @columns if @columns
-      width, height = Term.size
-      width -= indent
-      (width-2) / (@max_size + @padding)
+      w = @width
+      w -= indent
+      (w-2) / (@max_size + @padding)
     end
 
     def num_rows

@@ -16,6 +16,8 @@ describe Term do
     #puts table.by_columns :border=>true
     #puts "rows"
     #puts table.by_rows 
+    puts table.by_rows
+
     table.by_columns.should_not be_nil
     table.by_rows.should_not be_nil
 
@@ -23,6 +25,7 @@ describe Term do
     
     table.by_columns.should_not be_nil
     table.by_rows.should_not be_nil
+
   end
   
   it "tables nothing" do

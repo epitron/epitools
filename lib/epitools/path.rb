@@ -58,14 +58,30 @@ require 'epitools/core_ext/string'
 #
 class Path
 
+  # The directories in the path, split into an array. (eg: ['usr', 'src', 'linux'])
+  attr_reader :dirs
+
+  # The filename without an extension
+  attr_reader :base
+
+  # The file extension, including the . (eg: ".mp3")
+  attr_reader :ext
+
+
   ## initializers
 
   def initialize(newpath, hints={})
     self.send("path=", newpath, hints)
   end
 
-  def self.glob(str)
-    Dir[str].map { |entry| new(entry) }
+  def initialize_copy(other)
+    @dirs = other.dirs && other.dirs.dup
+    @base = other.base && other.base.dup
+    @ext  = other.ext  && other.ext.dup
+  end
+
+  def self.glob(str, hints={})
+    Dir[str].map { |entry| new(entry, hints) }
   end
 
   def self.[](path)
@@ -118,6 +134,13 @@ class Path
         self.dir, self.filename = File.split(newpath)
       end
     end
+
+    # FIXME: Make this work with globs.
+    if hints[:relative]
+      update(relative_to(Path.pwd))
+    elsif hints[:relative_to]
+      update(relative_to(hints[:relative_to]))
+    end
   end
 
   def filename=(newfilename)
@@ -157,16 +180,31 @@ class Path
     end
   end
 
+  #
+  # Clear out the internal state of this object, so that it can be reinitialized.
+  #
+  def reset!
+    [:@dirs, :@base, :@ext].each { |var| remove_instance_variable var }
+    self
+  end
+
+  #
+  # Reload this path (update cached values.)
+  #
+  def reload!
+    temp = path
+    reset!
+    self.path = temp
+    self
+  end
+
+  def update(other)
+    @dirs = other.dirs
+    @base = other.base
+    @ext  = other.ext
+  end
+
   ## getters
-
-  # The directories in the path, split into an array. (eg: ['usr', 'src', 'linux'])
-  attr_reader :dirs
-
-  # The filename without an extension
-  attr_reader :base
-
-  # The file extension, including the . (eg: ".mp3")
-  attr_reader :ext
 
   # Joins and returns the full path
   def path
@@ -178,50 +216,44 @@ class Path
   end
 
   #
+  # Is this a relative path?
+  #
+  def relative?
+    # FIXME: Need a Path::Relative subclass, so that "dir/filename" can be valid.
+    #        (If the user changes dirs, the relative path should change too.)
+    dirs.first == ".."
+  end
+
+  #
   # Path relative to current directory (Path.pwd)
   #
   def relative
     relative_to(pwd)
   end
 
-  def relative_to(to)
-    from = path.split(File::SEPARATOR)
-    to = Path[to].path.split(File::SEPARATOR)
-    p [from, to]
-    from.length.times do
-      break if from[0] != to[0]
-      from.shift; to.shift
-    end
-    fname = from.pop
-    join(*(from.map { RELATIVE_PARENTDIR } + to))
-  end
-
-  def relative_to2(anchor=nil)
-    anchor ||= Path.pwd
-
-    # operations to transform anchor into self
-
+  def relative_to(anchor)
     # stage 1: go ".." until we find a common dir prefix
     #          (discard everything and go '/' if there's no common dir)
     # stage 2: append the rest of the other path
 
-    # find common prefix
-    smaller, bigger = [ anchor.dirs, self.dirs ].sort_by(&:size)
-    common_prefix_end = bigger.zip(smaller).index { |a,b | a != b }
-    common_prefix = bigger[0...common_prefix_end]
+    first_mismatch = dirs.zip(anchor.dirs).index { |a,b| a != b }
 
-    if common_prefix.any?
-      dots = nil
-    end
+    num_dots = anchor.dirs.size - first_mismatch
 
-    self.dirs & anchor.dirs
+    result = self.dup
+    result.dirs = ([".."] * num_dots) + dirs[first_mismatch..-1]
 
+    result
   end
 
   # The current directory (with a trailing /)
   def dir
     if dirs
-      File::SEPARATOR + File.join(*dirs)
+      if relative?
+        File.join(*dirs)
+      else
+        File::SEPARATOR + File.join(*dirs)
+      end
     else
       nil
     end
@@ -330,8 +362,7 @@ class Path
   end
 
   def parent_of?(child)
-    # If `self` is a parent of `child`, it's a prefix.
-    child.path[/^#{Regexp.escape self.path}\/.+/] != nil
+    dirs == child.dirs[0...dirs.size]
   end
 
   ## comparisons
@@ -358,6 +389,7 @@ class Path
 
   #
   # Path["/etc"].join("anything{}").path == "/etc/anything{}"
+  # (globs ignored)
   #
   def join(other)
     Path.new File.join(self, other)
@@ -365,6 +397,7 @@ class Path
 
   #
   # Path["/etc"]/"passwd" == Path["/etc/passwd"]
+  # (globs permitted)
   #
   def /(other)
     # / <- fixes jedit syntax highlighting bug.
@@ -488,6 +521,7 @@ class Path
   def read_json
     JSON.load(io)
   end
+  alias_method :from_json, :read_json
 
   # Convert the object to JSON and write it to the file (overwriting the existing file).
   def write_json(object)
@@ -498,6 +532,7 @@ class Path
   def read_html
     Nokogiri::HTML(io)
   end
+  alias_method :from_html, :read_html
 
 
   # Convert the object to YAML and write it to the file (overwriting the existing file).
@@ -509,6 +544,7 @@ class Path
   def read_yaml
     YAML.load(io)
   end
+  alias_method :from_yaml, :read_yaml
 
 
   def read_xml
@@ -533,6 +569,14 @@ class Path
     write BSON.serialize(object)
   end
 
+  #
+  # Change into the directory. If a block is given, it changes into
+  # the directory for the duration of the block, then puts you back where you
+  # came from once the block is finished.
+  #
+  def cd(&block)
+    Path.cd(path, &block)
+  end
 
   #
   # Examples:
@@ -541,44 +585,27 @@ class Path
   #   Path["Songy Song.aac"].rename(:dir=>"/music2")
   #   Path["/music2/Songy Song.aac"].exists? #=> true
   #
-  def rename!(options)
-raise "Broken!"
-
-    dest = rename(options)
-    self.path = dest.path # become dest
-    self
-  end
-
   def rename(options)
-raise "Broken!"
-
     raise "Options must be a Hash" unless options.is_a? Hash
     dest = self.with(options)
 
     raise "Error: destination (#{dest.inspect}) already exists" if dest.exists?
     File.rename(path, dest)
 
-    dest
+    update(dest)
+
+    self
   end
 
   #
   # Renames the file the specified full path (like Dir.rename.)
   #
   def rename_to(path)
-raise "Broken!"
-
     rename :path=>path.to_s
   end
-  alias_method :mv,       :rename_to
 
   def rename_to!(path)
-raise "Broken!"
     rename! :path=>path.to_s
-  end
-  alias_method :mv!,       :rename_to!
-
-  def reload!
-    self.path = to_s
   end
 
   #
@@ -592,16 +619,13 @@ raise "Broken!"
       def #{method}
         if exists?
           if directory?
-            Path[path]
+            reload!
           else
             raise "Error: A file by this name already exists."
           end
         else
-          #{command}(path)
-          #Path[path]
-          p [:path, path]
-          self.path = path # regenerate object
-          p [:path, path]
+          #{command} path   # Make the directory
+          reload!
           self
         end
       end
@@ -616,17 +640,9 @@ raise "Broken!"
     FileUtils.mv(path, dest)
   end
 
-  def join(other)
-    if uri?
-      Path[URI.join(path, other).to_s]
-    else
-      Path[File.join(path, other)]
-    end
-  end
-
   def ln_s(dest)
     dest = Path[dest]
-    FileUtils.ln_s self, dest
+    FileUtils.ln_s(self, dest)
   end
 
   ## Owners and permissions
@@ -670,9 +686,9 @@ raise "Broken!"
       File.unlink(self) == 1
     end
   end
-  alias_method :"delete!", :rm
-  alias_method :"unlink!", :rm
-  alias_method :"remove!", :rm
+  alias_method :delete!, :rm
+  alias_method :unlink!, :rm
+  alias_method :remove!, :rm
 
   def truncate(offset=0)
     File.truncate(self, offset) if exists?
@@ -697,44 +713,32 @@ raise "Broken!"
 
   # http://ruby-doc.org/stdlib/libdoc/zlib/rdoc/index.html
 
-  def gzip(level=nil)
-    gz_filename = self.with(:filename=>filename+".gz")
+  def gzip!(level=nil)
+    gz_file = self.with(:filename=>filename+".gz")
 
-    raise "#{gz_filename} already exists" if gz_filename.exists?
+    raise "#{gz_file} already exists" if gz_file.exists?
 
     open("rb") do |input|
-      Zlib::GzipWriter.open(gz_filename) do |gzip|
-        IO.copy_stream(input, gzip)
+      Zlib::GzipWriter.open(gz_file) do |output|
+        IO.copy_stream(input, output)
       end
     end
 
-    gz_filename
-  end
-
-  def gzip!(level=nil)
-    gzipped = self.gzip(level)
-    self.rm
-    self.path = gzipped.path
-  end
-
-  def gunzip
-    raise "Not a .gz file" unless ext == "gz"
-
-    gunzipped = self.with(:ext=>nil)
-
-    gunzipped.open("wb") do |out|
-      Zlib::GzipReader.open(self) do |gunzip|
-        IO.copy_stream(gunzip, out)
-      end
-    end
-
-    gunzipped
+    update(gz_file)
   end
 
   def gunzip!
-    gunzipped = self.gunzip
-    self.rm
-    self.path = gunzipped.path
+    raise "Not a .gz file" unless ext == "gz"
+
+    regular_file = self.with(:ext=>nil)
+
+    regular_file.open("wb") do |output|
+      Zlib::GzipReader.open(self) do |input|
+        IO.copy_stream(input, output)
+      end
+    end
+
+    update(regular_file)
   end
 
   def =~(pattern)
@@ -926,7 +930,26 @@ raise "Broken!"
     @@dir_stack.pop
   end
 
-  def self.cd(dest); Dir.chdir(dest); end
+  #
+  # Change into the directory "dest". If a block is given, it changes into
+  # the directory for the duration of the block, then puts you back where you
+  # came from once the block is finished.
+  #
+  def self.cd(dest, &block)
+    dest = Path[dest]
+
+    raise "Can't 'cd' into #{dest}" unless dest.dir?
+
+    if block_given?
+      orig = pwd
+
+      Dir.chdir(dest)
+      yield
+      Dir.chdir(orig)
+    else
+      Dir.chdir(dest)
+    end
+  end
 
   def self.ls(path); Path[path].ls  end
 
@@ -968,6 +991,10 @@ raise "Broken!"
 end
 
 
+class Path::Relative < Path
+  # FIXME: Implement this.
+end
+
 #
 # A wrapper for URL objects.
 #
@@ -993,32 +1020,24 @@ class Path::URL < Path
   #
   # When this is: http://host.com:port/path/filename.ext?param1=value1&param2=value2&...
   #
-  def to_s
-    uri.to_s
-  end
+  def to_s; uri.to_s; end
 
 
   #
   # ...this is: 'http'
   #
-  def scheme
-    uri.scheme
-  end
+  def scheme; uri.scheme; end
   alias_method :protocol, :scheme
 
   #
   # ...and this is: 'host.com'
   #
-  def host
-    uri.host
-  end
+  def host; uri.host; end
 
   #
   # ...and this is: 80
   #
-  def port
-    uri.port
-  end
+  def port; uri.port; end
 
   #
   # ...and this is: {param1: value1, param2: value2, ...etc... }
@@ -1030,6 +1049,11 @@ class Path::URL < Path
       nil
     end
   end
+
+  def join(other)
+    Path.new URI.join(path, other).to_s
+  end
+
 
   # ...and `path` is /path/filename.ext
 

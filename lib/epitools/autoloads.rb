@@ -17,6 +17,7 @@ autoload :Timeout,    'timeout'
 autoload :Find,       'find'
 autoload :Benchmark,  'benchmark'
 autoload :Tracer,     'tracer'
+autoload :CSV,        'csv'
 #autoload :DelegateClass, 'delegate'
 
 # YAML is sometimes loaded improperly.

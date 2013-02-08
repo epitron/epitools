@@ -99,6 +99,29 @@ class Numeric
     Math.log(self, n)
   end
 
+
+  BYTE_SIZE_TABLE = {
+    # power    # units
+    0          => "",
+    1          => "KB",
+    2          => "MB",
+    3          => "GB",
+    4          => "TB",
+    5          => "PB",
+    6          => "EB",
+    7          => "ZB",
+    8          => "YB",
+  }
+
+  def human_bytes(decimals=0)
+    power = self.log(1024).floor
+    base  = 1024.0 ** power
+    units = BYTE_SIZE_TABLE[power]
+    "#{(self / base).round(decimals)}#{units}"
+  end
+
+  alias_method :human_size, :human_bytes
+
 end
 
 

@@ -2,7 +2,11 @@
 
 Useful miscellaneous improvements for base Ruby objects, plus some extra
 data structures and handy wrappers. (Think of it as a light-weight version
-of ActiveSupport. All modules are loaded on demand with `autoload`.)
+of ActiveSupport.
+
+All epitools modules (and a bunch of Ruby's stdlib) are 
+{loaded on demand with "autoload"}[https://github.com/epitron/epitools/blob/master/lib/epitools/autoloads.rb],
+so it's really fast. (Require this in your .irbrc or .pryrc, and you'll never have to require another Ruby stdlib module again!)
 
 Enhanced base classes: {Enumerable}[http://rdoc.info/github/epitron/epitools/master/Enumerable], {Hash}[http://rdoc.info/github/epitron/epitools/master/Hash], {String}[http://rdoc.info/github/epitron/epitools/master/String], {Array}[http://rdoc.info/github/epitron/epitools/master/Array], {Object}[http://rdoc.info/github/epitron/epitools/master/Object], {Integer}[http://rdoc.info/github/epitron/epitools/master/Integer], etc.
 
@@ -32,7 +36,7 @@ or check out the rdoc: http://rdoc.info/github/epitron/epitools/master/frames
 
 == Copyright
 
-Copyright (c) 2009-2012 epitron
+Copyright (c) 2009-2013 epitron
 
 == License
 

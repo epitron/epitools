@@ -9,6 +9,7 @@
 #
 class Iter
 
+
   attr_accessor :container
 
   def initialize(vals)
@@ -64,6 +65,8 @@ class Iter
     end
   end
   
+
+
   class Elem < BasicObject
   
     attr_accessor :val, :visited
@@ -159,5 +162,6 @@ class Iter
       "<Elem: #{@val.inspect}>"
     end
   end
+
   
 end
