@@ -1,15 +1,7 @@
+# require 'pry-rescue/rspec'
 require 'epitools'
 
 describe Object do
-
-  it "has Enum" do
-    defined?(Enum).should_not == nil
-  end
-  
-  #it "enums" do
-  #  generator = enum { |y| y.yield 1 }
-  #  generator.next.should == 1
-  #end
 
   it "withs" do
     class Cookie; attr_accessor :size, :chips; end
@@ -161,7 +153,7 @@ describe Numeric do
     20.sin.should == Math.sin(20)
     1.5.exp.should == Math.exp(1.5)
 
-    253.log(5).should == Math.log(253,5)
+    253.log(5).should == 3.438088195871358
     (2**(4212.log(2))).round.should == 4212.0
   end
 
@@ -357,12 +349,33 @@ end
 
 describe Enumerable do
 
+  it "maps deeply" do
+    [["a\n", "b\n"], ["c\n", "d\n"]].map_recursively(&:strip).should == [ %w[a b], %w[c d] ]
+    
+    [[1,2],[3,4]].deep_map {|e| e ** 2}.should == [[1,4],[9,16]] 
+    [1,2,3,4].deep_map {|e| e ** 2}.should == [1,4,9,16] 
+    [[],[],1,2,3,4].deep_map {|e| e ** 2}.should == [[], [], 1, 4, 9, 16] 
+
+    {1=>2, 3=>{4=>5, 6=>7}}.deep_map {|k,v| [k, v**2] }.should == [ [1,4], [3, [[4,25], [6,49]]] ]
+  end
+  
+  it "selects deeply" do
+
+    [[1,2],[3,4]].deep_select {|e| e % 2 == 0 }.should == [[2],[4]]
+    puts
+
+    {1=>2, 3=>{4=>5, 6=>7}}.deep_select {|k,v| k == 1 }.should == {1=>2} 
+    #[1,2,3,4].deep_select {|e| e ** 2}.should == [1,4,9,16] 
+    #[[],[],1,2,3,4].deep_select {|e| e ** 2}.should == [[], [], 1, 4, 9, 16] 
+  end
+  
   it "splits" do
     [1,2,3,4,5].split_at     {|e| e == 3}.should == [ [1,2], [4,5] ]
     [1,2,3,4,5].split_after  {|e| e == 3}.should == [ [1,2,3], [4,5] ]
     [1,2,3,4,5].split_before {|e| e == 3}.should == [ [1,2], [3,4,5] ]
 
-    "a\nb\n---\nc\nd\n".lines.split_at(/---/).map_recursively(&:strip).should   == [ %w[a b], %w[c d] ]
+    result = "a\nb\n---\nc\nd\n".lines.split_at(/---/)
+    result.map_recursively(&:strip).should == [ %w[a b], %w[c d] ]
   end
 
   it "handles nested things" do
@@ -394,19 +407,6 @@ describe Enumerable do
     [1,1,3,3].average.should == 2.0
   end
 
-  it "maps deeply" do
-    [[1,2],[3,4]].deep_map {|e| e ** 2}.should == [[1,4],[9,16]] 
-    [1,2,3,4].deep_map {|e| e ** 2}.should == [1,4,9,16] 
-    [[],[],1,2,3,4].deep_map {|e| e ** 2}.should == [[], [], 1, 4, 9, 16] 
-  end
-  
-  it "selects deeply" do
-    [[1,2],[3,4]].deep_select {|e| e % 2 == 0 }.should == [[2],[4]]
-    {1=>2, 3=>{4=>5, 6=>7}}.deep_select {|k,v| k == 1 }.should == {1=>2} 
-    #[1,2,3,4].deep_select {|e| e ** 2}.should == [1,4,9,16] 
-    #[[],[],1,2,3,4].deep_select {|e| e ** 2}.should == [[], [], 1, 4, 9, 16] 
-  end
-  
   it "foldl's" do
     a = [1,2,3,4]
     a.foldl(:+).should == a.sum
@@ -417,7 +417,7 @@ describe Enumerable do
   
   it "powersets" do
     [1,2,3].powerset.should == [[], [1], [2], [1, 2], [3], [1, 3], [2, 3], [1, 2, 3]]
-    Enum.new([1,2], :each).powerset.should == [[], [1], [2], [1, 2]]
+    [1,2].to_enum.powerset.should == [[], [1], [2], [1, 2]]
   end
   
   it "unzips" do
@@ -466,10 +466,10 @@ describe Hash do
   it "maps values" do
     h = @h.map_values{|v| v.upcase}
 
-    h.values.should == @h.values.map{|v| v.upcase}
-    h.keys.should   == @h.keys
+    h.values.should =~ @h.values.map{|v| v.upcase}
+    h.keys.should   =~ @h.keys
     h.map_values! { 1 }
-    h.values.should == [1,1]
+    h.values.should =~ [1,1]
   end
 
   it "slices" do
@@ -490,7 +490,7 @@ describe Hash do
     h.mkdir_p(["a", "b", "whoa"]).should == {"a"=>{"b"=>{"c"=>{}, "whoa"=>{}}}}
     
     lambda { 
-      h.tree.should == ["a", "  b", "    c", "    whoa"]
+      h.tree.should =~ ["a", "  b", "    c", "    whoa"]
     }.should_not raise_error
   end
   
@@ -529,7 +529,7 @@ describe Binding do
   a = 1
   b = proc { a }
   
-  b.binding.keys.should == [:a, :b]
+  b.binding.keys.should =~ [:a, :b]
   b.binding.keys.should == b.binding.local_variables
   
   b.binding[:a].should  == 1
@@ -592,13 +592,13 @@ describe "truthiness" do
     {
       # truthy things
       true => [
-        "yes", "on", "1", "Enabled", 1, 1.7, :blah, true, [1,2,3], Enumerator.new([1,2,3], :each),
+        "yes", "on", "1", "Enabled", 1, 1.7, :blah, true, [1,2,3], [1,2,3].to_enum,
         1938389127239847129803741980237498012374,
       ],
       
       # untruthy things
       false => [
-        "", " ", "asdf", 0, 0.0, false, nil, [], Enumerator.new([], :each),
+        "", " ", "asdf", 0, 0.0, false, nil, [], [].to_enum,
       ]
     }.each do |truthiness, objs|
       objs.each { |obj| obj.truthy?.should == truthiness }

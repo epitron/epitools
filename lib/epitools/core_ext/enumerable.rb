@@ -35,7 +35,7 @@ module Enumerable
         end
       end
     else
-      enum_for :skip, n
+      to_enum(:skip, n)
     end
   end
 
@@ -166,16 +166,22 @@ module Enumerable
   # Example:
   #   [ [1,2], [3,4] ].deep_map{|e| e ** 2 } #=> [ [1,4], [9,16] ]
   #
-  def deep_map(depth=nil, &block)
+  def deep_map(max_depth=nil, current_depth=0, parent=nil, &block)
+    return self if max_depth and (current_depth > max_depth)
+
     map do |obj|
-
-      case obj
-      when Enumerable
-        obj.deep_map(&block)
+      if obj == parent # infinite loop scenario!
+        yield obj
       else
-        block.call(obj)
+        case obj
+        when String
+          yield obj
+        when Enumerable
+          obj.deep_map(max_depth, current_depth+1, self, &block)
+        else
+          yield obj
+        end
       end
-
     end
   end
 
@@ -190,30 +196,58 @@ module Enumerable
   # Example:
   #   [ [1,2], [3,4] ].deep_select{|e| e % 2 == 0 } #=> [ [2], [4] ]
   #
-  def deep_select(depth=nil, &block)
-    map do |*args|
+  def deep_select(max_depth=nil, current_depth=0, parent=nil, &block)
+    return self if max_depth and (current_depth > max_depth)
 
-      obj = args.last
-
-      if depth.nil? or depth > 0
-
-        case obj
-        when Hash
-
-        when Array, Enumerable
-          result = obj.deep_select(depth ? depth-1 : nil, &block)
-          result.any? ? result : nil
-        end
-
+    map do |obj|
+      p [:obj, obj]
+      result = if obj == parent # infinite loop scenario!
+        p :infinite
+        obj if yield obj
       else
-        obj if block.call(obj)
+        case obj
+        when String
+          p :string
+          obj if yield obj
+        when Enumerable
+          p :recurse
+          obj.deep_select(max_depth, current_depth+1, self, &block)
+        else
+          p :else
+          p [:yield, yield(obj)]
+          obj if yield obj
+        end
       end
-
+      p [:result, result]
+      result
     end.compact
   end
 
-  alias_method :recursive_select, :deep_select
+  # def deep_select(depth=nil, &block)
+  #   map do |*args|
 
+  #     obj = args.last
+
+  #     if depth.nil? or depth > 0
+
+  #       case obj
+  #       when Hash
+
+  #       when Array, Enumerable
+  #         result = obj.deep_select(depth ? depth-1 : nil, &block)
+  #         result.any? ? result : nil
+  #       end
+
+  #     else
+  #       obj if block.call(obj)
+  #     end
+
+  #   end.compact
+  # end
+
+  alias_method :recursive_select,   :deep_select
+  alias_method :select_recursively, :deep_select
+  alias_method :select_recursive,   :deep_select
 
   #
   # Identical to "reduce" in ruby1.9 (or foldl in haskell.)
@@ -324,7 +358,7 @@ class Enumerator
   # Display a spinner every `every` elements that pass through the Enumerator.
   #
   def with_spinner(every=37)
-    Enumerator.new do |yielder|
+    to_enum do |yielder|
       spins = 0
 
       each.with_index do |e, i|

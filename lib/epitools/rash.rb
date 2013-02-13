@@ -51,7 +51,7 @@ class Rash
   # Return everything that matches the query.
   #
   def all(query)
-    return Enumerator.new(self, :all, query) unless block_given?   
+    return to_enum(:all, query) unless block_given?   
   
     if @hash.include? query
       yield @hash[query]

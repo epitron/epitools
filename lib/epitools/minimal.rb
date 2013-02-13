@@ -4,14 +4,6 @@ if RUBY_VERSION["1.8"]
   Enumerator = Enumerable::Enumerator unless defined? Enumerator
 end
 
-unless defined? Enum
-  if defined? Enumerator
-    Enum = Enumerator
-  else
-    $stderr.puts "WARNING: Couldn't find the Enumerator class. Enum will not be available."
-  end
-end
-
 RbConfig = Config unless defined? RbConfig
 
 
@@ -121,7 +113,7 @@ class Object
       alias_method "#{meth}_without_enumerator", meth
       class_eval %{
         def #{meth}(*args, &block)
-          return Enum.new(self, #{meth.inspect}, *args, &block) unless block_given?
+          return to_enum(#{meth.inspect}, *args, &block) unless block_given?
           #{meth}_without_enumerator(*args, &block)
         end
       }

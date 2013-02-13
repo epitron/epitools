@@ -66,7 +66,7 @@ class Array
   #
   # Shuffle the array
   #
-  unless defined? shuffle
+  unless instance_methods.include? :shuffle
     def shuffle
       sort_by{rand}
     end
@@ -75,13 +75,20 @@ class Array
   #
   # Pick (a) random element(s).
   #
-  unless defined? sample
+  unless instance_methods.include? :sample
     def sample(n=1)
-      if n == 1
-        self[rand(size)]
-      else
-        shuffle[0...n]
+      return self[rand sz] if n == 1
+
+      sz      = size
+      indices = []
+
+      loop do
+        indices += (0..n*1.2).map { rand sz }
+        indices.uniq
+        break if indices.size >= n
       end
+
+      values_at(*indices[0...n])
     end
   end
   alias_method :pick, :sample

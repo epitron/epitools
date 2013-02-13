@@ -19,8 +19,12 @@ class Numeric
   def clamp(range)
     if self < range.first
       range.first
-    elsif self > range.last 
-      range.last
+    elsif self >= range.last 
+      if range.exclude_end?
+        range.last - 1
+      else
+        range.last
+      end
     else
       self
     end
@@ -95,8 +99,11 @@ class Numeric
 
   end
 
-  def log(n)
-    Math.log(self, n)
+  # Math.log is different in 1.8
+  if RUBY_VERSION["1.8"]
+    def log(n); Math.log(self) / Math.log(n); end
+  else
+    def log(n); Math.log(self, n); end
   end
 
 

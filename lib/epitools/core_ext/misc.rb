@@ -9,6 +9,7 @@ class MatchData
 
 end
 
+
 class Binding
 
   #
@@ -30,13 +31,20 @@ class Binding
   #
   # Return all the local variables in the binding
   #
-  def local_variables
-    eval("local_variables")
+
+  if RUBY_VERSION["1.8"]
+    def local_variables
+      eval("local_variables").map(&:to_sym)
+    end
+  else
+    def local_variables
+      eval("local_variables")
+    end
   end
+
   alias_method :keys, :local_variables
 
 end
-
 
 
 class Proc

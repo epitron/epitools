@@ -14,7 +14,7 @@ Spork.prefork do
   
   require 'rspec'
   require 'epitools'
-  
+
   Rspec.configure do |c|
     c.mock_with :rspec
   end

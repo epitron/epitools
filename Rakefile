@@ -1,13 +1,13 @@
-VERSION = File.read("VERSION").strip
+gem_version = File.read("VERSION").strip
 
 task :build do
   system "gem build .gemspec"
 end
  
 task :release => :build do
-  system "gem push epitools-#{VERSION}.gem"
+  system "gem push epitools-#{gem_version}.gem"
 end
 
 task :install => :build do
-  system "gem install epitools-#{VERSION}.gem"
+  system "gem install epitools-#{gem_version}.gem"
 end

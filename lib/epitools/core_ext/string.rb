@@ -1,3 +1,4 @@
+require 'epitools/minimal'
 require 'epitools/core_ext/numbers'
 
 class String
@@ -107,6 +108,7 @@ class String
   # Convert a query string to a hash of params
   #
   def to_params
+    require 'cgi' unless defined? CGI.parse
     CGI.parse(self).map_values do |v|
       # CGI.parse wraps every value in an array. Unwrap them!
       if v.is_a?(Array) and v.size == 1
@@ -231,7 +233,7 @@ class String
   # Parse this string as YAML
   #
   def from_yaml
-    YAML.parse(self).to_ruby
+    YAML.load(self)
   end
 
   #
