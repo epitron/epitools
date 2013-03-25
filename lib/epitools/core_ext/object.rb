@@ -142,5 +142,3 @@ class Object
   end
   
 end
-
-

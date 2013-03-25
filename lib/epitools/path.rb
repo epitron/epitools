@@ -1079,18 +1079,3 @@ class Path::URL < Path
 
 end
 
-
-#
-# Path("/some/path") is an alias for Path["/some/path"]
-#
-def Path(arg)
-  Path[arg]
-end
-
-class String
-  def to_Path
-    Path.new self
-  end
-
-  alias_method :to_P, :to_Path
-end

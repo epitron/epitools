@@ -357,7 +357,16 @@ class String
     end
     
   end # unless public_method_defined? :to_proc
-  
+
+  #
+  # Convert this string into a Path object (for representing files/directories).
+  #
+  def to_Path
+    Path.new self
+  end
+
+  alias_method :to_P, :to_Path
+
 end
 
 
