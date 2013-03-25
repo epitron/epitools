@@ -245,13 +245,13 @@ class String
   alias_method :from_marshal, :unmarshal
 
   #
-  # Convert the string to a Path object.
+  # Convert the string to a Path object (for representing files/directories).
   #
-  def as_path
+  def to_Path
     Path[self]
   end
-  alias_method :to_p, :as_path
-  
+  alias_method :to_P, :to_Path
+
   #
   # Convert this string into a string describing this many of the string.
   # (Note: Doesn't know anything about proper grammar.)
@@ -357,15 +357,6 @@ class String
     end
     
   end # unless public_method_defined? :to_proc
-
-  #
-  # Convert this string into a Path object (for representing files/directories).
-  #
-  def to_Path
-    Path.new self
-  end
-
-  alias_method :to_P, :to_Path
 
 end
 
