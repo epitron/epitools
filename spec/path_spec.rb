@@ -324,7 +324,7 @@ describe Path do
     Path.which("ruby").should_not be_nil
     Path.which("asdfasdfhkajlsdhfkljashdf").should be_nil
     Path.which("ruby").class.should == Path
-    Path.which("ps", "sh", "tar").should == ["/bin/ps", "/bin/sh", "/bin/tar"]
+    Path.which("ps", "sh", "tar").map(&:path).should == ["/bin/ps", "/bin/sh", "/usr/bin/tar"]
   end
 
   it "Path[]s another path" do

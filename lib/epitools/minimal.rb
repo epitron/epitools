@@ -141,6 +141,21 @@ class Object
     send(method, *args, &block) if respond_to? method
   end
 
+  #
+  # Return this object. If given a block, yields this object
+  # and returns the result of the block.
+  #
+  # eg: stuff.group_by(&:self)
+  #
+  def self
+    if block_given?
+      yield self
+    else
+      self
+    end
+  end
+  alias_method :fap, :self
+
 end
 
 #
@@ -176,6 +191,18 @@ class Module
   
 end
 
+
+class String
+
+  #
+  # Convert the string to a Path object (for representing files/directories).
+  #
+  def to_Path
+    Path[self]
+  end
+  alias_method :to_P, :to_Path
+
+end
 
 #
 # Path("/some/path") is an alias for Path["/some/path"]

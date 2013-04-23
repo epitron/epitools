@@ -245,14 +245,6 @@ class String
   alias_method :from_marshal, :unmarshal
 
   #
-  # Convert the string to a Path object (for representing files/directories).
-  #
-  def to_Path
-    Path[self]
-  end
-  alias_method :to_P, :to_Path
-
-  #
   # Convert this string into a string describing this many of the string.
   # (Note: Doesn't know anything about proper grammar.)
   #

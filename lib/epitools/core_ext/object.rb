@@ -24,11 +24,26 @@ class Object
   #
   # (All this method does is dup the object, then call "key=(value)" for each
   # key/value in the options hash.)
+  #
+  # == BONUS FEATURE! ==
+  #
+  # If you supply a block, it just gives you the object, and
+  # returns whatever your block returns.
+  #
+  # Example:
+  #   >> {a: 10, b: 2}.with { |hash| hash[:a] / hash[:b] }
+  #   => 5
+  #
+  # Good for chaining lots of operations together in a REPL.
   #  
   def with(options={})
-    obj = dup
-    options.each { |key, value| obj.send "#{key}=", value }
-    obj
+    if block_given?
+      yield self
+    else
+      obj = dup
+      options.each { |key, value| obj.send "#{key}=", value }
+      obj
+    end
   end
   
   #

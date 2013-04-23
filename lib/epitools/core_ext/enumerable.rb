@@ -1,5 +1,3 @@
-
-
 module Enumerable
 
   #
@@ -346,6 +344,19 @@ module Enumerable
   end
   alias_method :iter, :to_iter
 
+  #
+  # Counts how many instances of each object are in the collection,
+  # returning a hash.
+  #
+  # eg: [:a, :b, :c, :c, :c, :c].counts #=> {:a=>1, :b=>1, :c=>4}
+  #
+  def counts
+    h = Hash.of_integers
+    each { |x| h[x] += 1 }
+    h
+  end
+  alias_method :counted, :counts
+  alias_method :grouped, :counts
 
 end
 
