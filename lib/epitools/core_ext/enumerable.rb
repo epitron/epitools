@@ -346,13 +346,17 @@ module Enumerable
 
   #
   # Counts how many instances of each object are in the collection,
-  # returning a hash.
+  # returning a hash. (Also optionally takes a block.)
   #
   # eg: [:a, :b, :c, :c, :c, :c].counts #=> {:a=>1, :b=>1, :c=>4}
   #
   def counts
     h = Hash.of_integers
-    each { |x| h[x] += 1 }
+    if block_given?
+      each { |x| h[yield x] += 1 }
+    else
+      each { |x| h[x] += 1 }
+    end
     h
   end
   alias_method :counted, :counts
