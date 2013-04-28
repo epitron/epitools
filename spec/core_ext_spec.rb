@@ -186,6 +186,15 @@ describe String do
     "\n\n\nblah\n\n\nblah\n\n\n".nice_lines.should == ["blah", "blah"]    
   end
   
+  it "titlecases" do
+    "asdf asdfasdf asdf".titlecase.should == "Asdf Asdfasdf Asdf"
+    " asdf".titlecase.should == " Asdf"
+    "ASDFASDFA SDF".titlecase.should == "Asdfasdfa Sdf"
+    s = "asdf asdf"
+    s.titlecase!
+    s.should == "Asdf Asdf"
+  end
+
   it "strips color" do
     s = "woot!"
     color_s = s.light_green
@@ -360,7 +369,6 @@ describe Enumerable do
   end
   
   it "selects deeply" do
-
     [[1,2],[3,4]].deep_select {|e| e % 2 == 0 }.should == [[2],[4]]
     puts
 
@@ -401,7 +409,7 @@ describe Enumerable do
   it "sums" do
     [1,2,3,4,5].sum.should == 15
   end
-  
+
   it "averages" do
     [1,3].average.should == 2.0
     [1,1,3,3].average.should == 2.0

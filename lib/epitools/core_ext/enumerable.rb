@@ -142,9 +142,9 @@ module Enumerable
   #
   def sum
     if block_given?
-      inject(0) { |total,elem| total + yield(elem) }
+      map(&block).reduce(:+)
     else
-      inject(0) { |total,elem| total + elem }
+      reduce(:+)
     end
   end
 
@@ -153,7 +153,10 @@ module Enumerable
   #
   def average
     count = 0
-    sum = inject(0) { |total,n| count += 1; total + n }
+    sum   = 0
+
+    each { |e| count += 1; sum += e }
+
     sum / count.to_f
   end
 

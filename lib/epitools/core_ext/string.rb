@@ -51,6 +51,21 @@ class String
   end
 
   #
+  # Convert string to "Title Case" (first letter of each word capitalized)
+  #
+  def titlecase!
+    downcase!
+    gsub!(/\b\w/) { |m| m.upcase }
+  end
+
+  #
+  # Return a new string converted to "Title Case" (first letter of each word capitalized)
+  #
+  def titlecase
+    dup.titlecase!
+  end
+
+  #
   # Remove ANSI color codes.
   #
   def strip_color
