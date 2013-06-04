@@ -186,6 +186,18 @@ describe String do
     "\n\n\nblah\n\n\nblah\n\n\n".nice_lines.should == ["blah", "blah"]    
   end
   
+  it "wraps" do
+    s1 = "Hello there, I am a sentence or series of words."
+    s2 = "012345678901234567890123456789012345678901234567"
+    s1.wrap(14).should == "Hello there, I\nam a sentence\nor series of\nwords."
+    s2.wrap(14).should == "01234567890123\n45678901234567\n89012345678901\n234567"
+  end
+
+  it "indents" do
+    s = "Some things\nNeed indenting\nSo, you indent them!\n"
+    s.indent(2).should == "  Some things\n  Need indenting\n  So, you indent them!\n"
+  end
+
   it "titlecases" do
     "asdf asdfasdf asdf".titlecase.should == "Asdf Asdfasdf Asdf"
     " asdf".titlecase.should == " Asdf"

@@ -84,6 +84,36 @@ class String
   alias_method :nicelines,   :nice_lines
   alias_method :clean_lines, :nice_lines
 
+  #
+  # Wrap the lines in the string so they're at most "width" wide.
+  # (If no width is specified, defaults to the width of the terminal.)
+  #
+  def wrap(width=nil, ignore=nil)
+    if width.nil?
+      require 'io/console'
+      height, width = STDIN.winsize
+    end
+
+    wrap_re = /(?:.{1,#{width}}[ \t]+|.{1,#{width}})/
+
+    # TODO: 'ignore' ignores characters matching some regexp
+    #
+    # if ignore
+    #   stripped = gsub(ignore, '') # remove whatever we're ignoring
+    #   lines = stripped.scan(wrap_re) # wrap the lines
+    #   lines.each do |line|
+    #     line.
+    #   end
+
+    scan(wrap_re).map(&:rstrip).join("\n")
+  end
+
+  #
+  # Indent all the lines in the string by "amount" of spaces.
+  #
+  def indent(amount=2)
+    lines.map { |line| (" "*amount) + line }.join ''
+  end
 
   #
   # Iterate over slices of the string of size `slice_width`.

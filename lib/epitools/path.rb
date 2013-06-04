@@ -504,10 +504,12 @@ class Path
       read_json
     when 'html', 'htm'
       read_html
-    when 'xml', 'rdf', 'rss'
-      read_xml
     when 'yaml', 'yml'
       read_yaml
+    when 'xml', 'rdf', 'rss'
+      read_xml
+    when 'csv'
+      read_csv
     when 'marshal'
       read_marshal
     when 'bson'
@@ -545,6 +547,12 @@ class Path
     YAML.load(io)
   end
   alias_method :from_yaml, :read_yaml
+
+  # Parse the file as CSV
+  def read_csv(opts={})
+    CSV.open(io, opts).each
+  end
+  alias_method :from_csv, :read_csv
 
 
   def read_xml
