@@ -147,7 +147,7 @@ class Object
   #
   # eg: stuff.group_by(&:self)
   #
-  def self
+  define_method :self do
     if block_given?
       yield self
     else

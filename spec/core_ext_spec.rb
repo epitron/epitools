@@ -91,6 +91,10 @@ describe Object do
     :whee.marshal.should == Marshal.dump(:whee)
   end
     
+  it "selfs" do
+    a = [1,2,3,4]
+    a.map(&:self).should == a
+  end
   
 end
 
