@@ -230,3 +230,16 @@ module ObjectSpace
   extend self
 
 end
+
+
+
+#
+# Flush standard input's buffer.
+#
+def STDIN.purge
+  begin
+    loop { read_nonblock(4096) }
+  rescue Errno::EAGAIN
+    # No more input!
+  end
+end
