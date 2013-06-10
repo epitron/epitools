@@ -15,6 +15,7 @@
 #
 #   <no type given>              => Don't enforce a type -- any ruby object is allowed.
 #   ["str", "string"]            => String
+#   ["sym", "symbol"]            => Symbol
 #   ["int", "integer"]           => Integer
 #   ["float"]                    => Float
 #   ["bigdecimal"]               => BigDecimal
@@ -40,6 +41,7 @@ class TypedStruct < Struct
   CONVERTERS = Hash[ *{
     [:passthru]                  => :passthru,
     ["str", "string"]            => proc { |me| me.to_s },
+    ["sym", "symbol"]            => proc { |me| me.to_sym },
     ["int", "integer"]           => proc { |me| me.to_i },
     ["float"]                    => proc { |me| me.to_f },
     ["bigdecimal"]               => proc { |me| BigDecimal.new me },
