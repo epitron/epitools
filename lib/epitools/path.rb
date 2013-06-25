@@ -184,7 +184,7 @@ class Path
   # Clear out the internal state of this object, so that it can be reinitialized.
   #
   def reset!
-    [:@dirs, :@base, :@ext].each { |var| remove_instance_variable var }
+    [:@dirs, :@base, :@ext].each { |var| remove_instance_variable(var) rescue nil  }
     self
   end
 
