@@ -140,7 +140,7 @@ module Enumerable
   #
   # Sum the elements
   #
-  def sum
+  def sum(&block)
     if block_given?
       map(&block).reduce(:+)
     else
@@ -362,8 +362,17 @@ module Enumerable
     end
     h
   end
-  alias_method :counted, :counts
-  alias_method :grouped, :counts
+  alias_method :count_by,     :counts
+  alias_method :group_counts, :counts
+
+
+  #
+  # group_by the elements themselves
+  #
+  def groups
+    group_by(&:self)
+  end
+  alias_method :grouped, :groups
 
 end
 

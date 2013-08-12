@@ -74,7 +74,7 @@ class String
   alias_method :strip_ansi, :strip_color 
 
   #
-  # Like #lines, but skips empty lines and removes \n's.
+  # Like #each_line, but skips empty lines and removes \n's.
   #
   def nice_lines
     # note: $/ is the platform's newline separator
@@ -83,6 +83,16 @@ class String
   
   alias_method :nicelines,   :nice_lines
   alias_method :clean_lines, :nice_lines
+
+  #
+  # Like #each_line, but removes trailing \n
+  #
+  def each_chomped
+    each_line { |line| yield line.chomp }
+  end
+  alias_method :chomped_lines, :each_chomped
+  alias_method :chomp_lines,   :each_chomped
+
 
   #
   # Wrap the lines in the string so they're at most "width" wide.

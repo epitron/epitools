@@ -13,7 +13,7 @@ end
 class Binding
 
   #
-  # Get a variables in this binding
+  # Get a variable in this binding
   #
   def [](key)
     eval(key.to_s)
@@ -31,7 +31,6 @@ class Binding
   #
   # Return all the local variables in the binding
   #
-
   if RUBY_VERSION["1.8"]
     def local_variables
       eval("local_variables").map(&:to_sym)
@@ -43,6 +42,19 @@ class Binding
   end
 
   alias_method :keys, :local_variables
+
+  #
+  # Combine the variables in two bindings (the latter having precedence)
+  #
+  def merge(other)
+    self.eval do
+      other.eval do
+        binding
+      end
+    end
+  end
+
+  alias_method :|, :merge
 
 end
 
@@ -242,4 +254,10 @@ def STDIN.purge
   rescue Errno::EAGAIN
     # No more input!
   end
+end
+
+
+class DateTime
+  def to_i; to_time.to_i; end
+  def to_f; to_time.to_f; end
 end

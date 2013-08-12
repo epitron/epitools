@@ -99,13 +99,34 @@ class Numeric
 
   end
 
-  # Math.log is different in 1.8
-  if RUBY_VERSION["1.8"]
-    def log(n); Math.log(self) / Math.log(n); end
-  else
-    def log(n); Math.log(self, n); end
+
+  def ln
+    Math.log(self)
   end
 
+
+  # Math.log is different in 1.8
+  if RUBY_VERSION["1.8"]
+
+    def log(n=nil)
+      if n
+        Math.log(self) / Math.log(n)
+      else
+        Math.log(self)
+      end
+    end
+
+  else
+
+    def log(n=nil)
+      if n
+        Math.log(self, n)
+      else
+        Math.log(self)
+      end
+    end
+
+  end
 
   BYTE_SIZE_TABLE = {
     # power    # units

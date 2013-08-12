@@ -50,10 +50,33 @@ class Array
   end
 
   #
-  # Pick the middle element.
+  # Pick the middle element
   #
   def middle
     self[(size-1) / 2]
+  end
+
+  #
+  # Find the statistical mean
+  #
+  def mean
+    sum / size.to_f
+  end
+  alias_method :average, :mean
+
+  #
+  # Find the statistical median (middle value in the sorted dataset)
+  #
+  def median
+    sort.middle
+  end
+
+
+  #
+  # Find the statistical "mode" (most frequently occurring value)
+  #
+  def mode
+    counts.max_by { |k,v| v }.first
   end
 
   #

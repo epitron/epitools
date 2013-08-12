@@ -352,6 +352,16 @@ describe Array do
     a << 6
     a.middle.should == 3
   end
+
+  it "means, medians, modes" do
+    a = [1,2,3,4,4,5,5,5,6]
+    #       0 1 2 3 4 5 6 7 8
+    #               ^- median
+
+    a.median.should == 4
+    a.mode.should == 5
+    a.mean.should == a.sum.to_f / a.size
+  end
   
   it "/'s" do
     a = [1,2,3,4,5]
@@ -424,6 +434,7 @@ describe Enumerable do
   
   it "sums" do
     [1,2,3,4,5].sum.should == 15
+    [1,2,3,4,5].sum { 1 }.should == 5
   end
 
   it "averages" do
