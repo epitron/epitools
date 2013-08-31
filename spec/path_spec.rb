@@ -324,7 +324,12 @@ describe Path do
     Path.which("ruby").should_not be_nil
     Path.which("asdfasdfhkajlsdhfkljashdf").should be_nil
     Path.which("ruby").class.should == Path
-    Path.which("ps", "sh", "tar").map(&:path).should == ["/bin/ps", "/bin/sh", "/usr/bin/tar"]
+
+    testprogs = ["ps", "sh", "tar"]
+
+    real_result = `which #{testprogs.join(" ")}`.each_line.map(&:strip)
+
+    Path.which(*testprogs).map(&:path).should == real_result
   end
 
   it "Path[]s another path" do
@@ -453,6 +458,23 @@ describe Path do
   it "should glob with Path#/" do
     entries = Path["/etc"]/"*"
     entries.should be_an Array
+  end
+
+  it "xattrs" do
+    file = Path["~/test"]
+    file.touch
+    file["nothing"].should == nil
+
+    file["user.test"] = "whee"
+
+    file["user.test"].should == "whee"
+    Path.getfattr(file)["user.test"].should == "whee"
+
+    file["user.test"] = nil
+    file["user.test"].should == nil
+    Path.getfattr(file)["user.test"].should == nil
+
+    lambda { file["blahblahblah"] = "whee" }.should raise_error
   end
 
 end

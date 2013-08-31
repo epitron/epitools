@@ -68,7 +68,9 @@ class Path
   attr_reader :ext
 
 
-  ## initializers
+  ###############################################################################
+  # Initializers
+  ###############################################################################
 
   def initialize(newpath, hints={})
     self.send("path=", newpath, hints)
@@ -110,7 +112,9 @@ class Path
     end
   end
 
-  ## setters
+  ###############################################################################
+  # Setters
+  ###############################################################################
 
   attr_writer :base
   attr_writer :dirs
@@ -279,7 +283,9 @@ class Path
     extensions
   end
 
-  ## fstat info
+  ###############################################################################
+  # fstat
+  ###############################################################################
 
   def exists?
     File.exists? path
@@ -365,7 +371,9 @@ class Path
     dirs == child.dirs[0...dirs.size]
   end
 
-  ## comparisons
+  ###############################################################################
+  # Comparisons
+  ###############################################################################
 
   include Comparable
 
@@ -385,7 +393,9 @@ class Path
   end
 
 
-  ## appending
+  ###############################################################################
+  # Joining paths
+  ###############################################################################
 
   #
   # Path["/etc"].join("anything{}").path == "/etc/anything{}"
@@ -406,7 +416,86 @@ class Path
     Path[ File.join(self, other) ]
   end
 
-  ## opening/reading files
+  ###############################################################################
+  # Xattrs
+  ###############################################################################
+
+  #
+  # Read xattrs from file (requires "getfattr" to be in the path)
+  #
+  def self.getfattr(path)
+    # # file: Scissor_Sisters_-_Invisible_Light.flv
+    # user.m.options="-c"
+
+    cmd = ["getfattr", "-d", "-e", "hex", path]
+
+    attrs = {}
+
+    IO.popen(cmd, "rb", :err=>[:child, :out]) do |io|
+      io.each_line do |line|
+        if line =~ /^([^=]+)=0x(.+)/
+          key   = $1
+          value = [$2].pack("H*") # unpack hex string
+
+          attrs[key] = value
+        end
+      end
+    end
+
+    attrs
+  end
+
+  #
+  # Set xattrs on a file (requires "setfattr" to be in the path)
+  #
+  def self.setfattr(path, key, value)
+    cmd = %w[setfattr]
+
+    if value == nil
+      # delete
+      cmd += ["-x", key]
+    else
+      # set
+      cmd += ["-n", key, "-v", value]
+    end
+
+    cmd << path
+
+    IO.popen(cmd, "rb", :err=>[:child, :out]) do |io|
+      result = io.each_line.to_a
+      error = {cmd: cmd, result: result.to_s}.inspect
+      raise error if result.any?
+    end
+  end
+
+  #
+  # Return a hash of all of this file's xattrs.
+  # (Metadata key=>valuse pairs, supported by most modern filesystems.)
+  #
+  def attrs
+    @attrs ||= Path.getfattr(path)
+  end
+  alias_method :xattrs, :attrs
+
+  #
+  # Retrieve one of this file's xattrs
+  #
+  def [](key)
+    attrs[key]
+  end
+
+  #
+  # Set this file's xattr
+  #
+  def []=(key, value)
+    Path.setfattr(path, key, value)
+    @attrs = nil
+  end
+
+
+  ###############################################################################
+  # Opening/Reading files
+  ###############################################################################
 
   def open(mode="rb", &block)
     if block_given?
@@ -456,7 +545,10 @@ class Path
     self
   end
 
-  ## modifying files
+
+  ###############################################################################
+  # Modifying files
+  ###############################################################################
 
   #
   # Append data to this file (accepts a string, an IO, or it can yield the file handle to a block.)
@@ -493,6 +585,10 @@ class Path
       end
     end
   end
+
+  ###############################################################################
+  # Parsing files
+  ###############################################################################
 
   #
   # Parse the file based on the file extension.
