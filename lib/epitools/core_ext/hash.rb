@@ -90,6 +90,16 @@ class Hash
   end
 
   #
+  # Returns a new Hash whose values default to empty sets. (Good for collecting unique things!)
+  #
+  # eg:
+  #   Hash.of_sets[:yays] << "Yay!"
+  #
+  def self.of_sets
+    new {|h,k| h[k] = Set.new }
+  end
+
+  #
   # Returns a new Hash whose values default to 0. (Good for counting things!)
   #
   # eg:

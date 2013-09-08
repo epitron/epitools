@@ -18,6 +18,7 @@ autoload :Find,       'find'
 autoload :Benchmark,  'benchmark'
 autoload :Tracer,     'tracer'
 autoload :CSV,        'csv'
+autoload :Matrix,     'matrix'
 
 module Digest
   autoload :SHA1,     'digest/sha1'

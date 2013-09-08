@@ -621,6 +621,32 @@ describe ObjectSpace do
 
 end
 
+describe Matrix do
+
+  it "draws a matrix" do
+    Matrix.identity(3).draw
+    Matrix.random(3).draw
+    (Matrix.identity(3) + 102321 ).draw
+  end
+
+  it "makes random matrices" do
+    m = Matrix.random(4)
+    m.size.should == [4,4]
+
+    m = Matrix.random(3,2)
+    m.size.should == [3,2]
+  end
+
+  it "does scalar things" do
+    m = Matrix[[1,2,3]]
+    (m + 1).to_a.should == [[2,3,4]]
+    (m - 1).to_a.should == [[0,1,2]]
+    (m * 2).to_a.should == [[2,4,6]]
+    (m / 2.0).to_a.should == [[0.5,1,1.5]]
+  end
+
+end
+
 describe "truthiness" do
   
   it "is truthy!" do
