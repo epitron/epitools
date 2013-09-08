@@ -645,6 +645,14 @@ describe Matrix do
     (m / 2.0).to_a.should == [[0.5,1,1.5]]
   end
 
+  it "lets you set things" do
+    m = Matrix.zeros(1,3)
+    m.to_a.should == [[0,0,0]]
+    m[0,0].should == 0
+    m[0,2] = 5
+    m.to_a.should == [[0,0,5]]
+  end
+
 end
 
 describe "truthiness" do

@@ -18,7 +18,7 @@ autoload :Find,       'find'
 autoload :Benchmark,  'benchmark'
 autoload :Tracer,     'tracer'
 autoload :CSV,        'csv'
-autoload :Matrix,     'matrix'
+autoload :Matrix,     'epitools/core_ext/matrix'
 
 module Digest
   autoload :SHA1,     'digest/sha1'
