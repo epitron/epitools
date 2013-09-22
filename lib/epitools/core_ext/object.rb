@@ -60,8 +60,9 @@ class Object
   end
 
   #
-  # Cache (memoize) the result of this method the first time it's called
-  # and return this value for all subsequent calls.
+  # Cache (memoize) the result of an instance method the first time
+  # it's called, storing this value in the "@methodname" instance variable,
+  # and always return this value on subsequent calls.
   #  
   def self.memoize(*methods)
     methods.each do |meth|
@@ -69,6 +70,7 @@ class Object
 
       if old_method.arity == 0
         ivarname = "@#{meth}"
+        
         define_method meth do
           instance_variable_get(ivarname) or instance_variable_set(ivarname, old_method.bind(self).call)
         end
