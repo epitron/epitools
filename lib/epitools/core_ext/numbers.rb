@@ -4,7 +4,7 @@ class Numeric
 
   def truthy?; self > 0; end
 
-  def commatize  
+  def commatize
     to_s.gsub(/(\d)(?=\d{3}+(?:\.|$))(\d{3}\..*)?/,'\1,\2')
   end
 

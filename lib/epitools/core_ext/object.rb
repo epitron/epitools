@@ -58,7 +58,26 @@ class Object
       copy
     end
   end
-  
+
+  #
+  # Cache (memoize) the result of this method the first time it's called
+  # and return this value for all subsequent calls.
+  #  
+  def self.memoize(*methods)
+    methods.each do |meth|
+      old_method = instance_method(meth)
+
+      if old_method.arity == 0
+        ivarname = "@#{meth}"
+        define_method meth do
+          instance_variable_get(ivarname) or instance_variable_set(ivarname, old_method.bind(self).call)
+        end
+      else
+        raise "Can't memoize methods with arguments. (YET.)"
+      end
+    end
+  end
+
   #
   # Serialize this object to a binary String, using Marshal.dump.
   #

@@ -351,7 +351,7 @@ class Path
   end
 
   def symlink_target
-    Path.new File.readlink(path)
+    Path.new File.readlink(path.gsub(/\/$/, ''))
   end
   alias_method :readlink, :symlink_target
 

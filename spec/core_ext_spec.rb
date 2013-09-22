@@ -96,6 +96,29 @@ describe Object do
     a.map(&:self).should == a
   end
   
+  it "memoizes" do
+
+    class Fake
+
+      def cacheme
+        @temp = !@temp
+      end
+      memoize :cacheme
+
+    end
+
+    f = Fake.new
+    f.instance_variable_get("@cacheme").should == nil
+
+    f.cacheme.should == true
+    f.instance_variable_get("@temp").should == true
+    f.instance_variable_get("@cacheme").should == true
+
+    f.cacheme.should == true
+    f.instance_variable_get("@temp").should == true
+    f.instance_variable_get("@cacheme").should == true
+  end
+  
 end
 
 
