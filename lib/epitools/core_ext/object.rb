@@ -103,12 +103,6 @@ class Object
   end
 
   #
-  # Proper grammar.
-  #  
-  alias_method :is_an?, :is_a?
-  alias_method :responds_to?, :respond_to?
-
-  #
   # Emit a quick debug message (only if $DEBUG is true)
   #
   def dmsg(msg)

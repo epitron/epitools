@@ -132,6 +132,12 @@ class Object
   end
 
   #
+  # Proper grammar.
+  #
+  alias_method :is_an?, :is_a?
+  alias_method :responds_to?, :respond_to?
+
+  #
   # Instead of:
   #   @person ? @person.name : nil
   # Now you can do:
