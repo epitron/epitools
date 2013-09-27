@@ -296,8 +296,8 @@ class Path
   end
 
   def lstat
-    @lstat ||= File.lstat self    # to cache or not to cache -- that is the question.
-    #File.lstat self
+    @lstat ||= File.lstat self    # to cache, or not to cache? that is the question.
+    # File.lstat self                 # ...answer: not to cache!
   end
 
   def mode
@@ -308,12 +308,24 @@ class Path
     lstat.mtime
   end
 
+  def mtime=(new_mtime)
+    File.utime(atime, new_mtime, path)
+    @lstat = nil
+    new_mtime
+  end
+
   def ctime
     lstat.ctime
   end
 
   def atime
     lstat.atime
+  end
+
+  def atime=(new_atime)
+    File.utime(new_atime, mtime, path)
+    @lstat = nil
+    new_atime
   end
 
   # FIXME: Does the current user own this file?

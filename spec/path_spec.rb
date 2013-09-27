@@ -477,4 +477,18 @@ describe Path do
     lambda { file["blahblahblah"] = "whee" }.should raise_error
   end
 
+  it "changes mtime/atime" do
+    file   = Path.tmp
+    now    = file.mtime
+    before = now - 50.days
+
+    file.mtime = before
+    file.mtime.should == before
+
+    beforebefore = before - 50.days
+
+    file.atime = beforebefore
+    file.atime.should == beforebefore
+  end
+
 end
