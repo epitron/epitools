@@ -1,9 +1,7 @@
 #
 # TODOs:
-#   Relative paths
-#   Rename bugs
-#   tmp bugs
-#
+#   * Relative paths
+#   * Fix Path#/: If it contains glob chars, but a file already exists with that name, assume we're not globbing (fixes problems with {}, [], etc.)
 
 require 'epitools/minimal'
 require 'epitools/core_ext/enumerable'
