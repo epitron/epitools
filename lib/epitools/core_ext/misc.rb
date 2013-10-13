@@ -213,6 +213,13 @@ module URI
     query.to_params
   end
 
+  #
+  # URIs are strings, dammit!
+  #
+  def to_str
+    to_s
+  end
+
 end
 
 
