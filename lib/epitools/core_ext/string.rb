@@ -163,17 +163,19 @@ class String
   # Convert a query string to a hash of params
   #
   def to_params
-    require 'cgi' unless defined? CGI.parse
-    CGI.parse(self).map_values do |v|
-      # CGI.parse wraps every value in an array. Unwrap them!
-      if v.is_a?(Array) and v.size == 1
-        v.first
-      else
-        v 
+    params = {}
+
+    split(/[&;]/).each do |pairs|
+      key, value = pairs.split('=',2).collect { |v| CGI.unescape(v) }
+
+      if key and value
+        params[key] ||= []
+        params[key] << value
       end
-    end      
+    end
+
+    params.map_values { |v| v.size > 1 ? v : v.first }
   end
-  
 
   #
   # Cached constants for base62 decoding.
