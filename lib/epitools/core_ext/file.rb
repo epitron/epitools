@@ -18,7 +18,7 @@ class File
   end
 
   #
-  # Read the previous +length+ bytes. After the read, +pos+ will be at the beginning of the region that you just read.
+  # Read the previous `length` bytes. After the read, `pos` will be at the beginning of the region that you just read.
   #
   def read_backwards(length)
     old_pos = pos
