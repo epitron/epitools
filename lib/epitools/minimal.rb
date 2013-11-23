@@ -52,12 +52,12 @@ class Object
       when Class, Module
         Object.send(:remove_const, x.name)
       when Method
-        x.owner.send(:undef_method, x.name)
+        x.owner.send(:remove_method, x.name)
       when Symbol
         if Object.const_get(x)
           Object.send(:remove_const, x)
         elsif method(x)
-          undef_method x
+          remove_method x
         end
       else
         raise "Error: don't know how to 'del #{x.inspect}'"
