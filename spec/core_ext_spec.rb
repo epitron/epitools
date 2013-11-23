@@ -755,3 +755,15 @@ describe "to_hms and from_hms" do
   "1:20:33".from_hms.to_hms.should == "01:20:33"
   "5:01:20:33".from_hms.to_hms.should == "05:01:20:33"
 end
+
+
+describe File do
+
+  it "reverse_eaches" do
+    tmp = Path.tmp
+    tmp << "hi\nthere\neveryone!\n"
+    f = open(tmp)
+    f.reverse_each.to_a.should == ["everyone!\n", "there\n", "hi\n"]
+  end
+
+end

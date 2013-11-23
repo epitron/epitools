@@ -268,16 +268,18 @@ class String
   
   # `true` if this string starts with the substring 
   #  
-  def startswith(substring)
+  def startswith?(substring)
     self[0...substring.size] == substring
   end
+  alias_method :startswith, :startswith?
   
   #
   # `true` if this string ends with the substring 
   #  
-  def endswith(substring)
+  def endswith?(substring)
     self[-substring.size..-1] == substring
   end
+  alias_method :endswith, :endswith?
 
   #
   # Parse this string as JSON

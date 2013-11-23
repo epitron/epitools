@@ -178,6 +178,15 @@ class Range
     Kernel.rand(self)
   end
 
+  #
+  # The middle element of this range.
+  #
+  def middle
+    (min + max) / 2
+  end
+
+  
+
 end
 
 
