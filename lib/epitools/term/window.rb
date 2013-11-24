@@ -1,3 +1,8 @@
+#
+# Documentation:
+#   http://www.termsys.demon.co.uk/vtansi.htm
+#   http://invisible-island.net/xterm/ctlseqs/ctlseqs.html
+#
 module Term
 
   class Window
