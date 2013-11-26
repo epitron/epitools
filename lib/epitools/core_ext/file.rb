@@ -28,13 +28,12 @@ class File
     raise "length must be a multiple of 512" if block_aligned and length % 512 != 0
 
     end_pos = pos
+    return nil if end_pos == 0
 
     if block_aligned
       misalignment = end_pos % length
       length      += misalignment
     end
-
-    return nil if end_pos == 0
 
     if length >= end_pos # this read will take us to the beginning of the file
       seek(0)
@@ -61,11 +60,12 @@ class File
     seek(start_pos)
 
     while data = reverse_read(4096)
-      data    += fragment
       lines    = data.lines
-      fragment = lines.shift
+      lines.last << fragment unless lines.last[-1] == "\n"
 
-      lines.reverse_each { |line| yield line }
+      fragment = lines.first
+
+      lines[1..-1].reverse_each { |line| yield line }
     end
 
     yield fragment
