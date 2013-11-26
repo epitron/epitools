@@ -60,20 +60,26 @@ class File
     return to_enum(:reverse_each_from_current_pos) unless block_given?
 
     fragment = readline rescue ""
+    seek(-fragment.size, IO::SEEK_CUR) if fragment.size > 0
 
     while data = reverse_read(4096)
+      # p pos: pos, fragment: fragment
       data += fragment
 
-      loc  = data.size-1
+      # p data: data
+
+      line_end = data.size - 1
 
       # NOTE: `rindex(str, loc)` includes the character at `loc`
-      while index = data.rindex("\n", loc-1)
-        line = data[index+1..loc]
+      while line_start = data.rindex("\n", line_end-1)
+        line = data[line_start+1..line_end]
+
         yield line
-        loc = index
+
+        line_end = line_start
       end
 
-      fragment = data[0..loc]
+      fragment = data[0..line_end]
     end
 
     yield fragment

@@ -216,8 +216,10 @@ describe String do
   it "wraps" do
     s1 = "Hello there, I am a sentence or series of words."
     s2 = "012345678901234567890123456789012345678901234567"
+    s3 = "hello there"
     s1.wrap(14).should == "Hello there, I\nam a sentence\nor series of\nwords."
     s2.wrap(14).should == "01234567890123\n45678901234567\n89012345678901\n234567"
+    s3.wrap(80).should == "hello there"
   end
 
   it "indents" do

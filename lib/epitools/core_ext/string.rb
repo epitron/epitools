@@ -101,21 +101,32 @@ class String
   def wrap(width=nil, ignore=nil)
     if width.nil?
       require 'io/console'
-      height, width = STDIN.winsize
+      _, width = STDIN.winsize
+      width -= 1
     end
 
-    wrap_re = /(?:.{1,#{width}}[ \t]+|.{1,#{width}})/
+    return self if size <= width
 
-    # TODO: 'ignore' ignores characters matching some regexp
-    #
-    # if ignore
-    #   stripped = gsub(ignore, '') # remove whatever we're ignoring
-    #   lines = stripped.scan(wrap_re) # wrap the lines
-    #   lines.each do |line|
-    #     line.
-    #   end
+    strings   = []
+    start_pos = 0
+    end_pos   = width
 
-    scan(wrap_re).map(&:rstrip).join("\n")
+    loop do
+      split_pos = rindex(/\s/, end_pos) || end_pos
+
+      strings << self[start_pos...split_pos]
+
+      start_pos = index(/\S/, split_pos)
+      break if start_pos == nil
+      end_pos   = start_pos + width
+
+      if end_pos > size
+        strings << self[start_pos..-1]
+        break
+      end
+    end
+
+    strings.join("\n")
   end
 
   #
