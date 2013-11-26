@@ -8,7 +8,7 @@ class BOFError < Exception; end
 class File
 
   #
-  # A much faster `reverse_each` implementation.
+  # A streaming `reverse_each` implementation. (For large files, it's faster and uses less memory.)
   #
   def reverse_each(&block)
     return to_enum(:reverse_each) unless block_given?
@@ -27,31 +27,27 @@ class File
   def reverse_read(length, block_aligned=false)
     raise "length must be a multiple of 512" if block_aligned and length % 512 != 0
 
-    b = pos
+    end_pos = pos
 
     if block_aligned
-      misalignment = b % length
-      length += misalignment
+      misalignment = end_pos % length
+      length      += misalignment
     end
 
-    return nil if b == 0
+    return nil if end_pos == 0
 
-    # |---a------b---|  <- b is current pos, read from a to b, end up at a
-
-    if length > b
+    if length >= end_pos # this read will take us to the beginning of the file
       seek(0)
     else
       seek(-length, IO::SEEK_CUR)
     end
 
-    a = pos
-
-    data = read(b - a)
-    seek(a)
+    start_pos = pos
+    data      = read(end_pos - start_pos)
+    seek(start_pos)
 
     data
   end
-
 
   #
   # Read each line of file backwards (from the current position.)
@@ -59,27 +55,17 @@ class File
   def reverse_each_from_current_pos
     return to_enum(:reverse_each_from_current_pos) unless block_given?
 
+    # read the rest of the current line, in case we started in the middle of a line
+    start_pos = pos
     fragment = readline rescue ""
-    seek(-fragment.size, IO::SEEK_CUR) if fragment.size > 0
+    seek(start_pos)
 
     while data = reverse_read(4096)
-      # p pos: pos, fragment: fragment
-      data += fragment
+      data    += fragment
+      lines    = data.lines
+      fragment = lines.shift
 
-      # p data: data
-
-      line_end = data.size - 1
-
-      # NOTE: `rindex(str, loc)` includes the character at `loc`
-      while line_start = data.rindex("\n", line_end-1)
-        line = data[line_start+1..line_end]
-
-        yield line
-
-        line_end = line_start
-      end
-
-      fragment = data[0..line_end]
+      lines.reverse_each { |line| yield line }
     end
 
     yield fragment
@@ -90,6 +76,13 @@ class File
   #
   def seek_end
     seek(0, IO::SEEK_END)
+  end
+
+  #
+  # Seek to `BOF`
+  #
+  def seek_start
+    seek(0)
   end
 
   #
