@@ -636,6 +636,13 @@ describe Range do
     50.times { r.includes?(r.rand).should == true }
   end
 
+  it "does | and &" do
+    a = (1..10)
+    b = (5...21)
+    a & b == (5..10)
+    a | b == (1..20)
+  end
+
 end
 
 describe ObjectSpace do

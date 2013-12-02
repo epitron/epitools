@@ -169,28 +169,6 @@ end
 
 
 
-class Range
-
-  #
-  # Pick a random number from the range.
-  #
-  def rand
-    Kernel.rand(self)
-  end
-
-  #
-  # The middle element of this range.
-  #
-  def middle
-    (min + max) / 2
-  end
-
-  
-
-end
-
-
-
 class Struct
 
   #
