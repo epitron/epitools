@@ -409,24 +409,24 @@ end
 
 describe Enumerable do
 
-  it "maps deeply" do
-    [["a\n", "b\n"], ["c\n", "d\n"]].map_recursively(&:strip).should == [ %w[a b], %w[c d] ]
+  # it "maps deeply" do
+  #   [["a\n", "b\n"], ["c\n", "d\n"]].map_recursively(&:strip).should == [ %w[a b], %w[c d] ]
     
-    [[1,2],[3,4]].deep_map {|e| e ** 2}.should == [[1,4],[9,16]] 
-    [1,2,3,4].deep_map {|e| e ** 2}.should == [1,4,9,16] 
-    [[],[],1,2,3,4].deep_map {|e| e ** 2}.should == [[], [], 1, 4, 9, 16] 
+  #   [[1,2],[3,4]].deep_map {|e| e ** 2}.should == [[1,4],[9,16]] 
+  #   [1,2,3,4].deep_map {|e| e ** 2}.should == [1,4,9,16] 
+  #   [[],[],1,2,3,4].deep_map {|e| e ** 2}.should == [[], [], 1, 4, 9, 16] 
 
-    {1=>2, 3=>{4=>5, 6=>7}}.deep_map {|k,v| [k, v**2] }.should == [ [1,4], [3, [[4,25], [6,49]]] ]
-  end
+  #   {1=>2, 3=>{4=>5, 6=>7}}.deep_map {|k,v| [k, v**2] }.should == [ [1,4], [3, [[4,25], [6,49]]] ]
+  # end
   
-  it "selects deeply" do
-    [[1,2],[3,4]].deep_select {|e| e % 2 == 0 }.should == [[2],[4]]
-    puts
+  # it "selects deeply" do
+  #   [[1,2],[3,4]].deep_select {|e| e % 2 == 0 }.should == [[2],[4]]
+  #   puts
 
-    {1=>2, 3=>{4=>5, 6=>7}}.deep_select {|k,v| k == 1 }.should == {1=>2} 
-    #[1,2,3,4].deep_select {|e| e ** 2}.should == [1,4,9,16] 
-    #[[],[],1,2,3,4].deep_select {|e| e ** 2}.should == [[], [], 1, 4, 9, 16] 
-  end
+  #   {1=>2, 3=>{4=>5, 6=>7}}.deep_select {|k,v| k == 1 }.should == {1=>2} 
+  #   #[1,2,3,4].deep_select {|e| e ** 2}.should == [1,4,9,16] 
+  #   #[[],[],1,2,3,4].deep_select {|e| e ** 2}.should == [[], [], 1, 4, 9, 16] 
+  # end
   
   it "splits" do
     [1,2,3,4,5].split_at     {|e| e == 3}.should == [ [1,2], [4,5] ]
@@ -631,19 +631,95 @@ end
 
 describe Range do
 
+  before :all do
+    @a = 1..3   # ----
+    @b = 2...6  #   ----
+    @c = 8..10  #         ----
+  end
+
+  it "splices" do
+    @a.splice(@b).should == [1...2, 2...4, 4..6]
+    @a.splice(@c).should == [@a, nil, @c]
+    @a.splice(@c).should == [@a, nil, @c]
+    (1..3).splice(2..3).should == [1...2, 2..3, nil]
+    (1..3).splice(1..4).should == [nil, 1...4, 4..4]
+  end
+
+  it "< >" do
+
+    # a < b is true when:
+
+    #   self: ----
+    #  other:      -----
+    ((1..2) < (3..4)).should == true
+    ((1..2) > (3..4)).should == false
+
+    #   self: ----------
+    #  other:      -----
+    ((1..4) < (3..4)).should == true
+    ((1..4) > (3..4)).should == false
+
+    #   self: -----
+    #  other: ----------
+    ((1..2) < (1..4)).should == true
+    ((1..2) > (1..4)).should == false
+
+    #   self: ------
+    #   other:    ------
+    ((1..3) < (2..4)).should == true
+    ((1..3) > (2..4)).should == false
+
+
+    # a > b is true when:
+
+    #   self:      -----
+    #  other: ----
+    ((3..4) > (1..2)).should == true
+    ((3..4) < (1..2)).should == false
+
+    #   self:      -----
+    #  other: ----------
+    ((3..4) > (1..4)).should == true
+    ((3..4) < (1..4)).should == false
+
+    #   self: ----------
+    #  other: -----
+    ((1..4) > (1..2)).should == true
+    ((1..4) < (1..2)).should == false
+
+    #   self:     ------
+    #   other: ------
+    ((2..4) > (1..3)).should == true
+    ((2..4) < (1..3)).should == false
+
+  end
+
+  it "<= == =>" do
+    
+  end
+
+
+  it "overlaps" do
+    @a.overlaps?(@b).should == true
+    @b.overlaps?(@a).should == true
+    @b.overlaps?(@c).should == false
+    @a.overlaps?(@c).should == false
+    @c.overlaps?(@c).should == true
+  end
+
+  it "does | and &" do
+    (@a & @b).should == (2..5)
+    (@a | @b).should == (1..5)
+  end
+
   it "generates random numbers" do
     r = 1..10
     50.times { r.includes?(r.rand).should == true }
   end
 
-  it "does | and &" do
-    a = (1..10)
-    b = (5...21)
-    a & b == (5..10)
-    a | b == (1..20)
-  end
-
 end
+
+
 
 describe ObjectSpace do
 
