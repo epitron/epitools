@@ -11,3 +11,7 @@ end
 task :install => :build do
   system "gem install epitools-#{gem_version}.gem"
 end
+
+task :pry do
+  system "pry --gem"
+end

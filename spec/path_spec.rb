@@ -55,6 +55,10 @@ describe Path do
     path.ext.should == "mkv"
 
     path.filename[-4..-1].should == ".mkv"
+
+    path.ext += ".extra"
+    path.filename.should == "hello.mkv.extra"
+    path.ext.should == "extra"
   end
 
   it "replaces filename" do
@@ -208,7 +212,7 @@ describe Path do
     Path.pwd.should == start
   end
 
-  it "renames" do
+  it "renames/mvs" do
     path = Path.tmp
 
     path.rm
@@ -218,10 +222,49 @@ describe Path do
 
     old_name = path.to_s
 
-    path.rename(:ext=>".dat")
+    dest = path.rename(:ext=>".dat")
 
-    path.to_s.should == old_name+".dat"
+    dest.to_s.should == old_name+".dat"
+    path.to_s.should == old_name
+    dest.to_s.should_not == old_name
+
+    dest.exists?.should == true
+    path.exists?.should == false
+
+    path.touch
+    lambda { path.rename(:ext=>".dat") }.should raise_error
+    
+    dest.rm
+    path.rename!(:ext=>".dat")
     path.to_s.should_not == old_name
+    path.exists?.should == true
+
+    path.rm
+  end
+
+  it "backups" do
+    path = Path.tmp
+    path.rm
+    path.touch
+
+    dest = path.backup!
+    path.exists?.should == false
+    dest.exists?.should == true
+
+    dest.rm
+
+    path.touch
+    p path.numbered_backup_file
+
+    dest = path.numbered_backup!
+    path.touch
+    dest2 = path.numbered_backup!
+
+    dest.should_not == dest2
+    path.should_not == dest
+
+    dest.rm
+    dest2.rm
   end
 
   it "rms" do

@@ -175,8 +175,13 @@ class Path
   def ext=(newext)
     if newext.blank?
       @ext = nil
-    elsif newext.startswith('.')
-      @ext = newext[1..-1]
+      return
+    end
+
+    newext = newext[1..-1] if newext.startswith('.')
+
+    if newext['.']
+      self.filename = basename + '.' + newext
     else
       @ext = newext
     end
@@ -473,7 +478,7 @@ class Path
 
     IO.popen(cmd, "rb", :err=>[:child, :out]) do |io|
       result = io.each_line.to_a
-      error = {cmd: cmd, result: result.to_s}.inspect
+      error = {:cmd => cmd, :result => result.to_s}.inspect
       raise error if result.any?
     end
   end
@@ -693,33 +698,105 @@ class Path
   end
 
   #
+  # A private method for handling arguments to mv and rename.
+  #
+  def arg_to_path(arg)
+    case arg
+    when String, Path
+      Path[arg]
+    when Hash
+      self.with(arg)
+    else
+      raise "Error: argument must be a path (a String or a Path), or a hash of attributes to replace in the Path."
+    end
+  end
+  private :arg_to_path
+
+  #
+  # Renames the file, but doesn't change the current Path object, and returns a Path that points at the new filename.
+  #
   # Examples:
+  #   Path["file"].rename("newfile")      #=> Path["newfile"]
   #   Path["SongySong.mp3"].rename(:basename=>"Songy Song")
   #   Path["Songy Song.mp3"].rename(:ext=>"aac")
   #   Path["Songy Song.aac"].rename(:dir=>"/music2")
   #   Path["/music2/Songy Song.aac"].exists? #=> true
   #
-  def rename(options)
-    raise "Options must be a Hash" unless options.is_a? Hash
-    dest = self.with(options)
+  def rename(arg)
+    dest = arg_to_path(arg)
 
     raise "Error: destination (#{dest.inspect}) already exists" if dest.exists?
+    raise "Error: can't rename #{self.inspect} because source location doesn't exist." unless exists?
+
     File.rename(path, dest)
+    dest
+  end
+  alias_method :ren, :rename
 
-    update(dest)
+  #
+  # Works the same as "rename", but the destination can be on another disk.
+  #
+  def mv(arg)
+    dest = arg_to_path(arg)
 
-    self
+    raise "Error: can't move #{self.inspect} because source location doesn't exist." unless exists?
+
+    FileUtils.mv(path, dest)
+    dest
+  end
+  alias_method :move, :mv
+
+  #
+  # Rename the file and change this Path object so that it points to the destination file.
+  #
+  def rename!(arg)
+    update(rename(arg))
+  end
+  alias_method :ren!, :rename!
+
+  #
+  # Moves the file (overwriting the destination if it already exists). Also points the current Path object at the new destination.
+  #
+  def mv!(arg)
+    update(mv(arg))
+  end
+  alias_method :move!, :mv!
+
+  #
+  # Find a backup filename that doesn't exist yet by appending "(1)", "(2)", etc. to the current filename.
+  #
+  def numbered_backup_file
+    return self unless exists?
+
+    n = 1
+    loop do
+      new_file = with(:basename => "#{basename} (#{n})")
+      return new_file unless new_file.exists?
+      n += 1
+    end
   end
 
   #
-  # Renames the file the specified full path (like Dir.rename.)
+  # Return a copy of this Path with ".bak" at the end
   #
-  def rename_to(path)
-    rename :path=>path.to_s
+  def backup_file
+    with(:filename => filename+".bak")
   end
 
-  def rename_to!(path)
-    rename! :path=>path.to_s
+  #
+  # Rename this file, "filename.ext", to "filename (1).ext" (or (2), or (3), or whatever number is available.)
+  # (Does not modify this Path object.)
+  #
+  def numbered_backup!
+    rename(numbered_backup_file)
+  end
+
+  #
+  # Rename this file, "filename.ext", to "filename.ext.bak".
+  # (Does not modify this Path object.)
+  #
+  def backup!
+    rename(backup_file)
   end
 
   #
@@ -748,10 +825,7 @@ class Path
 
   def cp_r(dest)
     FileUtils.cp_r(path, dest) #if Path[dest].exists?
-  end
-
-  def mv(dest)
-    FileUtils.mv(path, dest)
+    dest
   end
 
   def ln_s(dest)

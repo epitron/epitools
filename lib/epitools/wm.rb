@@ -107,6 +107,8 @@ module WM
     # string is made up of regular text, plus <>'d keypresses
     # eg: "Hello<Ctrl-T><Ctrl-L><Ctrl-Shift-K><Return>!!!"
     #
+    # TODO: add `xdotool` support
+    #
     def send_keys(keys)
       xse(keys)
     end
