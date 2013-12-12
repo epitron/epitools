@@ -4,8 +4,26 @@ class Numeric
 
   def truthy?; self > 0; end
 
-  def commatize
-    to_s.gsub(/(\d)(?=\d{3}+(?:\.|$))(\d{3}\..*)?/,'\1,\2')
+  #
+  # Convert this number to a string, adding commas between each group of 3 digits.
+  #
+  # (The "char" argument is optional, and specifies what character to use in between
+  #  each group of numbers.)
+  #
+  def commatize(char=",")
+    str = self.is_a?(BigDecimal) ? to_s("F") : to_s
+
+    int, frac = str.split(".")
+    int = int.gsub /(\d)(?=\d{3}+(?:\.|$))(\d{3}\..*)?/, "\\1#{char}\\2"
+
+    frac ? "#{int}.#{frac}" : int
+  end
+
+  #
+  # Convert this number to a string, adding underscores between each group of 3 digits.
+  #
+  def underscorize
+    commatize("_")
   end
 
   #

@@ -155,6 +155,9 @@ describe Numeric do
     12983287123.commatize.should       == "12,983,287,123"
     -12983287123.commatize.should      == "-12,983,287,123"
     -12983287123.4411.commatize.should == "-12,983,287,123.4411"
+    1111.1234567.commatize.should      == "1,111.1234567"
+    BigDecimal.new("1111.1234567").commatize.should == "1,111.1234567"
+    -1234567.1234567.underscorize.should == "-1_234_567.1234567"
   end
   
   it "does time things" do
