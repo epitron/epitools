@@ -336,11 +336,15 @@ class String
   end
   
   #
-  # Converts time duration strings (mm:ss, hh:mm:ss, or dd:hh:mm:ss) to seconds.
+  # Converts time duration strings (mm:ss, mm:ss.dd, hh:mm:ss, or dd:hh:mm:ss) to seconds.
   # (The reverse of Integer#to_hms)
   #
   def from_hms
-    nums = split(':').map(&:to_i)
+    nums = split(':')
+
+    nums[-1] = nums[-1].to_f if nums[-1] =~ /\d+\.\d+/ # convert fractional seconds to a float
+    nums.map! { |n| n.is_a?(String) ? n.to_i : n } # convert the rest to integers
+
     nums_and_units = nums.reverse.zip %w[seconds minutes hours days]
     nums_and_units.map { |num, units| num.send(units) }.sum
   end

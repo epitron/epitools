@@ -168,6 +168,25 @@ class Numeric
 
   alias_method :human_size, :human_bytes
 
+  #
+  # Convert seconds to hours:minutes:seconds (hours is dropped if it's zero)
+  #
+  def to_hms
+    seconds = self
+
+    days, seconds    = seconds.divmod(86400)
+    hours, seconds   = seconds.divmod(3600)
+    minutes, seconds = seconds.divmod(60)
+    seconds, frac    = seconds.divmod(1)
+
+    result = "%0.2d:%0.2d" % [minutes,seconds]
+    result = ("%0.2d:" % hours) + result   if hours > 0 or days > 0
+    result = ("%0.2d:" % days)  + result   if days > 0
+    result += ("." + frac.round(2).to_s.split(".").last[0..1]) if frac > 0
+
+    result
+  end
+
 end
 
 
@@ -251,23 +270,6 @@ class Integer
     self < 2 ? self : (self-1).fib + (self-2).fib
   end
   alias_method :fibonacci, :fib
-
-  #
-  # Convert seconds to hours:minutes:seconds (hours is dropped if it's zero)
-  #
-  def to_hms
-    seconds = self
-
-    days, seconds    = seconds.divmod(86400)
-    hours, seconds   = seconds.divmod(3600)
-    minutes, seconds = seconds.divmod(60)
-
-    result = "%0.2d:%0.2d" % [minutes,seconds]
-    result = ("%0.2d:" % hours) + result   if hours > 0 or days > 0
-    result = ("%0.2d:" % days) + result    if days > 0
-
-    result
-  end
 
 end
 
