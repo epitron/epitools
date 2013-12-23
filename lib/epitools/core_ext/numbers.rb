@@ -182,7 +182,7 @@ class Numeric
     result = "%0.2d:%0.2d" % [minutes,seconds]
     result = ("%0.2d:" % hours) + result   if hours > 0 or days > 0
     result = ("%0.2d:" % days)  + result   if days > 0
-    result += ("." + frac.round(2).to_s.split(".").last[0..1]) if frac > 0
+    result += ("." + frac.round(2).to_s.split(".").last) if frac > 0
 
     result
   end

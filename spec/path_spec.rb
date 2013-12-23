@@ -504,6 +504,7 @@ describe Path do
   end
 
   it "xattrs" do
+
     file = Path["~/test"]
     file.touch
     file["nothing"].should == nil
@@ -518,6 +519,12 @@ describe Path do
     Path.getfattr(file)["user.test"].should == nil
 
     lambda { file["blahblahblah"] = "whee" }.should raise_error
+
+    # Test assigning an entire hash of attributes, using diffing
+    attrs = file.attrs
+    attrs["user.diff_element"] = "newtest"
+    file.attrs = attrs
+    file["user.newtest"].should == "newtest"
   end
 
   it "changes mtime/atime" do

@@ -224,5 +224,69 @@ class Hash
   end
   alias_method :mql, :query
   
+
+  #
+  # Return all the changes necessary to transform `self` into `other`. (Works on nested hashes.) The result is a hash of {:key => [old value, new value]} pairs.
+  #
+  # (NOTE: Since "nil" is used to denote a value was removed, you can't use this method to diff hashes where a value is "nil".)
+  #
+  def diff(other)
+    (self.keys + other.keys).uniq.inject({}) do |memo, key|
+      unless self[key] == other[key]
+        if self[key].kind_of?(Hash) && other[key].kind_of?(Hash)
+          memo[key] = self[key].diff(other[key])
+        else
+          memo[key] = [self[key], other[key]] 
+        end
+      end
+      memo
+    end
+  end
+
+  #
+  # Applies a Hash#diff changeset to this hash.
+  #
+  def apply_diff!(changes)
+    path = [[self, changes]]
+    pos, local_changes = path.pop
+
+    while local_changes
+      local_changes.each_pair do |key, change|
+        if change.kind_of?(Array)
+          if change[1].nil?
+            pos.delete key
+          else
+            pos[key] = change[1]
+          end
+        else
+          path.push([pos[key], change])
+        end
+      end
+
+      pos, local_changes = path.pop
+    end
+
+    self
+  end
+
+  #
+  # Applies a Hash#diff changeset and returns the transformed hash.
+  #
+  def apply_diff(changes)
+    deep_dup.apply_diff!(changes)
+  end
+
+  #
+  # Duplicate this hash, including hashes nested inside of it.
+  #
+  def deep_dup
+    duplicate = self.dup
+    duplicate.each_pair do |k,v|
+      tv = duplicate[k]
+      duplicate[k] = tv.is_a?(Hash) && v.is_a?(Hash) ? tv.deep_dup : v
+    end
+    duplicate
+  end
+
 end
 

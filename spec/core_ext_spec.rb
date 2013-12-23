@@ -412,24 +412,24 @@ end
 
 describe Enumerable do
 
-  it "maps deeply" do
-    [["a\n", "b\n"], ["c\n", "d\n"]].map_recursively(&:strip).should == [ %w[a b], %w[c d] ]
+  # it "maps deeply" do
+  #   [["a\n", "b\n"], ["c\n", "d\n"]].map_recursively(&:strip).should == [ %w[a b], %w[c d] ]
     
-    [[1,2],[3,4]].deep_map {|e| e ** 2}.should == [[1,4],[9,16]] 
-    [1,2,3,4].deep_map {|e| e ** 2}.should == [1,4,9,16] 
-    [[],[],1,2,3,4].deep_map {|e| e ** 2}.should == [[], [], 1, 4, 9, 16] 
+  #   [[1,2],[3,4]].deep_map {|e| e ** 2}.should == [[1,4],[9,16]] 
+  #   [1,2,3,4].deep_map {|e| e ** 2}.should == [1,4,9,16] 
+  #   [[],[],1,2,3,4].deep_map {|e| e ** 2}.should == [[], [], 1, 4, 9, 16] 
 
-    {1=>2, 3=>{4=>5, 6=>7}}.deep_map {|k,v| [k, v**2] }.should == [ [1,4], [3, [[4,25], [6,49]]] ]
-  end
+  #   {1=>2, 3=>{4=>5, 6=>7}}.deep_map {|k,v| [k, v**2] }.should == [ [1,4], [3, [[4,25], [6,49]]] ]
+  # end
   
-  it "selects deeply" do
-    [[1,2],[3,4]].deep_select {|e| e % 2 == 0 }.should == [[2],[4]]
-    puts
+  # it "selects deeply" do
+  #   [[1,2],[3,4]].deep_select {|e| e % 2 == 0 }.should == [[2],[4]]
+  #   puts
 
-    {1=>2, 3=>{4=>5, 6=>7}}.deep_select {|k,v| k == 1 }.should == {1=>2} 
-    #[1,2,3,4].deep_select {|e| e ** 2}.should == [1,4,9,16] 
-    #[[],[],1,2,3,4].deep_select {|e| e ** 2}.should == [[], [], 1, 4, 9, 16] 
-  end
+  #   {1=>2, 3=>{4=>5, 6=>7}}.deep_select {|k,v| k == 1 }.should == {1=>2} 
+  #   #[1,2,3,4].deep_select {|e| e ** 2}.should == [1,4,9,16] 
+  #   #[[],[],1,2,3,4].deep_select {|e| e ** 2}.should == [[], [], 1, 4, 9, 16] 
+  # end
   
   it "splits" do
     [1,2,3,4,5].split_at     {|e| e == 3}.should == [ [1,2], [4,5] ]
@@ -567,6 +567,18 @@ describe Hash do
   it "includes?s and key?s" do
     @h.key?("key1").should      == true
     @h.includes?("key1").should == true
+  end
+
+  it "diffs" do
+    a = {a: {c: 1, b: 2}, b: 2}
+    b = {a: {c: 2, b: 2}}
+
+    changes = a.diff(b)
+    changes.should == {:a=>{:c=>[1, 2]}, :b=>[2, nil]}
+    a.apply_diff(changes).should == b
+    
+    a.apply_diff!(changes)
+    a.should == b
   end
   
 end

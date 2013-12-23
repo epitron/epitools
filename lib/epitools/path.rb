@@ -493,6 +493,22 @@ class Path
   alias_method :xattrs, :attrs
 
   #
+  # Set this file's xattrs. (Optimized so that only changed attrs are written to disk.)
+  #
+  def attrs=(new_attrs)
+    changes = attrs.diff(new_attrs)
+
+    changes.each do |key, (old, new)|
+      case new
+      when String, Numeric, Boolean, nil
+        self[key] = new
+      else
+        raise "Error: Can't use a #{new.class} as an xattr value. Try passing a String."
+      end
+    end
+  end
+
+  #
   # Retrieve one of this file's xattrs
   #
   def [](key)
@@ -506,7 +522,6 @@ class Path
     Path.setfattr(path, key, value)
     @attrs = nil
   end
-
 
   ###############################################################################
   # Opening/Reading files
