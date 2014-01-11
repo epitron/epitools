@@ -1,25 +1,3 @@
-require 'epitools/colored'
-
-class String
-
-  #
-  # Find all occurrences of "pattern" in the string and highlight them
-  # with the specified color. (defaults to light_yellow)
-  #
-  # The pattern can be a string or a regular expression.
-  #
-  def highlight(pattern, color=:light_yellow, &block)
-    pattern = Regexp.new(Regexp.escape(pattern)) if pattern.is_a? String
-
-    if block_given?
-      gsub(pattern, &block)
-    else
-      gsub(pattern) { |match| match.send(color) }
-    end
-  end
-
-end
-
 #
 # Create scrollable output via less!
 #
@@ -181,6 +159,4 @@ def autoinstall(*packages)
     cmd(["sudo apt-get install ?", packages.join(' ')])
   end
 end
-
-
 

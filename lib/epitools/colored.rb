@@ -184,6 +184,22 @@ module Colored
   end
 
   #
+  # Find all occurrences of "pattern" in the string and highlight them
+  # with the specified color. (defaults to light_yellow)
+  #
+  # The pattern can be a string or a regular expression.
+  #
+  def highlight(pattern, color=:light_yellow, &block)
+    pattern = Regexp.new(Regexp.escape(pattern)) if pattern.is_a? String
+
+    if block_given?
+      gsub(pattern, &block)
+    else
+      gsub(pattern) { |match| match.send(color) }
+    end
+  end
+
+  #
   # An array of all possible colors.
   #
   def colors

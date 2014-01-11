@@ -451,6 +451,7 @@ class Path
         if line =~ /^([^=]+)=0x(.+)/
           key   = $1
           value = [$2].pack("H*") # unpack hex string
+          value = value.encode("UTF-8", "UTF-8") # set its encoding as UTF-8
 
           attrs[key] = value
         end
