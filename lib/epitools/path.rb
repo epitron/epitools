@@ -501,7 +501,7 @@ class Path
 
     changes.each do |key, (old, new)|
       case new
-      when String, Numeric, Boolean, nil
+      when String, Numeric, true, false, nil
         self[key] = new
       else
         raise "Error: Can't use a #{new.class} as an xattr value. Try passing a String."
