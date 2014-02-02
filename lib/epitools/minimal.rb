@@ -65,9 +65,13 @@ class Object
   end
   
   # The hidden singleton lurks behind everyone
-  def metaclass
-    class << self
-      self
+  if defined? singleton_class
+    alias metaclass singleton_class
+  else
+    def metaclass
+      class << self
+        self
+      end
     end
   end
 
