@@ -246,6 +246,13 @@ class Integer
   end
 
   #
+  # Am I a prime number?
+  #
+  def prime?
+    Prime.prime? self
+  end
+
+  #
   # Returns the all the prime factors of a number.
   #
   def factors

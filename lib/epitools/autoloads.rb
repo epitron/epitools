@@ -18,6 +18,7 @@ autoload :Find,       'find'
 autoload :Benchmark,  'benchmark'
 autoload :Tracer,     'tracer'
 autoload :CSV,        'csv'
+autoload :Shellwords, 'shellwords'
 autoload :Matrix,     'epitools/core_ext/matrix'
 
 module Digest
@@ -53,6 +54,7 @@ autoload :Sys,          'epitools/sys'
 ## Gems (common)
 
 autoreq  :Nokogiri,     'nokogiri'
+autoreq  :Mechanize,    'mechanize'
 autoreq  :ANSI,         'ansi'
 autoreq  :BSON,         'bson'
 autoreq  :JSON,         'json'

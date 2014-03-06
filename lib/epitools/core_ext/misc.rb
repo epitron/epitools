@@ -253,3 +253,22 @@ class DateTime
   def to_i; to_time.to_i; end
   def to_f; to_time.to_f; end
 end
+
+
+class NilClass
+
+  def present?
+    false
+  end
+
+  def blank?
+    true
+  end
+
+end
+
+class FalseClass
+  def present?
+    false
+  end
+end

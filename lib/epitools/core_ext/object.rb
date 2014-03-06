@@ -170,5 +170,9 @@ class Object
     puts "* Benchmarking #{n} iterations..."
     Benchmark.bmbm(&benchblock)
   end
-  
+
+  def present?
+    true
+  end
+
 end

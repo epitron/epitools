@@ -67,8 +67,8 @@ describe Object do
   end
   
   it "nots" do
-    10.even?.should     == true
-    10.not.even?.should == false
+    10.should be_even
+    10.not.should_not be_even
   end
   
   it "alias_class_methods" do
@@ -198,6 +198,14 @@ end
 
 describe String do
   
+  it "anys?" do
+    "".should_not be_any
+    "\n".should_not be_any
+    "YAY".should be_any
+  end
+  
+
+
   it "rot13s" do
     message = "Unbreakable Code"
     message.rot13.should_not   == message
@@ -293,7 +301,7 @@ describe String do
     e.should be_an Enumerator
     e.to_a.should == %w[he ll ot he re !]
   end
-  
+
 end
 
 
@@ -352,6 +360,10 @@ describe Integer do
     256.factors.should == [2,2,2,2,2,2,2,2]
   end
   
+  it "primes numbers" do
+    [3,5,7,11,13,17,23,3628273133].all? { |n| n.should be_prime }
+  end
+
 end
 
 
@@ -795,6 +807,20 @@ describe File do
     tmp << "hi\nthere\neveryone!\n"
     f = open(tmp)
     f.reverse_each.to_a.should == ["everyone!\n", "there\n", "hi\n"]
+  end
+
+end
+
+
+describe "Anything" do
+
+  it "is present" do
+    {
+      true  => ["hello", 1, 2, 3, []],
+      false => [nil, "", false]
+    }.each do |truth, vals|
+      vals.each { |val| val.present?.should == truth }
+    end
   end
 
 end

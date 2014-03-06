@@ -18,6 +18,14 @@ class String
   end
 
   #
+  # Is there anything in the string? (ignoring whitespace/newlines)
+  #
+  def any?
+    not blank?
+  end
+  alias_method :present?, :any?
+
+  #
   # Does this string contain something that means roughly "true"?
   #
   def truthy?

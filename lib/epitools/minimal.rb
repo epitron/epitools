@@ -168,6 +168,7 @@ class Object
 
 end
 
+
 #
 # Patch 'Module#const_missing' to support 'autoreq' (which can autoload gems)
 #
@@ -202,6 +203,30 @@ class Module
 end
 
 
+module Kernel
+
+  #
+  # Executes a command and returns its output. (Like the backtick operator,
+  # but doesn't require shell ecaping arguments.)
+  #
+  def run(*cmd)
+    result = IO.popen(cmd) { |io| io.read }
+    result.empty? ? nil : result
+  end
+  alias_method :backtick, :run
+
+  #
+  # Same as shell, but includes stderr in the result.
+  #
+  def run_with_stderr(*cmd)
+    result = IO.popen(cmd, err: [:child, :out]) { |io| io.read }
+    result.empty? ? nil : result
+  end
+  alias_method :backtick_with_stderr, :run_with_stderr
+
+end
+
+
 class String
 
   #
@@ -220,7 +245,6 @@ end
 def Path(arg)
   Path[arg]
 end
-
 
 ####################################################################
 
