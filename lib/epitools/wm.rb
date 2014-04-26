@@ -361,6 +361,21 @@ module WM
       end
     end
 
+    def xdotool_keys(keys)
+      # --window windowid
+      #    Send keystrokes to a specific window id. See "SENDEVENT NOTES" below. The default, if no
+      #    window is given, depends on the window stack. If the window stack is empty the current
+      #    window is typed at using XTEST. Otherwise, the default is "%1" (see "WINDOW STACK").
+
+      # --delay milliseconds
+      #    Delay between keystrokes. Default is 12ms.
+
+      # --clearmodifiers
+      #    Clear modifiers before sending keystrokes. See CLEARMODIFIERS below.
+      # xdotool key k1 k2 k3
+      # xdotool type string
+    end
+
     def xse(keys)
       temp   = Tempfile.new("xse")
       events = keys_to_events(keys)

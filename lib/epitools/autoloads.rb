@@ -3,7 +3,6 @@
 autoload :Set,        'set'
 autoload :URI,        'uri'
 autoload :CGI,        'cgi'
-autoload :Base64,     'base64'
 autoload :Zlib,       'zlib'
 autoload :FileUtils,  'fileutils'
 autoload :Tempfile,   'tempfile'

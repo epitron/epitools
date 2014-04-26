@@ -227,7 +227,7 @@ class String
   # Decode a mime64/base64 encoded string
   #
   def from_base64
-    Base64.decode64 self
+    unpack("m").first
   end
   alias_method :decode64, :from_base64 
   
@@ -235,7 +235,7 @@ class String
   # Encode into a mime64/base64 string
   #
   def to_base64
-    Base64.encode64 self
+    [self].pack("m")
   end
   alias_method :base64,   :to_base64
   alias_method :encode64, :to_base64

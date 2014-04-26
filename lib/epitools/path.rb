@@ -442,16 +442,16 @@ class Path
     # # file: Scissor_Sisters_-_Invisible_Light.flv
     # user.m.options="-c"
 
-    cmd = ["getfattr", "-d", "-e", "hex", path]
+    cmd = %w[getfattr -d -m - -e base64] + [path]
 
     attrs = {}
 
     IO.popen(cmd, "rb", :err=>[:child, :out]) do |io|
       io.each_line do |line|
-        if line =~ /^([^=]+)=0x(.+)/
+        if line =~ /^([^=]+)=0s(.+)/
           key   = $1
-          value = [$2].pack("H*") # unpack hex string
-          value = value.encode("UTF-8", "UTF-8") # set its encoding as UTF-8
+          value = $2.from_base64 # unpack base64 string
+          value = value.encode("UTF-8", "UTF-8") # set string's encoding to UTF-8
 
           attrs[key] = value
         end
