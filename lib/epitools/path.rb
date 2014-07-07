@@ -1192,6 +1192,13 @@ class Path
     end
   end
 
+  #
+  # No-op (returns self)
+  #
+  def to_Path
+    self
+  end
+
 end
 
 

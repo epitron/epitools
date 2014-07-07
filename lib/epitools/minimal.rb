@@ -210,17 +210,21 @@ module Kernel
   # but doesn't require shell ecaping arguments.)
   #
   def run(*cmd)
-    result = IO.popen(cmd) { |io| io.read }
-    result.empty? ? nil : result
+    result = IO.popen(cmd) do |io|
+      block_given? ? yield(io) : io.read
+    end
+    String === result && result.empty? ? nil : result
   end
   alias_method :backtick, :run
 
   #
-  # Same as shell, but includes stderr in the result.
+  # Same as Kernel#run, but includes stderr in the result.
   #
   def run_with_stderr(*cmd)
-    result = IO.popen(cmd, err: [:child, :out]) { |io| io.read }
-    result.empty? ? nil : result
+    result = IO.popen(cmd, err: [:child, :out]) do |io| 
+      block_given? ? yield(io) : io.read
+    end
+    String === result && result.empty? ? nil : result
   end
   alias_method :backtick_with_stderr, :run_with_stderr
 

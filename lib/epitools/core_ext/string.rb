@@ -106,11 +106,16 @@ class String
   # Wrap the lines in the string so they're at most "width" wide.
   # (If no width is specified, defaults to the width of the terminal.)
   #
-  def wrap(width=nil, ignore=nil)
-    if width.nil?
+  def wrap(width=nil, strip_ansi=true)
+    if width.nil? or width < 0
       require 'io/console'
-      _, width = STDIN.winsize
-      width -= 1
+      _, winwidth = STDIN.winsize
+
+      if width < 0
+        width = (winwidth + width) - 1
+      else
+        width = winwidth - 1
+      end
     end
 
     return self if size <= width
@@ -134,14 +139,39 @@ class String
       end
     end
 
-    strings.join("\n")
+    if block_given?
+      strings.each { |s| yield s }
+    else
+      strings.join("\n")
+    end
   end
 
   #
   # Indent all the lines in the string by "amount" of spaces.
   #
-  def indent(amount=2)
-    lines.map { |line| (" "*amount) + line }.join ''
+  def indent(prefix="  ", strip_ansi=true)
+    prefix = (" " * prefix) if prefix.is_an? Integer
+
+    if block_given?
+      lines.each { |line| yield prefix + line }
+    else
+      lines.each { |line| prefix + line }.join ''
+    end
+  end
+
+  #
+  # Wrap all lines at window size, and indent 
+  #
+  def wrapdent(prefix, width=nil)
+    prefix_size = prefix.strip_ansi.size
+
+    if width
+      width = width - prefix_size
+    else
+      width = -prefix_size
+    end
+
+    wrap(width).map { |line| line + prefix }.join("\n")
   end
 
   #
