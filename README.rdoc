@@ -12,7 +12,7 @@ Enhanced base classes: {Enumerable}[http://rdoc.info/github/epitron/epitools/mas
 
 Extras:
 
-* {Path}[http://rdoc.info/github/epitron/epitools/master/Path] (a better Pathname)
+* {Path}[http://rdoc.info/github/epitron/epitools/master/Path] (an object-oriented interface to the filessytem -- like File, Dir, Pathname, and FileUtils all rolled into one)
 * {TypedStruct}[http://rdoc.info/github/epitron/epitools/master/TypedStruct] (like Struct, but setters always coerce input to a certain type, eg: boolean, integer, etc.)
 * {WM}[http://rdoc.info/github/epitron/epitools/master/WM] (control/query desktop windows in X. Note: `wmctrl` must be installed)
 * {Sys}[http://rdoc.info/github/epitron/epitools/master/Sys] (system tools -- determine operating system, list processes, view network statistics, etc.)
