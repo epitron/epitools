@@ -110,6 +110,23 @@ class Hash
   end
 
   #
+  # Returns a new Hash which automatically assigns each unique key to an increasing counter.
+  #
+  # eg:
+  #   > h = Hash.of_unique_ids
+  #   => {}
+  #   > h["Person"]               #=> 0
+  #   > h["Another Person"]       #=> 1
+  #   > h["Yet Another Person"]   #=> 2
+  #   > h["Person"]               #=> 0
+  #   > h
+  #   => {"Person"=>0, "Another Person"=>1, "Yet Another Person"=>2}
+  #
+  def self.of_unique_ids
+    new { |h,k| h[k] = h.size }
+  end
+
+  #
   # Hash keys become methods, kinda like OpenStruct. These methods have the lowest priority,
   # so be careful. They will be overridden by any methods on Hash.
   #

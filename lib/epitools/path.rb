@@ -844,6 +844,11 @@ class Path
     dest
   end
 
+  def cp(dest)
+    FileUtils.cp(path, dest)
+    dest
+  end
+
   def ln_s(dest)
     dest = Path[dest]
     FileUtils.ln_s(self, dest)

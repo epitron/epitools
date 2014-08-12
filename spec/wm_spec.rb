@@ -12,7 +12,7 @@ describe WM do
   end    
 
   def to_events(keys)
-  	WM::Window.new.keys_to_events(keys)
+    WM::Window.new.keys_to_events(keys)
   end
 
   it "parses X keys-string" do
@@ -24,8 +24,8 @@ describe WM do
   end
 
   it "sends keys to this window" do
-	sublime_window = WM.current_desktop.windows.select{|w| w.title =~ /wm_spec\.rb.+Sublime/ }.first
-	sublime_window.send_keys('<Ctrl-`>print "Hello from send_keys()!"<Return>')
+  	sublime_window = WM.current_desktop.windows.select{|w| w.title =~ /wm_spec\.rb.+Sublime/ }.first
+  	sublime_window.send_keys('<Ctrl-`>print("Hello from send_keys()!")<Return>')
   end
   
 end
