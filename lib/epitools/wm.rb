@@ -102,7 +102,8 @@ module WM
     end
 
     def activate!
-      system "wmctrl", "-i", "-a", window_id
+      #system "wmctrl", "-i", "-a", window_id
+      system "xdotool", "windowactivate", window_id
     end
 
     #
@@ -354,7 +355,7 @@ module WM
       def send_keys(keystring, delay=nil)
         keys = string_to_keys(keystring)
         cmd  = ["xdotool", "key", "--clearmodifiers", "--window", window_id] 
-        cmd += ["--delay", delay] if delay
+        cmd += ["--delay", delay.to_s] if delay
         cmd += keys
 
         system(*cmd)

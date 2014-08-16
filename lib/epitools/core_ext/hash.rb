@@ -172,7 +172,7 @@ class Hash
     result = []
     dent = indent * level
     each do |key, val|
-      result << dent+key
+      result << dent+key.to_s
       result += val.tree(level+1) if val.any?
     end
     result
@@ -181,9 +181,13 @@ class Hash
   #
   # Print the result of `tree`
   #
-  def print_tree
-    tree.each { |row| puts row }
-    nil
+  def print_tree(level=0, indent="  ", &block)
+    dent = indent * level
+
+    each do |key, val|
+      puts block_given? ? yield(key, level) : "#{dent}#{key}"
+      val.print_tree(level+1, indent, &block) if val.any?
+    end
   end  
   
   #

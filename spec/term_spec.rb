@@ -26,6 +26,26 @@ describe Term do
     table.by_columns.should_not be_nil
     table.by_rows.should_not be_nil
 
+    Term::Table do |table|
+      100.times do |n|
+        table.row do
+          col "#{n}."
+          col "A" * rand(10)
+          col "B" * rand(10)
+        end
+      end
+    end
+
+    Term::Table[
+      [1,2,3], 
+      [4,5,6] 
+    ]
+    
+    table = Term::Table.new
+    table.rows = [ [1,2,3], [4,5,6] ]
+    table.rows << [1,2,3]
+    table.rows << [4,5,6]
+    table.add_row [1,2,3,4,5]
   end
   
   it "tables nothing" do

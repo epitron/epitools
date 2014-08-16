@@ -87,6 +87,12 @@ module Term
       @columns  = options[:columns]
       @padding  = options[:padding] || 1
 
+      if (options.keys & [:horiz, :horizontal, :horizontally]).any?
+        @direction = :horizontal
+      else
+        @direction = :vertical
+      end
+
       # Update the terminal size
       @width, @height = Term.size
     end
@@ -129,14 +135,25 @@ module Term
       elems
     end
 
-    def by_columns
+    def in_columns
       return '' if @data.empty?
       render sliced_into(num_rows).transpose
     end
+    alias_method :by_columns, :in_columns
 
-    def by_rows
+    def in_rows
       return '' if @data.empty?
       render sliced_into(num_columns)
+    end
+    alias_method :by_rows, :in_rows
+
+    def display #(opts={})
+      case @direction
+      when :horizontal
+        puts in_rows
+      when :vertical
+        puts in_columns
+      end
     end
 
     def to_s

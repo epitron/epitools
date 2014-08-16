@@ -159,4 +159,3 @@ def autoinstall(*packages)
     cmd(["sudo apt-get install ?", packages.join(' ')])
   end
 end
-
