@@ -305,6 +305,17 @@ end
     end
     
   end
+
+  #
+  # Convert the integer into its sequence of bytes (little endian format: lowest-order-byte first)
+  #
+  def bytes
+    nbytes = (bit_length / 8.0).ceil
+
+    (0..nbytes).map do |current_byte|
+      (self >> (8 * current_byte)) & 0xFF
+    end
+  end
   
 end
 

@@ -1,11 +1,9 @@
-# Alias "Enumerator" to "Enum"
-if RUBY_VERSION["1.8"]
+if RUBY_VERSION[/^1.8/]
   require 'enumerator'
   Enumerator = Enumerable::Enumerator unless defined? Enumerator
 end
 
 RbConfig = Config unless defined? RbConfig
-
 
 class Object
 

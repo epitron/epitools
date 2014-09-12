@@ -60,7 +60,7 @@ class File
     seek(start_pos)
 
     while data = reverse_read(4096)
-      lines    = data.lines
+      lines = data.each_line.to_a
       lines.last << fragment unless lines.last[-1] == "\n"
 
       fragment = lines.first
