@@ -159,3 +159,13 @@ def autoinstall(*packages)
     cmd(["sudo apt-get install ?", packages.join(' ')])
   end
 end
+
+
+#
+# Re-execute the script using sudo if it's not currently running as root.
+#
+def sudoifnotroot
+  unless Process.uid == 0
+    exit system("sudo", $PROGRAM_NAME, *ARGV)
+  end
+end
