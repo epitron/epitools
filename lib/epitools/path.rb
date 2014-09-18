@@ -366,9 +366,10 @@ class Path
   end
 
   def symlink_target
-    Path.new File.readlink(path.gsub(/\/$/, ''))
+    Path[dir] / File.readlink(path.gsub(/\/$/, ''))
   end
   alias_method :readlink, :symlink_target
+  alias_method :target,   :symlink_target
 
   def uri?
     false
@@ -920,36 +921,61 @@ class Path
   alias_method :md5sum, :md5
 
 
-  # http://ruby-doc.org/stdlib/libdoc/zlib/rdoc/index.html
+  ## http://ruby-doc.org/stdlib/libdoc/zlib/rdoc/index.html
 
+  #
+  # gzip the file, returning the result as a string
+  #
+  def gzip(level=nil)
+    Zlib.deflate(read, level)
+  end
+
+  #
+  # gunzip the file, returning the result as a string
+  #
+  def gunzip(level=nil)
+    Zlib.inflate(read, level)
+  end
+
+  #
+  # Quickly gzip a file, creating a new .gz file, without removing the original,
+  # and returning a Path to that new file.
+  #
   def gzip!(level=nil)
     gz_file = self.with(:filename=>filename+".gz")
 
     raise "#{gz_file} already exists" if gz_file.exists?
 
     open("rb") do |input|
-      Zlib::GzipWriter.open(gz_file) do |output|
-        IO.copy_stream(input, output)
+      Zlib::GzipWriter.open(gz_file) do |gzwriter|
+        IO.copy_stream(input, gzwriter)
       end
     end
 
     update(gz_file)
   end
 
+  #
+  # Quickly gunzip a file, creating a new file, without removing the original,
+  # and returning a Path to that new file.
+  #
   def gunzip!
     raise "Not a .gz file" unless ext == "gz"
 
     regular_file = self.with(:ext=>nil)
 
     regular_file.open("wb") do |output|
-      Zlib::GzipReader.open(self) do |input|
-        IO.copy_stream(input, output)
+      Zlib::GzipReader.open(self) do |gzreader|
+        IO.copy_stream(gzreader, output)
       end
     end
 
     update(regular_file)
   end
 
+  #
+  # Match the full path against a regular expression
+  #
   def =~(pattern)
     to_s =~ pattern
   end

@@ -23,7 +23,7 @@ Gem::Specification.new do |s|
     s.specification_version = 3
   end
 
-  s.add_development_dependency "rspec"
+  s.add_development_dependency "rspec", "~> 2"
   #s.add_dependency "mechanize",     "~> 1.0.0"
   #s.add_dependency "sqlite3-ruby",  ">= 0"
 end
