@@ -8,11 +8,12 @@ class Range
   end
 
   #
-  # The middle element of this range.
+  # The number in the middle of this range.
   #
-  def middle
+  def mid
     (min + max) / 2
   end
+  alias_method :middle, :mid
 
   #
   # Return a new range which is the intersection of the two ranges

@@ -1,7 +1,5 @@
 require 'epitools'
 
-ASCII_PRINTABLE = (33..126)
-
 =begin
 000352c0  ed 33 8c 85 6e cc f6 f7  72 79 1c e3 3a b4 c2 c6  |.3..n...ry..:...|
 000352d0  c8 8d d6 ee 3e 68 a1 a5  ae b2 b7 97 a4 1d 5f a7  |....>h........_.|
@@ -19,6 +17,8 @@ ASCII_PRINTABLE = (33..126)
 
 module Hex
 
+  ASCII_PRINTABLE = (33..126)
+
   DUMP_COLORS = Rash.new(
     /\d/ => 13,
     /\w/ => 3,
@@ -31,15 +31,15 @@ module Hex
     color         = options[:color].nil? ? true : options[:color]
     highlight     = options[:highlight]
 
-    p options
-    p color
+    # p options
+    # p color
 
     lines               = data.scan(/.{1,16}/m)
     max_offset          = (base_offset + data.size) / 16 * 16
     max_offset_width    = max_offset.to_s.size
     max_hex_width       = 3 * 16 + 1
 
-    p [max_offset, max_offset_width]
+    # p [max_offset, max_offset_width]
     lines.each_with_index do |line,n|
       offset    = base_offset + n*16
       bytes     = line.unpack("C*")
@@ -53,21 +53,21 @@ module Hex
         end
       end.join('')
 
-      puts "<11>#{offset.to_s.ljust(max_offset_width)}<3>:  <14>#{hex.ljust(max_hex_width)} <8>|<15>#{plain}<8>|".colorize
+      puts "<11>#{offset.to_s.ljust(max_offset_width)}<3>:  <14>#{hex.ljust(max_hex_width)} <8>|<15>#{plain}<8>|".colorize(:strip => !color)
     end
   end
 
 end
 
-def hexdump(*args)
-  Hex.dump(*args)
-end
-
 if $0 == __FILE__
   data = (0..64).map{ rand(255).chr }.join('')
-  Hex.dump(data)
-  puts
+
+  puts "Random data"
   Hex.dump(data, :color=>false)
+
+  puts "Random data (now in colour!):"
+  Hex.dump(data)
+  
   puts
 
   data = "1234567890"*10

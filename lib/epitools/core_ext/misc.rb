@@ -197,7 +197,7 @@ module URI
   # Return a Hash of the variables in the query string
   #
   def params
-    query.to_params
+    query ? query.to_params : {}
   end
 
   #

@@ -387,6 +387,14 @@ class String
     nums_and_units.map { |num, units| num.send(units) }.sum
   end
   
+  #
+  # Print a hexdump of the string to STDOUT (coloured, if the terminal supports it)
+  #
+  def hexdump
+    Hex.dump(self)
+  end
+
+
   unless public_method_defined? :to_proc
   
     #  

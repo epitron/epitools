@@ -10,48 +10,100 @@ require 'epitools/core_ext/string'
 #
 # Path: An object-oriented wrapper for files. (Combines useful methods from FileUtils, File, Dir, and more!)
 #
-# Each Path object has the following attributes:
+# To create a path object, or array of path objects, throw whatever you want into Path[]:
 #
-#    path            => the entire path
-#    filename        => just the name and extension
-#    basename        => just the filename (without extension)
-#    ext             => just the extension
-#    dir             => just the directory
-#    dirs            => an array of directories
+#  These returns a single path object:
+#    passwd      = Path["/etc/passwd"]
+#    also_passwd = Path["/etc"] / "passwd"         # joins two paths
+#    parent_dir  = Path["/usr/local/bin"] / ".."   # joins two paths (up one dir)
 #
-# Note: all of the above attributes can be modified to produce new paths!
-# Here's a useful example:
+#  These return an array of path objects:
+#    pictures   = Path["photos/*.{jpg,png}"]   # globbing
+#    notes      = Path["notes/2014/**/*.txt"]  # recursive globbing
+#    everything = Path["/etc"].ls
 #
-#   # Check if there's a '.git' directory in the current or parent directories.
-#   def inside_a_git_repository?
-#     path = Path.pwd # get the current directory
+# Each Path object has the following attributes, which can all be modified:
+#
+#    path     => the absolute path, as a string
+#    filename => just the name and extension
+#    basename => just the filename (without extension)
+#    ext      => just the extension
+#    dir      => just the directory
+#    dirs     => an array of directories
+#
+# Some commonly used methods:
+#
+#   path.file?
+#   path.exists?
+#   path.dir?
+#   path.mtime
+#   path.xattrs
+#   path.symlink?
+#   path.broken_symlink?
+#   path.symlink_target
+#   path.executable?
+#   path.chmod(0o666)
+#
+# Interesting examples:
+#
+#   Path["*.jpeg"].each { |path| path.rename(:ext=>"jpg") } # renames .jpeg to .jpg
+#
+#   files     = Path["/etc"].ls         # all files in directory
+#   morefiles = Path["/etc"].ls_R       # all files in directory tree
+#
+#   Path["*.txt"].each(&:gzip!)
+#
+#   Path["filename.txt"] << "Append data!"     # appends data to a file
+#
+#   string = Path["filename.txt"].read         # read all file data into a string
+#   json   = Path["filename.json"].read_json   # read and parse JSON
+#   doc    = Path["filename.html"].read_html   # read and parse HTML
+#   xml    = Path["filename.xml"].parse        # figure out the format and parse it (as XML)
+#
+#   Path["saved_data.marshal"].write(data.marshal)   # Save your data!
+#   data = Path["saved_data.marshal"].unmarshal      # Load your data!
+#
+#   Path["unknown_file"].mimetype              # sniff the file to determine its mimetype
+#   Path["unknown_file"].mimetype.image?       # ...is this some kind of image?
+#
+#   Path["otherdir/"].cd do                    # temporarily change to "otherdir/"
+#     p Path.ls
+#   end
+#   p Path.ls
+#
+# The `Path#dirs` attribute is a split up version of the directory
+# (eg: Path["/usr/local/bin"].dirs => ["usr", "local", "bin"]).
+#
+# You can modify the dirs array to change subsets of the directory. Here's an example that
+# finds out if you're in a git repo:
+#
+#   def inside_a_git_repo?
+#     path = Path.pwd # start at the current directory
 #     while path.dirs.any?
-#       return true if (path/".git").exists?
-#       path.dirs.pop
+#       if (path/".git").exists?
+#         return true
+#       else
+#         path.dirs.pop  # go up one level
+#       end
 #     end
 #     false
 #   end
 #
-# More examples:
-#
-#   Path["*.jpeg"].each { |path| path.rename(:ext=>"jpg") }
-#   Path["filename.txt"] << "Append data!"
-#   etcfiles = Path["/etc"].ls
-#   Path["*.txt"].each(&:gzip)
-#
 # Swap two files:
 #
 #   a, b = Path["file_a", "file_b"]
-#   temp = a.with(:ext=>a.ext+".swapping") # return a modified version of this object
+#   temp = a.with(:ext => a.ext+".swapping") # return a modified version of this object
 #   a.mv(temp)
 #   b.mv(a)
 #   temp.mv(b)
 #
-# Paths can be created for existant and non-existant files. If you want to create a nonexistant
-# directory, just add a '/' at the end, so Path knows. (eg: Path["/etc/nonexistant/"]).
+# Paths can be created for existant and non-existant files.
+#
+# To create a nonexistant path object that thinks it's a directory, just add a '/' at the end.
+# (eg: Path["/etc/nonexistant/"]).
 #
 # Performance has been an important factor in Path's design, so doing crazy things with Path
-# usually doesn't kill your machine. Go nuts!
+# usually doesn't kill performance. Go nuts!
 #
 #
 class Path
@@ -196,7 +248,7 @@ class Path
   end
 
   #
-  # Reload this path (update cached values.)
+  # Reload this path (updates cached values.)
   #
   def reload!
     temp = path
@@ -284,6 +336,14 @@ class Path
     extensions = basename.split('.')[1..-1]
     extensions += [@ext] if @ext
     extensions
+  end
+
+  ###############################################################################
+  # inspect
+  ###############################################################################
+
+  def inspect
+    "#<Path:#{path}>"
   end
 
   ###############################################################################
@@ -546,8 +606,21 @@ class Path
   #
   # All the lines in this file, chomped.
   #
-  def lines
-    io.lines.map(&:chomp)
+  def each_line
+    io.each_line
+  end
+  alias_method :lines, :each_line
+
+  def grep(pat)
+    return to_enum(:grep, pat).to_a unless block_given?
+
+    each_line do |line|
+      yield line if line =~ pat
+    end
+  end
+
+  def nicelines
+    lines.map(&:chomp)
   end
 
   def unmarshal
@@ -733,7 +806,7 @@ class Path
   # Renames the file, but doesn't change the current Path object, and returns a Path that points at the new filename.
   #
   # Examples:
-  #   Path["file"].rename("newfile")      #=> Path["newfile"]
+  #   Path["file"].rename("newfile") #=> Path["newfile"]
   #   Path["SongySong.mp3"].rename(:basename=>"Songy Song")
   #   Path["Songy Song.mp3"].rename(:ext=>"aac")
   #   Path["Songy Song.aac"].rename(:dir=>"/music2")
@@ -851,8 +924,7 @@ class Path
   end
 
   def ln_s(dest)
-    dest = Path[dest]
-    FileUtils.ln_s(self, dest)
+    Path.ln_s(self, dest)
   end
 
   ## Owners and permissions
@@ -1179,10 +1251,13 @@ class Path
       orig = pwd
 
       Dir.chdir(dest)
-      yield
+      result = yield dest
       Dir.chdir(orig)
+
+      result
     else
       Dir.chdir(dest)
+      dest
     end
   end
 
@@ -1190,7 +1265,10 @@ class Path
 
   def self.ls_r(path); Path[path].ls_r; end
 
-  def self.ln_s(src, dest); Path[src].ln_s(dest); end
+  def self.ln_s(src, dest)
+    FileUtils.ln_s(src, dest)
+    Path[dest]
+  end
 
   ## TODO: Verbose mode
   #def self.verbose=(value); @@verbose = value; end

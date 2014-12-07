@@ -187,6 +187,23 @@ class Numeric
     result
   end
 
+  def to_hms_in_words
+    seconds = self
+
+    days, seconds    = seconds.divmod(86400)
+    hours, seconds   = seconds.divmod(3600)
+    minutes, seconds = seconds.divmod(60)
+    seconds, frac    = seconds.divmod(1)
+
+    result = "#{seconds} sec"
+    result = "#{minutes} min, " + result if minutes > 0
+    result = "#{"hour".amount(hours)}, " + result if hours > 0 or days > 0
+    result = "#{"day".amount(days)}, "   + result if days > 0
+    # result += ("." + frac.round(2).to_s.split(".").last) if frac > 0
+
+    result
+  end
+
 end
 
 
@@ -304,19 +321,18 @@ end
       end
     end
     
-  end
+    #
+    # Convert the integer into its sequence of bytes (little endian format: lowest-order-byte first)
+    #
+    def bytes
+      nbytes = (bit_length / 8.0).ceil
 
-  #
-  # Convert the integer into its sequence of bytes (little endian format: lowest-order-byte first)
-  #
-  def bytes
-    nbytes = (bit_length / 8.0).ceil
-
-    (0..nbytes).map do |current_byte|
-      (self >> (8 * current_byte)) & 0xFF
+      (0..nbytes).map do |current_byte|
+        (self >> (8 * current_byte)) & 0xFF
+      end
     end
+
   end
-  
 end
 
 class Time

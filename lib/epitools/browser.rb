@@ -1,8 +1,10 @@
 require 'epitools'
-gem 'mechanize', '~> 1.0'
 require 'mechanize'
 require 'epitools/browser/cache'
-require 'epitools/browser/mechanize_progressbar'
+
+if Mechanize::VERSION[/^1\./]
+  require 'epitools/browser/mechanize_progressbar'
+end
 
 # TODO: Make socksify optional (eg: if proxy is specified)
 #require 'socksify'

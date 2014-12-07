@@ -460,7 +460,7 @@ describe Path do
     (path.mode & 0o666).should > 0
   end
 
-  it 'symlinks and symlink_targets' do
+  it 'symlinks files' do
     path = Path.tmpfile
     path << "some data"
 
@@ -472,6 +472,24 @@ describe Path do
     target.symlink?.should == true
     target.read.should == path.read
     target.symlink_target.should == path
+  end
+
+  it 'symlinks relative dirs' do
+    dir = Path["/tmp/dir/"]
+    dir.mkdir
+    tmp = Path["/tmp/symlinktarget"]
+    tmp << "data"
+
+
+    link = (dir/"symlink")
+    link.ln_s "../file"
+
+    link.symlink?.should == true
+    
+    tmp.read.should == 
+
+    tmp.rm
+    dir.rm
   end
 
   it 'swaps two files' do

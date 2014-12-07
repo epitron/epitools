@@ -147,6 +147,7 @@ module Enumerable
       reduce(:+)
     end
   end
+  alias_method :sum_by, :sum
 
   #
   # Average the elements
