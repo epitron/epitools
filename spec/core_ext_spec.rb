@@ -67,8 +67,8 @@ describe Object do
   end
   
   it "nots" do
-    10.should be_even
-    10.not.should_not be_even
+    10.even?.should == true
+    10.not.even?.should == false
   end
   
   it "alias_class_methods" do
@@ -234,8 +234,10 @@ describe String do
   end
 
   it "indents" do
-    s = "Some things\nNeed indenting\nSo, you indent them!\n"
-    s.indent(2).should == "  Some things\n  Need indenting\n  So, you indent them!\n"
+    s                  = "Some things\nNeed indenting\nSo, you indent them!\n"
+    indented_2         = "  Some things\n  Need indenting\n  So, you indent them!\n"
+
+    s.indent(2).should == indented_2
   end
 
   it "titlecases" do
@@ -300,6 +302,25 @@ describe String do
     e = "hellothere!".each_slice(2)
     e.should be_an Enumerator
     e.to_a.should == %w[he ll ot he re !]
+  end
+
+  it "n choose r" do
+    n = 49
+    r = 6
+    
+    n.choose(r).should == n.fact / (r.fact * (n-r).fact)
+  end
+
+  it "n perms r" do
+    n = 23
+    r = 3
+
+    n.perms(r).should == (n.fact / (n-r).fact)
+  end
+
+  it "mulmods" do
+    1.25.mulmod(2).should == [2, 0.5]
+    5.mulmod(2).should == [10, 0]
   end
 
 end
@@ -510,6 +531,15 @@ describe Enumerable do
     [:a, :b, :c].to_enum.includes?(5).should == false
   end
   
+  it "permutatitons and combinations" do
+    10.times.permutation(2).to_a.should == 10.times.to_a.permutation(2).to_a
+    10.times.combination(2).to_a.should == 10.times.to_a.combination(2).to_a
+
+    result = []
+    10.times.permutation(2) { |perm| result << perm }
+    result.should == 10.times.permutation(2).to_a
+  end
+
 end
 
 describe Enumerator do

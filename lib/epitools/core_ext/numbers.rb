@@ -123,6 +123,46 @@ class Numeric
   end
 
 
+  #
+  # Combinations: compute "n choose r" (self.choose(r))
+  #
+  # This represents number of ways to pick "r" items from a collection of "self"
+  # items (where the order of the items doesn't matter, and items can't be repeated.)
+  #
+  # eg: 49.choose(6) is how many ways can we pick 6 lottery numbers from a set of 49.
+  #
+  # Formula: n! / (r! * (n-r)!) == n * n-1 * ... * n-r / r * r-1 * ... * 2
+  #
+  def choose(r)
+    (self-r+1..self).reduce(:*) / (2..r).reduce(:*)
+  end
+  alias_method :combinations, :choose
+
+  #
+  # Permutations: compute "n P r"
+  #
+  # This represents number of ways to pick "r" items from a collection of "self"
+  # items (where the order of the items DOES matter, and items can't be repeated.)
+  #
+  # eg: 23.perm(3) is how many ways 23 people can win 1st, 2nd and 3rd place in a race.
+  #
+  # Formula: n! / (n - r)!
+  #
+  def perms(r)
+    (self-r+1..self).reduce(:*)
+  end
+  alias_method :permutations, :perms
+
+  #
+  # Multiply self by n, returning the integer product and the floating point remainder.
+  #
+  def mulmod(n)
+    prod    = self * n
+    intprod = prod.to_i
+
+    [intprod, prod % intprod]
+  end
+
   # Math.log is different in 1.8
   if RUBY_VERSION["1.8"]
 
@@ -281,9 +321,7 @@ class Integer
   # Factorial (iterated style)
   #
   def fact
-    total = 1
-    self.downto(2) { |x| total *= x }
-    total
+    (2..self).reduce(:*)
   end
   alias_method :factorial, :fact
 

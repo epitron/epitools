@@ -147,15 +147,16 @@ class String
   end
 
   #
-  # Indent all the lines in the string by "amount" of spaces.
+  # Indent all the lines, if "prefix" is a string, prepend that string
+  # to each lien. If it's an integer, prepend that many spaces.
   #
-  def indent(prefix="  ", strip_ansi=true)
+  def indent(prefix="  ")
     prefix = (" " * prefix) if prefix.is_an? Integer
 
     if block_given?
       lines.each { |line| yield prefix + line }
     else
-      lines.each { |line| prefix + line }.join ''
+      lines.map { |line| prefix + line }.join('')
     end
   end
 

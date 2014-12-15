@@ -289,6 +289,21 @@ module Enumerable
     result
   end
 
+
+  #
+  # See: Array#permutation
+  #
+  def permutation(*args, &block)
+    to_a.permutation(*args, &block)
+  end
+
+  #
+  # See: See Array#combination
+  #
+  def combination(*args, &block)
+    to_a.combination(*args, &block)
+  end
+
   #
   # Returns the powerset of the Enumerable
   #
