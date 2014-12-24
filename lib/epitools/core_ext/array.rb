@@ -2,6 +2,12 @@
 class Array
 
   #
+  # Better names
+  #
+  alias_method :lpush, :unshift
+  alias_method :lpop,  :shift
+
+  #
   # flatten.compact.uniq
   #
   def squash
@@ -20,13 +26,13 @@ class Array
   #
   #   nums = [1,2,3,4,5,6,7,8,9,10,11,12]
   #   even = nums.remove_if { |n| n.even? }   # remove all even numbers from the "nums" array and return them
-  #   odd = nums                              # "nums" now only contains odd numbers
+  #   odd  = nums                             # "nums" now only contains odd numbers
   #
   def remove_if(&block)
     removed = []
 
     delete_if do |x|
-      if block.call(x)
+      if yield(x)
         removed << x
         true
       else
@@ -91,7 +97,7 @@ class Array
   #
   unless instance_methods.include? :shuffle
     def shuffle
-      sort_by{rand}
+      sort_by { rand }
     end
   end
 
@@ -179,6 +185,33 @@ class Array
       buckets
     end
 
+  end
+
+
+  alias_method :old_multiply, :*
+  private :old_multiply
+
+  #
+  # Overridden multiplication operator. Now lets you multiply the Array by another Array or Enumerable.
+  #
+  # Array * Integer == a new array with <Integer> copies of itself inside
+  # Array * String == a new string containing the elements, joined by the <String>
+  # Array * {Array or Enumerable} == the cross product (aka. cartesian product) of both arrays
+  #
+  def *(other)
+    case other
+    when Integer, String
+      old_multiply(other)
+    when Enumerable
+      cross_product(other).to_a
+    end
+  end
+
+  #
+  # Multiply the array by itself `n` times.
+  #
+  def **(n)
+    super.to_a
   end
 
 end

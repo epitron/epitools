@@ -390,6 +390,34 @@ module Enumerable
   end
   alias_method :grouped, :groups
 
+
+  #
+  # Multiplies this Enumerable by something. (Same behaviour as Enumerator#*)
+  #
+  def *(other)
+    case other
+    when Integer, String
+      to_enum * other
+    when Enumerable
+      to_enum.cross_product(other)
+    end
+  end
+
+  #
+  # Multiplies this Enumerable by itself `n` times.
+  #
+  def **(n)
+    [self].cycle(n).reduce(:*)
+  end
+
+  #
+  # Same behaviour as Enumerator#cross_product
+  #
+  def cross_product(other)
+    to_enum.cross_product(other)
+  end
+  alias_method :cross, :cross_product
+
 end
 
 
@@ -418,5 +446,50 @@ class Enumerator
       print "\b \b" # erase the spinner when done
     end
   end
+
+
+  #
+  # Concatenates two Enumerators, returning a new Enumerator.
+  #
+  def +(other)
+    raise "Can only concatenate Enumerable things to Enumerators" unless Enumerable === other
+
+    Enumerator.new do |yielder|
+      each { |e| yielder << e }
+      other.each { |e| yielder << e }
+    end
+  end
+
+
+  #
+  # Multiplies this Enumerator by something else.
+  #
+  # Enumerator * Integer == a new Enumerator that repeats the original one <Integer> times
+  # Enumerator * String == joins the Enumerator's elements into a new string, with <String> in between each pair of elements
+  # Enumerator * Enumerable == the cross product (aka. cartesian product) of the Enumerator and the Enumerable
+  #
+  def *(other)
+    case other
+    when Integer
+      cycle(other)
+    when String
+      join(other)
+    when Enumerable
+      cross(other)
+    else
+      raise "#{other.class} is not something that can be multiplied by an Enumerator"
+    end
+  end
+
+  #
+  # Takes the cross product (aka. cartesian product) of the Enumerator and the argument,
+  # returning a new Enumerator. (The argument must be some kind of Enumerable.)
+  #
+  def cross_product(other)
+    Enumerator.new do |yielder|
+      each { |a| other.each { |b| yielder << [a,b] } }
+    end
+  end
+  alias_method :cross, :cross_product
 
 end

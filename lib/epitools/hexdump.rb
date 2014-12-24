@@ -20,9 +20,9 @@ module Hex
   ASCII_PRINTABLE = (33..126)
 
   DUMP_COLORS = Rash.new(
-    /\d/ => 13,
-    /\w/ => 3,
-    nil => 9,
+    /\d/     => 13,
+    /\w/     => 3,
+    nil      => 9,
     :default => 7
   )
 

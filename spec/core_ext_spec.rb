@@ -540,6 +540,13 @@ describe Enumerable do
     result.should == 10.times.permutation(2).to_a
   end
 
+  it "cartesian products" do
+    a = [1,2]
+    b = [3,4]
+
+    (a * b).to_a.should == [[1,3],[1,4],[2,3],[2,4]]
+  end
+
 end
 
 describe Enumerator do
@@ -548,6 +555,36 @@ describe Enumerator do
     lambda { 
       (1..20).each.with_spinner(1).each { }
     }.should_not raise_error
+  end
+
+  it "concatenates" do
+    e = [1,2,3].to_enum + [4,5,6].to_enum
+    e.to_a.should == [1,2,3,4,5,6]
+
+    e = [1,2,3].to_enum + [4,5,6]
+    e.to_a.should == [1,2,3,4,5,6]
+  end
+
+  it "multiplies" do
+    e = [1,2,3].to_enum * 3 
+    e.to_a.should == [1,2,3]*3
+
+    e = [1,2].to_enum * [3,4].to_enum
+    e.to_a.should == [[1,3],[1,4],[2,3],[2,4]]
+
+    lambda { [].old_multiply }.should raise_error(NoMethodError)
+  end
+
+  it "exponentiates" do
+    e = [1,2].to_enum ** 2
+    squared = [[1,1], [1,2], [2,1], [2,2]]
+
+    e.to_a.should == squared
+
+    e = [1,2].to_enum ** 3
+
+    e.to_a.should == squared * [1,2]
+    e.to_a.should == ([1,2]**3)
   end
 
 end

@@ -542,7 +542,7 @@ describe Path do
     attrs = file.attrs
     attrs["user.diff_element"] = "newtest"
     file.attrs = attrs
-    file["user.newtest"].should == "newtest"
+    file["user.diff_element"].should == "newtest"
   end
 
   it "changes mtime/atime" do

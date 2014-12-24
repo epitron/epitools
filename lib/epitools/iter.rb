@@ -70,7 +70,7 @@ class Iter
   class Elem < BasicObject
   
     attr_accessor :val, :visited
-    
+
     def initialize(iter, val)
       @iter = iter
       @val  = val.is_a?(Elem) ? val.value : val
@@ -79,10 +79,6 @@ class Iter
     
     def elem?
       true
-    end
-    
-    def ==(other)
-      self.eql?(other)
     end
     
     def container
@@ -161,6 +157,19 @@ class Iter
     def inspect
       "<Elem: #{@val.inspect}>"
     end
+
+
+    include ::Comparable
+
+    def <=>(other)
+      case other
+      when Elem
+        @val <=> other.value
+      else
+        @val <=> other
+      end
+    end
+
   end
 
   

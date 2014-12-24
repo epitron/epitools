@@ -582,7 +582,7 @@ class Path
   #
   def []=(key, value)
     Path.setfattr(path, key, value)
-    @attrs = nil
+    @attrs = nil # clear cached xattrs
   end
 
   ###############################################################################
