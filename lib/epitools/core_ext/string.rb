@@ -161,6 +161,14 @@ class String
   end
 
   #
+  # Use Nokogiri to parse this string as HTML, and return an indented version
+  #
+  def nicehtml(indent=2)
+    Nokogiri::HTML(ARGF).to_xhtml(indent: indent)
+  end
+  alias_method :indent_html, :nicehtml
+
+  #
   # Wrap all lines at window size, and indent 
   #
   def wrapdent(prefix, width=nil)
