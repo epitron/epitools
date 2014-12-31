@@ -40,7 +40,7 @@ class Browser
     @last_get     = Time.at(0)
     @delay        = options[:delay]          || 1
     @delay_jitter = options[:delay_jitter]   || 0.2
-    @use_cache    = options[:cache] == false || true
+    @use_cache    = !!(options[:cache] || options[:cached] || options[:use_cache])
     @use_logs     = options[:logs]           || false
     @cookie_file  = options[:cookiefile]     || "cookies.txt"
     
@@ -136,10 +136,10 @@ class Browser
     # Determine the cache setting
     use_cache = options[:cached].nil? ? @use_cache : options[:cached]
 
-    cached_already = cache.include?(url)
+    cached_already = cache.include?(url) if use_cache
 
     puts
-    puts "[ GET #{url} (using cache: #{use_cache}) ]"
+    puts "[ GET #{url} (using cache: #{!!use_cache}) ]"
     
     delay unless cached_already
     max_retries = 4
@@ -152,7 +152,7 @@ class Browser
       else
         page = agent.get(url)
         @last_get = Time.now
-        cache_put(page, url)
+        cache_put(page, url) if use_cache
       end
 
       puts

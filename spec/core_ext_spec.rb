@@ -223,6 +223,11 @@ describe String do
   it "nice_lineses" do
     "\n\n\nblah\n\n\nblah\n\n\n".nice_lines.should == ["blah", "blah"]    
   end
+
+  it "nice_htmls" do
+    s = "<a><b><p><c>whee</a>"
+    s.nice_html.should_not == s
+  end
   
   it "wraps" do
     s1 = "Hello there, I am a sentence or series of words."

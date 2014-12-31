@@ -73,11 +73,26 @@ class String
     dup.titlecase!
   end
 
+
+  #
+  # A Regexp to recognize ANSI escape sequences
+  #
+  COLOR_REGEXP = /\e\[.*?(\d)+m/
+
+  #
+  # This string contains ANSI (VT100) control codes
+  #
+  def contains_color?
+    self[ANSI_REGEXP]
+  end  
+  alias_method :contains_colors?, :contains_color?
+  alias_method :contains_ansi?,  :contains_color?
+
   #
   # Remove ANSI color codes.
   #
   def strip_color
-    gsub(/\e\[.*?(\d)+m/, '')
+    gsub(ANSI_REGEXP, '')
   end
   alias_method :strip_ansi, :strip_color 
 
@@ -103,10 +118,33 @@ class String
 
 
   #
+  # Indent all the lines, if "prefix" is a string, prepend that string
+  # to each lien. If it's an integer, prepend that many spaces.
+  #
+  def indent(prefix="  ")
+    prefix = (" " * prefix) if prefix.is_an? Integer
+
+    if block_given?
+      lines.each { |line| yield prefix + line }
+    else
+      lines.map { |line| prefix + line }.join('')
+    end
+  end
+
+  #
+  # Use Nokogiri to parse this string as HTML, and return an indented version
+  #
+  def nice_html(indent=2)
+    Nokogiri::HTML.fragment(self).to_xhtml(indent: indent)
+  end
+  alias_method :nicehtml,    :nice_html
+  alias_method :indent_html, :nice_html
+
+  #
   # Wrap the lines in the string so they're at most "width" wide.
   # (If no width is specified, defaults to the width of the terminal.)
   #
-  def wrap(width=nil, strip_ansi=true)
+  def wrap(width=nil)
     if width.nil? or width < 0
       require 'io/console'
       _, winwidth = STDIN.winsize
@@ -147,40 +185,16 @@ class String
   end
 
   #
-  # Indent all the lines, if "prefix" is a string, prepend that string
-  # to each lien. If it's an integer, prepend that many spaces.
-  #
-  def indent(prefix="  ")
-    prefix = (" " * prefix) if prefix.is_an? Integer
-
-    if block_given?
-      lines.each { |line| yield prefix + line }
-    else
-      lines.map { |line| prefix + line }.join('')
-    end
-  end
-
-  #
-  # Use Nokogiri to parse this string as HTML, and return an indented version
-  #
-  def nicehtml(indent=2)
-    Nokogiri::HTML(ARGF).to_xhtml(indent: indent)
-  end
-  alias_method :indent_html, :nicehtml
-
-  #
   # Wrap all lines at window size, and indent 
   #
   def wrapdent(prefix, width=nil)
-    prefix_size = prefix.strip_ansi.size
-
     if width
-      width = width - prefix_size
+      width = width - prefix.size
     else
-      width = -prefix_size
+      width = -prefix.size
     end
 
-    wrap(width).map { |line| line + prefix }.join("\n")
+    wrap(width).each_line.map { |line| prefix + line }.join
   end
 
   #
