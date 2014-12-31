@@ -83,7 +83,7 @@ class String
   # This string contains ANSI (VT100) control codes
   #
   def contains_color?
-    self[ANSI_REGEXP]
+    self[COLOR_REGEXP]
   end  
   alias_method :contains_colors?, :contains_color?
   alias_method :contains_ansi?,  :contains_color?
@@ -92,7 +92,7 @@ class String
   # Remove ANSI color codes.
   #
   def strip_color
-    gsub(ANSI_REGEXP, '')
+    gsub(COLOR_REGEXP, '')
   end
   alias_method :strip_ansi, :strip_color 
 
