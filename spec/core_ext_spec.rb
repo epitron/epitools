@@ -747,7 +747,7 @@ end
 describe ObjectSpace do
 
   it "is Enumerable" do
-    ObjectSpace.select { |o| o.is_a? String }.map { |o| o.class.name }.uniq.should == ["String"]
+    ObjectSpace.select { |o| o.is_a? ObjectSpace }.map { |o| o.class.name }.uniq.should == ["Module"]
   end
 
 end
