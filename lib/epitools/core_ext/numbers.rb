@@ -1,3 +1,6 @@
+
+Number = Numeric # "obj.is_a? Number" just sounds better.
+
 class Numeric
 
   def integer?; true; end
