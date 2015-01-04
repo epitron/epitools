@@ -59,6 +59,14 @@ autoreq  :ANSI,         'ansi'
 autoreq  :BSON,         'bson'
 autoreq  :JSON,         'json'
 
+autoreq :AwesomePrint do
+  require 'awesome_print'
+
+  autoreq :Nokogiri do
+    require 'nokogiri'
+    require 'awesome_print/ext/nokogiri'
+  end
+end
 
 ## Network stuff
 
