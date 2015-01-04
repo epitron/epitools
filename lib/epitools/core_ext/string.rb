@@ -141,8 +141,12 @@ class String
   alias_method :indent_html, :nice_html
 
   #
-  # Wrap the lines in the string so they're at most "width" wide.
-  # (If no width is specified, defaults to the width of the terminal.)
+  # Word-wrap the string so each line is at most `width` wide.
+  # Returns a string, or, if a block is given, yields each
+  # word-wrapped line to the block.
+  #
+  # If `width` is nil, find the current width of the terminal and use that.
+  # If `width` is negative, subtract `width` from the terminal's current width.
   #
   def wrap(width=nil)
     if width.nil? or width < 0
@@ -150,7 +154,7 @@ class String
       _, winwidth = STDIN.winsize
 
       if width < 0
-        width = (winwidth + width) - 1
+        width = (winwidth - 1) + width
       else
         width = winwidth - 1
       end
@@ -184,18 +188,26 @@ class String
     end
   end
 
+  alias_method :word_wrap, :wrap
+
+
   #
   # Wrap all lines at window size, and indent 
   #
-  def wrapdent(prefix, width=nil)
+  def wrap_and_indent(prefix, width=nil)
+    prefix = " "*prefix if prefix.is_a? Numeric
+
+    prefix_size = prefix.strip_color.size
+
     if width
-      width = width - prefix.size
+      width = width - prefix_size
     else
-      width = -prefix.size
+      width = -prefix_size
     end
 
     wrap(width).each_line.map { |line| prefix + line }.join
   end
+  alias_method :wrapdent, :wrap_and_indent
 
   #
   # Iterate over slices of the string of size `slice_width`.
