@@ -58,10 +58,6 @@ module Enumerable
   #   #=> [ ["Chapter 1", ...], ["Chapter 2", ...], etc. ]
   #
   def split_at(matcher=nil, options={}, &block)
-    # TODO: Ruby 1.9 returns Enumerators for everything now. Maybe use that?
-
-    return self unless self.any?
-
     include_boundary = options[:include_boundary] || false
 
     if matcher.nil?
@@ -75,43 +71,42 @@ module Enumerable
       end
     end
 
-    chunks = []
-    current_chunk = []
+    Enumerator.new do |yielder|
+      current_chunk = []
+      splits        = 0
+      max_splits    = options[:once] == true ? 1 : options[:max_splits]
 
-    splits = 0
-    max_splits = options[:once] == true ? 1 : options[:max_splits]
+      each do |e|
 
-    each do |e|
+        if boundary_test_proc.call(e) and (max_splits == nil or splits < max_splits)
 
-      if boundary_test_proc.call(e) and (max_splits == nil or splits < max_splits)
+          if current_chunk.empty? and not include_boundary
+            next # hit 2 boundaries in a row... just keep moving, people!
+          end
 
-        if current_chunk.empty? and not include_boundary
-          next # hit 2 boundaries in a row... just keep moving, people!
-        end
+          if options[:after]
+            # split after boundary
+            current_chunk << e        if include_boundary   # include the boundary, if necessary
+            yielder << current_chunk                         # shift everything after the boundary into the resultset
+            current_chunk = []                              # start a new result
+          else
+            # split before boundary
+            yielder << current_chunk                         # shift before the boundary into the resultset
+            current_chunk = []                              # start a new result
+            current_chunk << e        if include_boundary   # include the boundary, if necessary
+          end
 
-        if options[:after]
-          # split after boundary
-          current_chunk << e        if include_boundary   # include the boundary, if necessary
-          chunks << current_chunk                         # shift everything after the boundary into the resultset
-          current_chunk = []                              # start a new result
+          splits += 1
+
         else
-          # split before boundary
-          chunks << current_chunk                         # shift before the boundary into the resultset
-          current_chunk = []                              # start a new result
-          current_chunk << e        if include_boundary   # include the boundary, if necessary
+          current_chunk << e
         end
 
-        splits += 1
-
-      else
-        current_chunk << e
       end
 
+      yielder << current_chunk if current_chunk.any?
+
     end
-
-    chunks << current_chunk if current_chunk.any?
-
-    chunks # resultset
   end
 
   #
