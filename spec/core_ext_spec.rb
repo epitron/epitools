@@ -470,9 +470,9 @@ describe Enumerable do
   end
   
   it "splits" do
-    [1,2,3,4,5].split_at     {|e| e == 3}.to_a.should == [ [1,2], [4,5] ]
-    [1,2,3,4,5].split_after  {|e| e == 3}.to_a.should == [ [1,2,3], [4,5] ]
-    [1,2,3,4,5].split_before {|e| e == 3}.to_a.should == [ [1,2], [3,4,5] ]
+    [1,2,3,4,5].split_at     {|e| e == 3}.should == [ [1,2], [4,5] ]
+    [1,2,3,4,5].split_after  {|e| e == 3}.should == [ [1,2,3], [4,5] ]
+    [1,2,3,4,5].split_before {|e| e == 3}.should == [ [1,2], [3,4,5] ]
 
     result = "a\nb\n---\nc\nd\n".lines.split_at(/---/)
     result.map_recursively(&:strip).should == [ %w[a b], %w[c d] ]
@@ -485,17 +485,22 @@ describe Enumerable do
       array.split_at("a")
     }.should_not raise_error
     
-    array.split_at("a").to_a.should     == [ array[0..1], array[3..3] ] 
-    array.split_at([1,2,3]).to_a.should == [ array[0..2] ]
+    array.split_at("a").should     == [ array[0..1], array[3..3] ] 
+    array.split_at([1,2,3]).should == [ array[0..2] ]
   end
   
-  it "handles arbitrary objects" do
+  it "splits with arbitrary objects" do
     arbitrary = Struct.new(:a, :b, :c)
     
     particular = arbitrary.new(1,2,3)
     array = [ arbitrary.new, arbitrary.new, particular, arbitrary.new]
     
-    array.split_at(particular).to_a.should == [ array[0..1], array[3..3] ]    
+    array.split_at(particular).should == [ array[0..1], array[3..3] ]    
+  end
+
+  it "splits lazily" do
+    result = "a\nb\nc\nd".each_line.split_at("b")
+    result.is_an?(Enumerator).should == true
   end
   
   it "sums" do

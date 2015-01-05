@@ -51,8 +51,14 @@ class Array
   #   => [ [:mins, 5], [:secs, 39] ]
   #
   def rzip(other)
-    # That's a lotta reverses!
-    reverse.zip(other.reverse).reverse
+    reverse.zip(other.reverse).reverse # That's a lotta reverses!
+  end
+
+  #
+  # See: Enumerable#split_at
+  #
+  def split_at(*args, &block)
+    super.to_a
   end
 
   #
