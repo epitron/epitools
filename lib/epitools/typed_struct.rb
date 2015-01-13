@@ -50,9 +50,9 @@ class TypedStruct < Struct
     ["timestamp", "unixtime"]    => proc { |me| Time.at me },
     ["bool", "boolean"]          => proc do |me| 
       case me
-      when false, nil, 0, "0", "off", "no",  "false", "disabled", "disable"
+      when false, nil, 0, /^(0|off|no|false|disabled?)$/
         false
-      when true,  1, "1", "on",  "yes", "true", "enabled", "enable"
+      when true,  1, /^(1|on|yes|true|enabled?)$/
         true
       else
         raise "Invalid boolean type: #{me.inspect}"
@@ -64,18 +64,30 @@ class TypedStruct < Struct
   # Initialize a new struct.
   #
   def self.[](specs)
+    wildcard = false
+    drop_unknown = false
+
     # create [name,type] pairs
     pairs = specs.split.map do |spec|
-      name, type = spec.split(":")
-
-      type ||= :passthru
-
-      unless converter = CONVERTERS[type]
-        raise "Unknown type: #{type}"
+      case spec
+      when "*"
+        wildcard = true
+        next
+      when "-"
+        drop_unknown = true
+        next
       end
 
-      [name.to_sym, converter]
-    end
+      names, type = spec.split(":")
+
+      names.split(",").map do |name|
+        type ||= :passthru
+        raise "Unknown type: #{type}" unless converter = CONVERTERS[type]
+        [name.to_sym, converter]
+      end
+    end.compact.flatten(1)
+
+    raise "Error: Can't specify both wildcard ('*') and drop unknown ('-')" if wildcard and drop_unknown
 
     # initialize the Struct
     struct = new(*pairs.transpose.first)
@@ -88,6 +100,23 @@ class TypedStruct < Struct
       end
     end
 
+    if wildcard
+      struct.class_eval do
+        def method_missing(name, val=nil)
+          if name =~ /^(.+)=$/
+            @extra_slots ||= {}
+            @extra_slots[$1.to_sym] = val
+          else
+            @extra_slots && @extra_slots[name]
+          end
+        end
+      end
+    end
+
+    struct.class_eval do
+      @@drop_unknown = drop_unknown
+    end
+
     struct
   end
 
@@ -95,10 +124,18 @@ class TypedStruct < Struct
     if args.size == 1 and args.first.is_a? Hash
       opts = args.first
     else
-      opts = Hash[members.zip(args)]
+      opts = members.zip(args)
     end
 
-    opts.each { |key,value| send "#{key}=", value }
+    if @@drop_unknown
+      opts.each { |key,value| send "#{key}=", value if respond_to? "#{key}=" }
+    else
+      opts.each { |key,value| send "#{key}=", value }
+    end
   end
 
+end
+
+def TypedStruct(schema)
+  TypedStruct[schema]
 end

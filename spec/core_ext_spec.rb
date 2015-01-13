@@ -453,20 +453,14 @@ describe Enumerable do
   it "maps deeply" do
     [["a\n", "b\n"], ["c\n", "d\n"]].map_recursively(&:strip).should == [ %w[a b], %w[c d] ]
     
-    [[1,2],[3,4]].deep_map {|e| e ** 2}.should == [[1,4],[9,16]] 
-    [1,2,3,4].deep_map {|e| e ** 2}.should == [1,4,9,16] 
-    [[],[],1,2,3,4].deep_map {|e| e ** 2}.should == [[], [], 1, 4, 9, 16] 
-
-    {1=>2, 3=>{4=>5, 6=>7}}.deep_map {|k,v| [k, v**2] }.should == [ [1,4], [3, [[4,25], [6,49]]] ]
+    [[1,2],[3,4]].map_recursively {|e| e ** 2}.should == [[1,4],[9,16]] 
+    [1,2,3,4].map_recursively {|e| e ** 2}.should == [1,4,9,16] 
+    [[],[],1,2,3,4].map_recursively {|e| e ** 2}.should == [[], [], 1, 4, 9, 16] 
   end
   
   it "selects deeply" do
-    [[1,2],[3,4]].deep_select {|e| e % 2 == 0 }.should == [[2],[4]]
-    puts
-
-    {1=>2, 3=>{4=>5, 6=>7}}.deep_select {|k,v| k == 1 }.should == {1=>2} 
-    #[1,2,3,4].deep_select {|e| e ** 2}.should == [1,4,9,16] 
-    #[[],[],1,2,3,4].deep_select {|e| e ** 2}.should == [[], [], 1, 4, 9, 16] 
+    [[1,2],[3,4]].select_recursively {|e| e % 2 == 0 }.should == [[2],[4]]
+    [{},"Blah",1,2,3,4].select_recursively {|e| e == 2 }.should == [2] 
   end
   
   it "splits" do
@@ -604,6 +598,16 @@ describe Hash do
 
   before :each do
     @h = {"key1"=>"val1", "key2"=>"val2"}
+  end
+
+  it "maps recursively" do
+    # nevermind. hashes are stupid.
+    # {a: 2, b: {c: 5, d: 7}}.map_recursively {|k,v| [k, v**2] }.should == {a: 4, b: {c: 25, d: 49}}
+  end
+
+  it "selects recursively" do
+    # nevermind. hashes are stupid.
+    # {1=>2, 3=>{4=>5, 6=>7}}.select_recursively {|k,v| k == 1 }.should == {1=>2} 
   end
     
   it "maps keys" do

@@ -310,6 +310,13 @@ describe Path do
     tmp.rm
     tmp.mkdir.should be_truthy
     tmp.rm.should be_truthy
+
+    tmp2 = Path.tmpfile
+    tmp2.rm
+    tmp2 = tmp2/"nonexistent"/"directory"
+
+    tmp2.exists?.should == false
+    lambda { tmp2.mkdir_p }.should_not raise_error
   end
 
   it "has classmethods" do

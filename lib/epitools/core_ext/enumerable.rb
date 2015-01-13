@@ -17,7 +17,6 @@ module Enumerable
   #
   alias_method :includes?,  :include?
 
-
   #
   # Skip the first n elements and return an Enumerator for the rest, or pass them
   # in succession to the block, if given. This is like "drop", but returns an enumerator
@@ -158,12 +157,13 @@ module Enumerable
 
   #
   # The same as "map", except that if an element is an Array or Enumerable, map is called
-  # recursively on that element.
+  # recursively on that element. (Hashes are ignored because of the complications of block
+  # arguments and return values.)
   #
   # Example:
   #   [ [1,2], [3,4] ].deep_map{|e| e ** 2 } #=> [ [1,4], [9,16] ]
   #
-  def deep_map(max_depth=nil, current_depth=0, parent=nil, &block)
+  def map_recursively(max_depth=nil, current_depth=0, parent=nil, &block)
     return self if max_depth and (current_depth > max_depth)
 
     map do |obj|
@@ -171,10 +171,10 @@ module Enumerable
         yield obj
       else
         case obj
-        when String
+        when String, Hash
           yield obj
         when Enumerable
-          obj.deep_map(max_depth, current_depth+1, self, &block)
+          obj.map_recursively(max_depth, current_depth+1, self, &block)
         else
           yield obj
         end
@@ -182,69 +182,39 @@ module Enumerable
     end
   end
 
-  alias_method :recursive_map,    :deep_map
-  alias_method :map_recursively,  :deep_map
-  alias_method :map_recursive,    :deep_map
+  alias_method :deep_map,      :map_recursively
+  alias_method :recursive_map, :map_recursively
+  alias_method :map_recursive, :map_recursively
 
   #
   # The same as "select", except that if an element is an Array or Enumerable, select is called
   # recursively on that element.
   #
   # Example:
-  #   [ [1,2], [3,4] ].deep_select{|e| e % 2 == 0 } #=> [ [2], [4] ]
+  #   [ [1,2], [3,4] ].select_recursively{|e| e % 2 == 0 } #=> [ [2], [4] ]
   #
-  def deep_select(max_depth=nil, current_depth=0, parent=nil, &block)
+  def select_recursively(max_depth=nil, current_depth=0, parent=nil, &block)
     return self if max_depth and (current_depth > max_depth)
 
     map do |obj|
-      p [:obj, obj]
-      result = if obj == parent # infinite loop scenario!
-        p :infinite
+      if obj == parent # infinite loop scenario!
         obj if yield obj
       else
         case obj
-        when String
-          p :string
+        when String, Hash
           obj if yield obj
         when Enumerable
-          p :recurse
           obj.deep_select(max_depth, current_depth+1, self, &block)
         else
-          p :else
-          p [:yield, yield(obj)]
           obj if yield obj
         end
       end
-      p [:result, result]
-      result
     end.compact
   end
 
-  # def deep_select(depth=nil, &block)
-  #   map do |*args|
-
-  #     obj = args.last
-
-  #     if depth.nil? or depth > 0
-
-  #       case obj
-  #       when Hash
-
-  #       when Array, Enumerable
-  #         result = obj.deep_select(depth ? depth-1 : nil, &block)
-  #         result.any? ? result : nil
-  #       end
-
-  #     else
-  #       obj if block.call(obj)
-  #     end
-
-  #   end.compact
-  # end
-
-  alias_method :recursive_select,   :deep_select
-  alias_method :select_recursively, :deep_select
-  alias_method :select_recursive,   :deep_select
+  alias_method :deep_select,        :select_recursively
+  alias_method :recursive_select,   :select_recursively
+  alias_method :select_recursive,   :select_recursively
 
   #
   # Identical to "reduce" in ruby1.9 (or foldl in haskell.)
@@ -349,7 +319,6 @@ module Enumerable
   end
   alias_method :group_neighbors_by, :group_neighbours_by
 
-
   #
   # Convert the array into a stable iterator (Iter) object.
   #
@@ -376,7 +345,6 @@ module Enumerable
   alias_method :count_by,     :counts
   alias_method :group_counts, :counts
 
-
   #
   # group_by the elements themselves
   #
@@ -384,7 +352,6 @@ module Enumerable
     group_by(&:self)
   end
   alias_method :grouped, :groups
-
 
   #
   # Multiplies this Enumerable by something. (Same behaviour as Enumerator#*)

@@ -907,8 +907,8 @@ class Path
         else
           #{command} path   # Make the directory
           reload!
-          self
         end
+        self
       end
     }
   end
