@@ -62,8 +62,8 @@ end
 class Proc
 
   #
-  # Chain two procs together, returning a new proc. Each proc is executed one after the other,
-  # with the same input arguments. The return value is an array of all the procs' return values.
+  # Join two procs together, returning a new proc. Each proc is executed one after the other,
+  # with the same input arguments. The return value is an array of the return values from all the procs.
   #
   # You can use either the .join method, or the overloaded & operator.
   #

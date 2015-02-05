@@ -411,6 +411,27 @@ class Enumerator
 
 
   #
+  # Pass in a bunch of indexes to elements in the Enumerator, and this method
+  # lazily returns them as a new Enumerator.
+  #
+  def values_at(*indexes)
+    return if indexes.empty?
+
+    indexes.flatten!
+
+    indexes = Set.new(indexes)
+
+    Enumerator.new do |yielder|
+      each_with_index do |e,i|
+        yielder << e if indexes.delete(i)
+        break if indexes.empty?
+      end
+    end
+  end
+
+
+
+  #
   # Concatenates two Enumerators, returning a new Enumerator.
   #
   def +(other)
