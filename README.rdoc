@@ -12,14 +12,14 @@ Enhanced base classes: {Enumerable}[http://rdoc.info/github/epitron/epitools/mas
 
 Extras:
 
-* {Path}[http://rdoc.info/github/epitron/epitools/master/Path] (an object-oriented interface to the filessytem -- like File, Dir, Pathname, and FileUtils all rolled into one)
+* {Path}[http://rdoc.info/github/epitron/epitools/master/Path] (an object-oriented interface to the filesytem -- it's File, Dir, FileUtils, and Pathname all rolled into one!)
+* {Browser}[http://rdoc.info/github/epitron/epitools/master/Browser] (a fake browser, with a cache, cookies, download progress bars, plus the rest of the mechanize/nokogiri API you know and love)
+* {Colored}[http://rdoc.info/github/epitron/epitools/master/Colored] (enhanced version of defunkt's colored -- adds ANSI colouring methods to String, eg: #red, #green, #light_blue, etc.)
 * {TypedStruct}[http://rdoc.info/github/epitron/epitools/master/TypedStruct] (like Struct, but setters always coerce input to a certain type, eg: boolean, integer, etc.)
 * {WM}[http://rdoc.info/github/epitron/epitools/master/WM] (control/query desktop windows in X. Note: `wmctrl` must be installed)
 * {Sys}[http://rdoc.info/github/epitron/epitools/master/Sys] (system tools -- determine operating system, list processes, view network statistics, etc.)
-* {Colored}[http://rdoc.info/github/epitron/epitools/master/Colored] (enhanced version of defunkt's colored -- adds ANSI colouring methods to String, eg: #red, #green, #light_blue, etc.)
 * {Term}[http://rdoc.info/github/epitron/epitools/master/Term] (a toolbox for making terminal-based scripts -- get terminal size, create tables, etc.)
 * {Iter}[http://rdoc.info/github/epitron/epitools/master/Iter] (a "stable iterator" -- lets you write algorithms that modify the array as you're iterating; good for clustering.)
-* {Browser}[http://rdoc.info/github/epitron/epitools/master/Browser] (a fake browser, with a cache, cookies, download progress bars, plus the rest of the mechanize/nokogiri API you know and love)
 * {Rash}[http://rdoc.info/github/epitron/epitools/master/Rash] (a hash which can have Regexps as keys, so that many input keys can map to a single value.)
 * {Progressbar}[http://rdoc.info/github/epitron/epitools/master/Progressbar] (better than the progressbar gem)
 * {MimeMagic}[http://rdoc.info/github/epitron/epitools/master/MimeMagic] (a port of the Unix `file` utility for automatically recognizing files based on their contents; faster than running `file` on every file if you have to process large batches of files. This is originally from the mimemagic gem by {Daniel Mendler}[https://github.com/minad], and has been slightly modified and enhanced.)
@@ -36,7 +36,7 @@ or check out the rdoc: http://rdoc.info/github/epitron/epitools/master/frames
 
 == Copyright
 
-Copyright (c) 2009-2013 epitron
+Copyright (c) 2009-2015 epitron
 
 == License
 
