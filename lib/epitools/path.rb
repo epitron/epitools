@@ -604,6 +604,16 @@ class Path
   end
 
   #
+  # Read the contents of the file, yielding it in 16k chunks. (default chunk size is 16k)
+  #
+  def each_chunk(chunk_size=2**14)
+    open do |f|
+      yield f.read(chunk_size) until f.eof?
+    end
+  end
+
+
+  #
   # All the lines in this file, chomped.
   #
   def each_line

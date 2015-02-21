@@ -566,4 +566,9 @@ describe Path do
     file.atime.should == beforebefore
   end
 
+  it "each_chunks" do
+    path = Path["/etc/passwd"]
+    path.each_chunk(20) { |chunk| chunk.size.should == 20; break }
+  end
+
 end
