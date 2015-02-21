@@ -630,6 +630,7 @@ class Path
   def ls; Path[File.join(path, "*")]; end
 
   def ls_r; Path[File.join(path, "**/*")]; end
+  alias_method :ls_R, :ls_r
 
   def ls_dirs
     ls.select(&:dir?)
