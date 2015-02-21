@@ -639,7 +639,10 @@ class Path
 
   def ls; Path[File.join(path, "*")]; end
 
-  def ls_r; Path[File.join(path, "**/*")]; end
+  def ls_r(symlinks=false)
+    glob = symlinks ? "**{,/*/**}/*" : "**/*"
+    Path[File.join(path, glob)]
+  end
   alias_method :ls_R, :ls_r
 
   def ls_dirs
