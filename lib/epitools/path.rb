@@ -123,7 +123,7 @@ class Path
   ###############################################################################
 
   def initialize(newpath, hints={})
-    self.send("path=", newpath, hints)
+    send("path=", newpath, hints)
   end
 
   def initialize_copy(other)
@@ -299,7 +299,7 @@ class Path
 
     num_dots = anchor.dirs.size - first_mismatch
 
-    result = self.dup
+    result = dup
     result.dirs = ([".."] * num_dots) + dirs[first_mismatch..-1]
 
     result
@@ -311,7 +311,7 @@ class Path
       if relative?
         File.join(*dirs)
       else
-        File::SEPARATOR + File.join(*dirs)
+        File.join("", *dirs)
       end
     else
       nil
