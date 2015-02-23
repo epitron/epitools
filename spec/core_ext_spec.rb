@@ -246,9 +246,17 @@ describe String do
   end
 
   it "titlecases" do
-    "asdf asdfasdf asdf".titlecase.should == "Asdf Asdfasdf Asdf"
-    " asdf".titlecase.should == " Asdf"
-    "ASDFASDFA SDF".titlecase.should == "Asdfasdfa Sdf"
+    {
+      "asdf asdfasdf asdf" => "Asdf Asdfasdf Asdf",
+      " asdf"              => " Asdf",
+      "ASDFASDFA SDF"      => "Asdfasdfa Sdf",
+      "What's Up"          => "What's Up",
+      "What's Up"          => "What's Up",
+      "they're awesome"    => "They're Awesome",
+      "king of pain"       => "King of Pain",
+      "a-b-c 1-2-3"        => "A-B-C 1-2-3"
+    }.each {|orig, titled| orig.titlecase.should == titled }
+
     s = "asdf asdf"
     s.titlecase!
     s.should == "Asdf Asdf"

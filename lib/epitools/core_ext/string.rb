@@ -59,20 +59,32 @@ class String
   end
 
   #
-  # Convert string to "Title Case" (first letter of each word capitalized)
+  # For `titlecase`
   #
-  def titlecase!
-    downcase!
-    gsub!(/\b\w/) { |m| m.upcase }
-  end
+  LOWERCASE_WORDS = Set.new %w[of to or the and an a at is for from in]
 
   #
   # Return a new string converted to "Title Case" (first letter of each word capitalized)
   #
   def titlecase
-    dup.titlecase!
+    first = true
+    words = downcase.split(/(?<!\w')\b/)
+
+    words.map.with_index do |word,i|
+      if LOWERCASE_WORDS.include?(word) and i > 0 # leave LOWERCASE_WORDS lowercase, unless it's the first word.
+        word
+      else
+        word.gsub(/^\w/) { |c| c.upcase } # capitalize first letter
+      end
+    end.join('')
   end
 
+  #
+  # Convert string to "Title Case" (first letter of each word capitalized)
+  #
+  def titlecase!
+    replace(titlecase)
+  end
 
   #
   # A Regexp to recognize ANSI escape sequences
