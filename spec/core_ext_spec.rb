@@ -254,7 +254,8 @@ describe String do
       "What's Up"          => "What's Up",
       "they're awesome"    => "They're Awesome",
       "king of pain"       => "King of Pain",
-      "a-b-c 1-2-3"        => "A-B-C 1-2-3"
+      "a-b-c 1-2-3"        => "A-B-C 1-2-3",
+      "i'm the best"       => "I'm the Best"
     }.each {|orig, titled| orig.titlecase.should == titled }
 
     s = "asdf asdf"

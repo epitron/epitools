@@ -32,7 +32,8 @@ describe Path do
   end
 
   it "'relative_to's" do
-    Path["/etc"].relative_to(Path["/tmp"]).should == "../etc/"
+    # Path["/etc"].relative_to(Path["/tmp"]).should == "../etc/"
+    Path["/etc/passwd"].relative_to("/etc").should == "passwd"
   end
 
   it "should glob with relative paths" do

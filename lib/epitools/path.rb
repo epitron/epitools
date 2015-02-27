@@ -291,18 +291,9 @@ class Path
   end
 
   def relative_to(anchor)
-    # stage 1: go ".." until we find a common dir prefix
-    #          (discard everything and go '/' if there's no common dir)
-    # stage 2: append the rest of the other path
-
-    first_mismatch = dirs.zip(anchor.dirs).index { |a,b| a != b }
-
-    num_dots = anchor.dirs.size - first_mismatch
-
-    result = dup
-    result.dirs = ([".."] * num_dots) + dirs[first_mismatch..-1]
-
-    result
+    anchor = anchor.to_s
+    anchor += "/" unless anchor[/\/$/]
+    to_s.gsub(/^#{Regexp.escape(anchor)}/, '')
   end
 
   # The current directory (with a trailing /)
