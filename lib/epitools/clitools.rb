@@ -169,3 +169,25 @@ def sudoifnotroot
     exit system("sudo", $PROGRAM_NAME, *ARGV)
   end
 end
+
+
+GEOIP_COUNTRY_DATA = '/usr/share/GeoIP/GeoIP.dat'
+GEOIP_CITY_DATA    = '/usr/share/GeoIP/GeoIPCity.dat'
+
+def geoip(addr)
+  $geoip ||= begin
+    if File.exists? GEOIP_CITY_DATA
+      geo = GeoIP.new GEOIP_CITY_DATA
+      proc { |addr| geo.city(addr) }
+
+    elsif File.exists? GEOIP_COUNTRY_DATA
+      geo = GeoIP.new GEOIP_COUNTRY_DATA
+      proc { |addr| geo.country(addr) }
+
+    else
+      raise "Can't find GeoIP data in /usr/share/GeoIP."
+    end
+  end
+
+  $geoip.call(addr)
+end

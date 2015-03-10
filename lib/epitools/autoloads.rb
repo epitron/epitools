@@ -27,6 +27,16 @@ module Digest
   autoload :MD5,      'digest/md5'
 end
 
+# Network Sockets
+['IP', 'Basic', 'TCP', 'UDP', 'UNIX', ''].each do |type|
+  autoload :"#{type}Socket", 'socket'
+end
+
+# Network Servers
+['TCP', 'UNIX'].each do |type|
+  autoload :"#{type}Server", 'socket'
+end
+
 if RUBY_VERSION["1.8.7"]
   autoload :Prime,      'mathn'
 else
@@ -58,6 +68,7 @@ autoreq  :Mechanize,    'mechanize'
 autoreq  :ANSI,         'ansi'
 autoreq  :BSON,         'bson'
 autoreq  :JSON,         'json'
+autoreq  :GeoIP,        'geoip'
 
 autoreq :AwesomePrint do
   require 'awesome_print'
@@ -67,19 +78,6 @@ autoreq :AwesomePrint do
     require 'awesome_print/ext/nokogiri'
   end
 end
-
-## Network stuff
-
-# Sockets
-['IP', 'Basic', 'TCP', 'UDP', 'UNIX', ''].each do |type|
-  autoload :"#{type}Socket", 'socket'
-end
-
-# Servers
-['TCP', 'UNIX'].each do |type|
-  autoload :"#{type}Server", 'socket'
-end
-
 
 ## YAML hacks (sometimes the module is loaded improperly)
 
