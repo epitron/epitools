@@ -1,4 +1,10 @@
-require 'epitools'
+require 'zlib'
+
+COMPRESSORS = {
+  ".gz"  => "gzip",
+  ".xz"  => "xz",
+  ".bz2" => "bzip2"
+}
 
 #
 # A mutation of "open" that lets you read/write gzip files, as well as
@@ -15,27 +21,28 @@ require 'epitools'
 #    zopen("test.txt.gz") { |f| f.read } # read the contents of the .gz file, then close the file handle automatically.
 #
 def zopen(path, mode="rb")
-  
-  path = Path[path] unless path.is_a? Path
-  file = path.open(mode)
-  
-  if path.ext == "gz"
+  ext = File.extname(path).downcase
+
+  if ext == ".gz"
+    io = open(path, mode)
     case mode
     when "r", "rb"
-      file = Zlib::GzipReader.new(file) 
+      io = Zlib::GzipReader.new(io)
     when "w", "wb"
-      file = Zlib::GzipWriter.new(file) 
+      io = Zlib::GzipWriter.new(io)
     else
       raise "Unknown mode: #{mode.inspect}. zopen only supports 'r' and 'w'."
     end
+  elsif bin = COMPRESSORS[ext]
+    io = IO.popen([bin, "-d" ,"-c", path])
   end
   
   if block_given?
-    result = yield(file)
-    file.close
+    result = yield(io)
+    io.close
     result
   else
-    file
+    io
   end
   
 end
