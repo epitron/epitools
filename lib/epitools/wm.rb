@@ -49,7 +49,7 @@ module WM
       current
     end
 
-    alias_method :active?, :current?    
+    alias_method :active?, :current?
 
     def windows
       @windows ||= WM.windows.select { |w| w.desktop_id == num }
@@ -102,8 +102,17 @@ module WM
     end
 
     def activate!
-      #system "wmctrl", "-i", "-a", window_id
-      system "xdotool", "windowactivate", window_id
+      system "wmctrl", "-i", "-a", window_id
+    end
+
+    #
+    # string is made up of regular text, plus <>'d keypresses
+    # eg: "Hello<Ctrl-T><Ctrl-L><Ctrl-Shift-K><Return>!!!"
+    #
+    # TODO: add `xdotool` support
+    #
+    def send_keys(keys)
+      xse(keys)
     end
 
     #
@@ -309,8 +318,8 @@ module WM
     # thorn                         0x00fe  /* U+00FE LATIN SMALL LETTER THORN */
     # ydiaeresis                    0x00ff  /* U+00FF LATIN SMALL LETTER Y WITH DIAERESIS */
     #
+    if Path.which("xse")
 
-    if Path.which("xdotool")
       KEYMAP = {
         "`" => "grave",
         " " => "space",
@@ -319,49 +328,63 @@ module WM
         "\[" => "Escape",
         '"' => "quotedbl",
       }
+      def keys_to_events(keys)
 
-      def string_to_keys(s)
+        tokens = keys.scan(/(<[^>]+>|.+?)/)
 
-        tokens = s.scan(/(<[^>]+>|.)/).flatten
+        tokens.flatten.map do |key|
+          mods = []
 
-        tokens.map do |token|
-          if token =~ /^<(.+)>$/
-            mods = $1.split(/[-+]/)
-            key  = mods.pop
-            # mods.each { |mod| raise "Error: unknown modifier #{mod}" unless mod =~ /^(Ctrl|Shift|Alt)$/i }
-          else
-            mods = []
-            key  = token
+          if key =~ /^<(.+)>$/
+
+            specials = $1.split("-")
+            key = specials.pop
+
+            key.downcase! if key =~ /^[A-Z]$/
+
+            specials.each do |special|
+              if special =~ /^(Ctrl|Shift|Alt)$/i
+                mods << $1
+              else
+                raise "Error: unknown modifier #{special}"
+              end
+            end
+
           end
+
+          mods << "Shift" if key =~ /^[A-Z\~\!\@\#\$\%\^\&\*\(\)\_\+]$/
 
           if key =~ /^[A-Z0-9]$/i or key.size > 1
-            # key is good!
+            keyname = key
           else
-            key = KEYMAP[key] || ("0x%x" % key.ord)
+            keyname = KEYMAP[key] || ("0x%x" % key.ord)
           end
 
-          [*mods, key].join("+")
+          "#{mods.join(" ")}<Key>#{keyname}"
         end
       end
 
-      #
-      # Send keypresses to this window, using xdotool.
-      # (`delay` specifies how long to pause between each keystroke, default: 12ms)
-      #
-      # Examples:
-      #   > window.send_keys("Hello Everybo<Ctrl-W>World!<Return>!!!")
-      #   > browser.send_keys("<Ctrl-T>http://google.com/<Return>")
-      #
-      def send_keys(keystring, delay=nil)
-        keys = string_to_keys(keystring)
-        cmd  = ["xdotool", "key", "--clearmodifiers", "--window", window_id] 
-        cmd += ["--delay", delay.to_s] if delay
-        cmd += keys
+      def xse(keys)
+        temp   = Tempfile.new("xse")
+        events = keys_to_events(keys)
 
-        system(*cmd)
+        # p events
+        eventstring = events.map { |e| e + "\n" }.join("")
+
+        temp.write eventstring 
+        temp.flush
+        temp.seek 0
+        # p [:temp, temp.read]
+
+        cmd = "xse", "-window", window_id, "-file", temp.path
+        # p [:cmd, cmd]
+        unless system(*cmd)
+          raise "Error: couldn't send key commands to 'xse'. (Is xsendevents installed?)"
+        end
       end
-    end
 
-  end
+    end # Path.which('xse')
+
+  end # class Window
 
 end
