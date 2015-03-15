@@ -19,7 +19,7 @@ autoload :Benchmark,  'benchmark'
 autoload :Tracer,     'tracer'
 autoload :CSV,        'csv'
 autoload :Shellwords, 'shellwords'
-autoload :Matrix,     'epitools/core_ext/matrix'
+autoload :SDBM,       'sdbm'
 
 module Digest
   autoload :SHA1,     'digest/sha1'
@@ -59,6 +59,7 @@ autoload :Iter,         'epitools/iter'
 autoload :WM,           'epitools/wm'
 autoload :TypedStruct,  'epitools/typed_struct'
 autoload :Sys,          'epitools/sys'
+autoload :Matrix,       'epitools/core_ext/matrix'
 
 
 ## Gems (common)

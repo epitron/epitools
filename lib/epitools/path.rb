@@ -321,7 +321,9 @@ class Path
     end
   end
 
-  alias_method :name, :filename
+  def name
+    filename || "#{dirs.last}/"
+  end
 
   def exts
     extensions = basename.split('.')[1..-1]
