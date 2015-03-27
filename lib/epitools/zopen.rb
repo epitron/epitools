@@ -35,6 +35,8 @@ def zopen(path, mode="rb")
     end
   elsif bin = COMPRESSORS[ext]
     io = IO.popen([bin, "-d" ,"-c", path])
+  else
+    io = open(path)
   end
   
   if block_given?
