@@ -503,7 +503,24 @@ describe Enumerable do
 
   it "splits lazily" do
     result = "a\nb\nc\nd".each_line.split_at("b")
-    result.is_an?(Enumerator).should == true
+    result.should be_an Enumerator
+  end
+
+  it "splits between" do
+    test_chunks = [
+      [ [1,1] ],
+      [ [1], [2] ],
+      [ [1,1], [2,2,2], [3,3,3,3] ],
+    ]
+
+    test_chunks.each do |chunks|
+      result = chunks.flatten.split_between do |a,b|
+        a != b
+      end
+
+      result.should be_an Enumerator
+      result.to_a.should == chunks
+    end
   end
   
   it "sums" do

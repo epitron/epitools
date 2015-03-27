@@ -121,7 +121,7 @@ module Enumerable
   end
 
   #
-  # Split the array into chunks, cutting between the matched element and the previous element.
+  # Split the array into chunks, cutting before each matched element.
   #
   # Example:
   #   [1,2,3,4].split_before{|e| e == 3 } #=> [ [1,2], [3,4] ]
@@ -130,6 +130,33 @@ module Enumerable
     options[:include_boundary]  ||= true
     split_at(matcher, options, &block)
   end
+
+  #
+  # Split the array into chunks, cutting between two elements.
+  #
+  # Example:
+  #   [1,1,2,2].split_between{|a,b| a != b } #=> [ [1,1], [2,2] ]
+  #
+  def split_between(&block)
+    Enumerator.new do |yielder|
+      current = []
+      last    = nil
+
+      each_cons(2) do |a,b|
+        current << a
+        if yield(a,b)
+          yielder << current
+          current = []
+        end
+        last = b
+      end
+
+      current << last
+      yielder << current
+    end
+  end
+
+  alias_method :cut_between, :split_between
 
   #
   # Sum the elements
