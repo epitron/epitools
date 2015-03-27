@@ -132,6 +132,10 @@ class Path
     @ext  = other.ext  && other.ext.dup
   end
 
+  def self.escape(str)
+    Shellwords.escape(str)
+  end
+
   def self.glob(str, hints={})
     Dir[str].map { |entry| new(entry, hints) }
   end
@@ -149,12 +153,12 @@ class Path
         Path::JS.new(path)
 
       else
-        # todo: highlight backgrounds of codeblocks to show indent level & put boxes (or rules?) around (between?) double-spaced regions
+        # TODO: highlight backgrounds of codeblocks to show indent level & put boxes (or rules?) around (between?) double-spaced regions
         path = Path.expand_path(path)
-        if path =~ /(^|[^\\])[\?\*\{\}]/ # contains unescaped glob chars?
-          glob(path)
-        else
+        unless path =~ /(^|[^\\])[\?\*\{\}]/ # contains unescaped glob chars?
           new(path)
+        else
+          glob(path)
         end
 
       end
@@ -446,12 +450,19 @@ class Path
 
   include Comparable
 
+  #
+  # An array of attributes which will be used sort paths (case insensitive, directories come first)
+  #
+  def sort_attrs
+    [filename ? 1 : 0, path.downcase]
+  end
+
   def <=>(other)
     case other
     when Path
-      self.path <=> other.path
+      sort_attrs <=> other.sort_attrs
     when String
-      self.path == other
+      path <=> other
     else
       raise "Invalid comparison: Path to #{other.class}"
     end
@@ -505,7 +516,9 @@ class Path
         if line =~ /^([^=]+)=0s(.+)/
           key   = $1
           value = $2.from_base64 # unpack base64 string
-          value = value.encode("UTF-8", "UTF-8") # set string's encoding to UTF-8
+          # value = value.encode("UTF-8", "UTF-8") # set string's encoding to UTF-8
+          value = value.force_encoding("UTF-8").scrub  # set string's encoding to UTF-8
+          # value = value.encode("UTF-8", "UTF-8")  # set string's encoding to UTF-8
 
           attrs[key] = value
         end
@@ -630,11 +643,14 @@ class Path
     read.unmarshal
   end
 
-  def ls; Path[File.join(path, "*")]; end
+  def ls
+    Dir.foreach(path).drop(2).map {|fn| Path.new(fn) }
+  end
 
   def ls_r(symlinks=false)
-    glob = symlinks ? "**{,/*/**}/*" : "**/*"
-    Path[File.join(path, glob)]
+    # glob = symlinks ? "**{,/*/**}/*" : "**/*"
+    # Path[File.join(path, glob)]
+    Find.find(path).drop(1).map {|fn| Path.new(fn) }
   end
   alias_method :ls_R, :ls_r
 
