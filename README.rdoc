@@ -8,21 +8,21 @@ All epitools modules (and a bunch of Ruby's stdlib) are
 {loaded on demand with "autoload"}[https://github.com/epitron/epitools/blob/master/lib/epitools/autoloads.rb],
 so it's really fast. (Require this in your .irbrc or .pryrc, and you'll never have to require another Ruby stdlib module again!)
 
-Enhanced base classes: {Enumerable}[http://rdoc.info/github/epitron/epitools/master/Enumerable], {Hash}[http://rdoc.info/github/epitron/epitools/master/Hash], {String}[http://rdoc.info/github/epitron/epitools/master/String], {Array}[http://rdoc.info/github/epitron/epitools/master/Array], {File}[http://rdoc.info/github/epitron/epitools/master/File], {Object}[http://rdoc.info/github/epitron/epitools/master/Object], {Integer}[http://rdoc.info/github/epitron/epitools/master/Integer], etc.
+Enhanced base classes: {Enumerable}[http://rdoc.info/gems/epitools/Enumerable], {Hash}[http://rdoc.info/gems/epitools/Hash], {String}[http://rdoc.info/gems/epitools/String], {Array}[http://rdoc.info/gems/epitools/Array], {File}[http://rdoc.info/gems/epitools/File], {Object}[http://rdoc.info/gems/epitools/Object], {Integer}[http://rdoc.info/gems/epitools/Integer], etc.
 
 Extras:
 
-* {Path}[http://rdoc.info/github/epitron/epitools/master/Path] (an object-oriented interface to the filesytem -- it's File, Dir, FileUtils, and Pathname all rolled into one!)
-* {Browser}[http://rdoc.info/github/epitron/epitools/master/Browser] (a fake browser, with a cache, cookies, download progress bars, plus the rest of the mechanize/nokogiri API you know and love)
-* {Colored}[http://rdoc.info/github/epitron/epitools/master/Colored] (enhanced version of defunkt's colored -- adds ANSI colouring methods to String, eg: #red, #green, #light_blue, etc.)
-* {TypedStruct}[http://rdoc.info/github/epitron/epitools/master/TypedStruct] (like Struct, but setters always coerce input to a certain type, eg: boolean, integer, etc.)
-* {WM}[http://rdoc.info/github/epitron/epitools/master/WM] (control/query desktop windows in X. Note: `wmctrl` must be installed)
-* {Sys}[http://rdoc.info/github/epitron/epitools/master/Sys] (system tools -- determine operating system, list processes, view network statistics, etc.)
-* {Term}[http://rdoc.info/github/epitron/epitools/master/Term] (a toolbox for making terminal-based scripts -- get terminal size, create tables, etc.)
-* {Iter}[http://rdoc.info/github/epitron/epitools/master/Iter] (a "stable iterator" -- lets you write algorithms that modify the array as you're iterating; good for clustering.)
-* {Rash}[http://rdoc.info/github/epitron/epitools/master/Rash] (a hash which can have Regexps as keys, so that many input keys can map to a single value.)
-* {Progressbar}[http://rdoc.info/github/epitron/epitools/master/Progressbar] (better than the progressbar gem)
-* {MimeMagic}[http://rdoc.info/github/epitron/epitools/master/MimeMagic] (a port of the Unix `file` utility for automatically recognizing files based on their contents; faster than running `file` on every file if you have to process large batches of files. This is originally from the mimemagic gem by {Daniel Mendler}[https://github.com/minad], and has been slightly modified and enhanced.)
+* {Path}[http://rdoc.info/gems/epitools/Path] (an object-oriented interface to the filesytem -- it's File, Dir, FileUtils, and Pathname all rolled into one!)
+* {Browser}[http://rdoc.info/gems/epitools/Browser] (a fake browser, with a cache, cookies, download progress bars, plus the rest of the mechanize/nokogiri API you know and love)
+* {Colored}[http://rdoc.info/gems/epitools/Colored] (enhanced version of defunkt's colored -- adds ANSI colouring methods to String, eg: #red, #green, #light_blue, etc.)
+* {TypedStruct}[http://rdoc.info/gems/epitools/TypedStruct] (like Struct, but setters always coerce input to a certain type, eg: boolean, integer, etc.)
+* {WM}[http://rdoc.info/gems/epitools/WM] (control/query desktop windows in X. Note: `wmctrl` must be installed)
+* {Sys}[http://rdoc.info/gems/epitools/Sys] (system tools -- determine operating system, list processes, view network statistics, etc.)
+* {Term}[http://rdoc.info/gems/epitools/Term] (a toolbox for making terminal-based scripts -- get terminal size, create tables, etc.)
+* {Iter}[http://rdoc.info/gems/epitools/Iter] (a "stable iterator" -- lets you write algorithms that modify the array as you're iterating; good for clustering.)
+* {Rash}[http://rdoc.info/gems/epitools/Rash] (a hash which can have Regexps as keys, so that many input keys can map to a single value.)
+* {Progressbar}[http://rdoc.info/gems/epitools/Progressbar] (better than the progressbar gem)
+* {MimeMagic}[http://rdoc.info/gems/epitools/MimeMagic] (a port of the Unix `file` utility for automatically recognizing files based on their contents; faster than running `file` on every file if you have to process large batches of files. This is originally from the mimemagic gem by {Daniel Mendler}[https://github.com/minad], and has been slightly modified and enhanced.)
 
 == Installing
 
@@ -32,7 +32,7 @@ Extras:
 
 This is basically a collection of enhancements to the ruby base types (Hash, Array,
 Enumerable, etc.). To learn how it works, read the specs in spec/*.rb,
-or check out the rdoc: http://rdoc.info/github/epitron/epitools/master/frames
+or check out the rdoc: http://rdoc.info/gems/epitools/frames
 
 == Copyright
 
