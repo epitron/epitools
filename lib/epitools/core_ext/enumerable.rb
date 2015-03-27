@@ -151,7 +151,7 @@ module Enumerable
         last = b
       end
 
-      current << last
+      current << last unless last.nil?
       yielder << current
     end
   end
