@@ -258,6 +258,8 @@ class Path
     temp = path
     reset!
     self.path = temp
+    @attrs = nil
+
     self
   end
 
@@ -644,7 +646,9 @@ class Path
   end
 
   def ls
-    Dir.foreach(path).drop(2).map {|fn| Path.new(fn) }
+    Dir.foreach(path).
+      reject {|fn| fn == "." or fn == ".." }.
+      map {|fn| Path.new(fn) }
   end
 
   def ls_r(symlinks=false)
@@ -1021,16 +1025,19 @@ class Path
   #
   # gzip the file, returning the result as a string
   #
-  def gzip(level=nil)
+  def deflate(level=nil)
     Zlib.deflate(read, level)
   end
+  alias_method :gzip, :deflate
+  
 
   #
   # gunzip the file, returning the result as a string
   #
-  def gunzip(level=nil)
-    Zlib.inflate(read, level)
+  def inflate
+    Zlib.inflate(read)
   end
+  alias_method :gunzip, :inflate
 
   #
   # Quickly gzip a file, creating a new .gz file, without removing the original,
@@ -1241,6 +1248,15 @@ class Path
   end
   alias_class_method :tempfile, :tmpfile
   alias_class_method :tmp,      :tmpfile
+
+  def self.tmpdir(prefix="tmp")
+    t = tmpfile
+
+    # FIXME: These operations should be atomic
+    t.rm; t.mkdir
+
+    t
+  end
 
   def self.home
     Path[ENV['HOME']]
