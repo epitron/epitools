@@ -45,6 +45,21 @@ class Object
       obj
     end
   end
+
+
+  #
+  # Creates attr_accessors and an initialize method
+  # that accepts the attrs as arguments.
+  # (It's kinda like an inline version of Struct.new(*args))
+  #
+  def self.attrs(*names)
+    attr_accessor *names
+    define_method :initialize do |*vals|
+      names.zip(vals) do |name, val|
+        instance_variable_set("@#{name}", val)
+      end
+    end
+  end
   
   #
   # Return a copy of the class with modules mixed into it.
