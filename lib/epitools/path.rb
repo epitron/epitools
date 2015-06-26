@@ -425,7 +425,12 @@ class Path
   end
 
   def symlink_target
-    Path[dir] / File.readlink(path.gsub(/\/$/, ''))
+    target = File.readlink(path.gsub(/\/$/, ''))
+    if target.startswith("/")
+      Path[target]
+    else
+      Path[dir] / target
+    end
   end
   alias_method :readlink, :symlink_target
   alias_method :target,   :symlink_target
@@ -669,7 +674,7 @@ class Path
   end
 
   def siblings
-    ls - [self]
+    Path[dir].ls - [self]
   end
 
   def touch
@@ -951,7 +956,11 @@ class Path
   end
 
   def ln_s(dest)
-    Path.ln_s(self, dest)
+    if dest.startswith("/")
+      Path.ln_s(self, dest)
+    else
+      Path.ln_s(self, self / dest )
+    end
   end
 
   ## Owners and permissions
@@ -1092,6 +1101,9 @@ class Path
       with(:dirs=>dirs[0...-1])
     end
   end
+
+  def startswith(s); path.startswith(s); end
+  def endswith(s); path.endswith(s); end
 
   #
   # Follows all symlinks to give the true location of a path.
