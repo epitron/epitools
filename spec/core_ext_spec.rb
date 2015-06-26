@@ -418,7 +418,7 @@ describe Array do
   end
   
   it "rzips" do
-    [5,39].rzip([:hours, :mins, :secs]).should == [ [5, :mins], [39, :secs] ]
+    [5,39].rzip([:hours, :mins, :secs]).to_a.should == [ [5, :mins], [39, :secs] ]
   end
   
   it "middles" do

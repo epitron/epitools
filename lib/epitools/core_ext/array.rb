@@ -51,7 +51,8 @@ class Array
   #   => [ [:mins, 5], [:secs, 39] ]
   #
   def rzip(other)
-    reverse.zip(other.reverse).reverse # That's a lotta reverses!
+    reverse_each.zip(other.reverse_each).reverse_each
+    # reverse.zip(other.reverse).reverse # That's a lotta reverses!
   end
 
   #
