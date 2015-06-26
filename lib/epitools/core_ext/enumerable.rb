@@ -37,6 +37,15 @@ module Enumerable
   end
 
   #
+  # Add reverse_each to old Ruby versions
+  #
+  unless defined? reverse_each
+    def reverse_each
+      to_a.to_enum(:reverse_each)
+    end
+  end
+
+  #
   # Split this enumerable into chunks, given some boundary condition. (Returns an array of arrays.)
   #
   # Options:
