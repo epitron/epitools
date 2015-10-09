@@ -27,21 +27,31 @@ module Digest
   autoload :MD5,      'digest/md5'
 end
 
-# Network Sockets
-['IP', 'Basic', 'TCP', 'UDP', 'UNIX', ''].each do |type|
-  autoload :"#{type}Socket", 'socket'
-end
-
-# Network Servers
-['TCP', 'UNIX'].each do |type|
-  autoload :"#{type}Server", 'socket'
-end
-
 if RUBY_VERSION["1.8.7"]
   autoload :Prime,      'mathn'
 else
   autoload :Prime,      'prime'
 end
+
+
+## Networking
+
+['IP', 'Basic', 'TCP', 'UDP', 'UNIX', ''].each do |type|
+  autoload :"#{type}Socket", 'socket'
+end
+
+['TCP', 'UNIX'].each do |type|
+  autoload :"#{type}Server", 'socket'
+end
+
+module Net
+  autoload :HTTP,  'net/http'
+  autoload :HTTPS, 'net/https'
+  autoload :FTP,   'net/ftp'
+  autoload :FTP,  'net/ftp'
+end
+
+autoload :Resolv, 'resolv'
 
 
 ## Nonstandard library (epitools)
@@ -80,7 +90,8 @@ autoreq :AwesomePrint do
   end
 end
 
-## YAML hacks (sometimes the module is loaded improperly)
+
+## YAML hacks (the module might not be loaded properly in older Rubies)
 
 if defined? YAML and not defined? YAML.parse
   del YAML  # remove the existing module

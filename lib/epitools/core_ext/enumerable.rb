@@ -59,6 +59,9 @@ module Enumerable
   #   [1,2,3,4,5].split{ |e| e == 3 }
   #   #=> [ [1,2], [4,5] ]
   #
+  #   "hello\n\nthere\n".each_line.split_at("\n").to_a
+  #   #=> [ ["hello\n"], ["there\n"] ]
+  #
   #   [1,2,3,4,5].split(:include_boundary=>true) { |e| e == 3 }
   #   #=> [ [1,2], [3,4,5] ]
   #
@@ -71,11 +74,10 @@ module Enumerable
     if matcher.nil?
       boundary_test_proc = block
     else
-      if matcher.is_a? String or matcher.is_a? Regexp
-        boundary_test_proc = proc { |element| element[matcher] rescue nil }
+      if matcher.is_a? Regexp
+        boundary_test_proc = proc { |element| element =~ matcher }
       else
         boundary_test_proc = proc { |element| element == matcher }
-        #raise "I don't know how to split with #{matcher}"
       end
     end
 

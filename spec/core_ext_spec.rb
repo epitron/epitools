@@ -251,7 +251,6 @@ describe String do
       " asdf"              => " Asdf",
       "ASDFASDFA SDF"      => "Asdfasdfa Sdf",
       "What's Up"          => "What's Up",
-      "What's Up"          => "What's Up",
       "they're awesome"    => "They're Awesome",
       "king of pain"       => "King of Pain",
       "a-b-c 1-2-3"        => "A-B-C 1-2-3",
@@ -477,8 +476,11 @@ describe Enumerable do
     [1,2,3,4,5].split_after  {|e| e == 3}.should == [ [1,2,3], [4,5] ]
     [1,2,3,4,5].split_before {|e| e == 3}.should == [ [1,2], [3,4,5] ]
 
-    result = "a\nb\n---\nc\nd\n".lines.split_at(/---/)
-    result.map_recursively(&:strip).should == [ %w[a b], %w[c d] ]
+    result = "a\nb\n---\nc\nd\n".each_line.split_at(/---/)
+    result.to_a.should == [ ["a\n", "b\n"], ["c\n", "d\n"] ]
+
+    result = "hello\n\nthere\n".each_line.split_at("\n")
+    result.to_a.should == [ ["hello\n"], ["there\n"] ]
   end
 
   it "splits with nested things" do
