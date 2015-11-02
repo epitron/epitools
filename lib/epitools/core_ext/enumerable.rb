@@ -194,6 +194,19 @@ module Enumerable
   end
 
   #
+  # Lazily enumerate unique elements
+  # (WARNING: This can cause an infinite loop if you enumerate over a cycle,
+  #           since it will keep reading the input until it finds a unique element)
+  #
+  def uniq
+    already_seen = Set.new
+
+    Enumerator::Lazy.new(self) do |yielder, value|
+      yielder << value if already_seen.add?(value)
+    end
+  end
+
+  #
   # The same as "map", except that if an element is an Array or Enumerable, map is called
   # recursively on that element. (Hashes are ignored because of the complications of block
   # arguments and return values.)

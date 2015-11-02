@@ -536,6 +536,10 @@ describe Enumerable do
     [1,1,3,3].average.should == 2.0
   end
 
+  it "uniqs lazily" do
+    [0,0,0,1].cycle.uniq.take(2).to_a.should == [0,1]
+  end
+
   it "foldl's" do
     a = [1,2,3,4]
     a.foldl(:+).should == a.sum
