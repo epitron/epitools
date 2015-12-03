@@ -11,6 +11,20 @@ class String
   end
 
   #
+  # Could this string be cast to an float?
+  #
+  def float?
+    strip.match(/^\d+\.\d+$/) ? true : false
+  end
+
+  #
+  # Could this string be cast to an number?
+  #
+  def number?
+    strip.match(/^\d\.?\d*$/) ? true : false
+  end
+
+  #
   # 'true' if the string's length is 0 (after whitespace has been stripped from the ends)
   #
   def blank?

@@ -5,6 +5,8 @@ class Numeric
 
   def truthy?; self > 0; end
 
+  def number?; true; end
+
   #
   # Convert this number to a string, adding commas between each group of 3 digits.
   #
