@@ -344,8 +344,8 @@ describe Integer do
   it "integer?" do
     
     {
-      true  => [ "123", "000", 123, 123.45 ],
-      false => [ "123asdf", "asdfasdf", Object.new, nil ]
+      true  => [ "123", "000", 123 ],
+      false => [ "123asdf", "asdfasdf", Object.new, nil, 123.45 ]
     }.each do |expected_result, objects|
       objects.each { |object| object.integer?.should == expected_result }
     end

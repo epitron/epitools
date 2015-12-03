@@ -19,6 +19,9 @@ class Object
   
 end
 
+class Integer
+  def integer?; true; end
+end
 
 class TrueClass
 
