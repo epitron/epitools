@@ -15,3 +15,15 @@ end
 task :pry do
   system "pry --gem"
 end
+
+task :spec do
+  cmd = %w[rspec -fd -c spec]
+  
+  if system *%w[which rescue]
+    system *(["rescue"]+cmd)
+  else
+    system *cmd
+  end
+end
+
+task :default => :spec
