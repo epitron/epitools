@@ -2,54 +2,6 @@ require 'epitools/minimal'
 require 'epitools/core_ext/numbers'
 
 class String
-  
-  #
-  # Could this string be cast to an integer?
-  #
-  def integer?
-    strip.match(/^\d+$/) ? true : false
-  end
-
-  #
-  # Could this string be cast to an float?
-  #
-  def float?
-    strip.match(/^\d+\.\d+$/) ? true : false
-  end
-
-  #
-  # Could this string be cast to an number?
-  #
-  def number?
-    strip.match(/^\d\.?\d*$/) ? true : false
-  end
-
-  #
-  # 'true' if the string's length is 0 (after whitespace has been stripped from the ends)
-  #
-  def blank?
-    strip.size == 0
-  end
-
-  #
-  # Is there anything in the string? (ignoring whitespace/newlines)
-  #
-  def any?
-    not blank?
-  end
-  alias_method :present?, :any?
-
-  #
-  # Does this string contain something that means roughly "true"?
-  #
-  def truthy?
-    case strip.downcase
-    when "1", "true", "yes", "on", "enabled", "affirmative"
-      true
-    else
-      false
-    end
-  end
 
   #
   # Convert \r\n to \n

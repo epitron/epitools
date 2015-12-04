@@ -3,10 +3,6 @@ Number = Numeric # "obj.is_a? Number" just sounds better.
 
 class Numeric
 
-  def truthy?; self > 0; end
-
-  def number?; true; end
-
   #
   # Convert this number to a string, adding commas between each group of 3 digits.
   #
@@ -251,11 +247,6 @@ end
 
 
 class Integer
-  
-  #
-  # 'true' if the integer is 0
-  #
-  def blank?; self == 0; end
 
   #
   # Convert the number into a hexadecimal string representation.
@@ -375,6 +366,7 @@ end
 
   end
 end
+
 
 class Time
 

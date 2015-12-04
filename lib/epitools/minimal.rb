@@ -1,3 +1,9 @@
+#
+# If you require 'epitools/minimal' instead of 'epitools',
+# this is what you get: core_ext monkeypatches and all the
+# autoloads; the barest essentials for survival.
+#
+
 if RUBY_VERSION[/^1.8/]
   require 'enumerator'
   Enumerator = Enumerable::Enumerator unless defined? Enumerator

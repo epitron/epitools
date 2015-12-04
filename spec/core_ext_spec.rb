@@ -341,7 +341,7 @@ end
 
 describe Integer do
   
-  it "integer?" do
+  it "integer?s" do
     
     {
       true  => [ "123", "000", 123 ],
@@ -403,7 +403,6 @@ end
 describe Float do
 
   it "float?" do
-
     {
       true  => [ "0.0", "1.000", 123.45 ],
       false => [ "123asdf", "asdfasdf", Object.new, nil, 12345, "000", "123" ]
@@ -417,8 +416,8 @@ describe Number do
 
   it "number?" do
     {
-      true  => [ "0.0", "1.000", 123.45, 12345, "000", "123", "1" ],
-      false => [ "123asdf", "asdfasdf", Object.new, nil ]
+      true  => [ "0.0", " 1.0", "1.000", "-1", "-1.25", 123.45, 12345, "000", "123", "1" ],
+      false => [ "123asdf", "abcd123", "asdfasdf", Object.new, nil ]
     }.each do |expected_result, objects|
       objects.each { |object| object.number?.should == expected_result }
     end
@@ -795,6 +794,7 @@ describe BasicObject do
   
 end
 
+
 describe Range do
 
   it "generates random numbers" do
@@ -811,6 +811,7 @@ describe Range do
 
 end
 
+
 describe ObjectSpace do
 
   it "is Enumerable" do
@@ -818,6 +819,7 @@ describe ObjectSpace do
   end
 
 end
+
 
 describe Matrix do
 
@@ -853,19 +855,23 @@ describe Matrix do
 
 end
 
+
 describe "truthiness" do
   
   it "is truthy!" do
     {
       # truthy things
       true => [
-        "yes", "on", "1", "Enabled", 1, 1.7, :blah, true, [1,2,3], [1,2,3].to_enum,
+        "yes", "on", "1", "Enabled",
+        1, 1.7, 
+        :blah, true,
+        [1,2,3], [1,2,3].to_enum,
         1938389127239847129803741980237498012374,
       ],
       
       # untruthy things
       false => [
-        "", " ", "asdf", 0, 0.0, false, nil, [], [].to_enum,
+        "", " ", "\t\n ", "asdf", 0, 0.0, false, nil, [], [].to_enum,
       ]
     }.each do |truthiness, objs|
       objs.each { |obj| obj.truthy?.should == truthiness }
@@ -873,6 +879,7 @@ describe "truthiness" do
   end
   
 end
+
 
 describe "proper grammar" do
 
@@ -916,6 +923,7 @@ describe "global methods" do
 
 end
 
+
 describe "to_jsons and to_yamls" do
   data = {"a"=>"b", "yes"=>true, "hello"=>[1,2,3,4,5]}
   data.to_json.from_json.should == data  
@@ -923,6 +931,7 @@ describe "to_jsons and to_yamls" do
   data = {:a=>"b", 1=>true, "hello"=>[1,2,3,4,5]}
   data.to_yaml.from_yaml.should == data  
 end
+
 
 describe "to_hms and from_hms" do
   60.to_hms.should == "01:00"
