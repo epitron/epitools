@@ -7,6 +7,16 @@ class Object
   def integer?; false; end
    
   #
+  # Default "float?" behaviour.
+  #
+  def float?; false; end
+
+  #
+  # Default "number?" behaviour.
+  #
+  def number?; false; end
+
+  #
   # `truthy?` means `not blank?`
   #
   def truthy?
@@ -19,6 +29,11 @@ class Object
   
 end
 
+class Integer
+
+  def integer?; true; end
+
+end
 
 class TrueClass
 
@@ -40,6 +55,7 @@ class Float
   # 'true' if the float is 0.0
   #
   def blank?; self == 0.0; end
+  def float?; true; end
 
 end
 

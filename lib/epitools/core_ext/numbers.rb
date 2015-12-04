@@ -3,9 +3,9 @@ Number = Numeric # "obj.is_a? Number" just sounds better.
 
 class Numeric
 
-  def integer?; true; end
-
   def truthy?; self > 0; end
+
+  def number?; true; end
 
   #
   # Convert this number to a string, adding commas between each group of 3 digits.

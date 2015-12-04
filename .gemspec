@@ -13,7 +13,7 @@ Gem::Specification.new do |s|
     "README.rdoc",
     "TODO"
   ]
-  s.files = `git ls`.lines.map(&:strip)
+  s.files = `git ls-files`.lines.map(&:strip)
   s.homepage = "http://github.com/epitron/epitools"
   s.licenses = ["WTFPL"]
   s.require_paths = ["lib"]
