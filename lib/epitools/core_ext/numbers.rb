@@ -368,6 +368,23 @@ end
 end
 
 
+class Float
+
+  #
+  # Convert the float to a rounded percentage string (eg: "42%").
+  # Its argument lets you specify how many decimals to display
+  #
+  # eg:
+  #    > 0.32786243.percent # => "33%"
+  #    > 0.32786243.percent(2) # => "32.79%"
+  #
+  def percent(decimals=0)
+    "%0.#{decimals}f%" % (self * 100)
+  end
+
+end
+
+
 class Time
 
   #

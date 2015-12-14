@@ -410,6 +410,14 @@ describe Float do
       objects.each { |object| object.float?.should == expected_result }
     end
   end
+
+  it "percent" do
+    f = 0.716237
+    f.percent.should == "72%"
+    f.percent(2).should == "71.62%"
+    f.percent(3).should == "71.624%"
+  end
+
 end
 
 describe Number do
