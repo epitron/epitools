@@ -398,6 +398,15 @@ describe Integer do
     [3,5,7,11,13,17,23,3628273133].all? { |n| n.should be_prime }
   end
 
+  it "factorializes" do
+    -3.fact.should == -6
+     0.fact.should == 1
+     1.fact.should == 1
+     2.fact.should == 2
+    42.fact.should == 1405006117752879898543142606244511569936384000000000
+     9.fact.should == 9.factorial
+  end
+
 end
 
 describe Float do

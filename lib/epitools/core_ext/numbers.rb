@@ -312,10 +312,16 @@ class Integer
   end
 
   #
-  # Factorial (iterated style)
+  # Factorial
   #
   def fact
-    (2..self).reduce(:*)
+    if self < 0
+      -(1..-self).reduce(:*)
+    elsif self == 0
+      1
+    else
+      (1..self).reduce(:*)
+    end
   end
   alias_method :factorial, :fact
 
