@@ -327,10 +327,11 @@ module Enumerable
   #   [1,2].powerset #=> [[], [1], [2], [1, 2]]
   #
   def powerset
-    # the bit pattern of the numbers from 0..2^(elements)-1 can be used to select the elements of the set...
+    return to_enum(:powerset) unless block_given?
     a = to_a
-    (0...2**a.size).map do |bitmask|
-      a.select.with_index{ |e, i| bitmask[i] == 1 }
+    (0...2**a.size).each do |bitmask|
+      # the bit pattern of the numbers from 0..2^(elements)-1 can be used to select the elements of the set...
+      yield a.select.with_index { |e, i| bitmask[i] == 1 }
     end
   end
 

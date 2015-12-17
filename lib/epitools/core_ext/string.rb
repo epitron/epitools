@@ -1,4 +1,5 @@
 require 'epitools/minimal'
+require 'epitools/core_ext/truthiness'
 require 'epitools/core_ext/numbers'
 
 class String
