@@ -52,6 +52,7 @@ module Net
 end
 
 autoload :Resolv, 'resolv'
+autoload :IPAddr, 'ipaddr'
 
 
 ## Nonstandard library (epitools)
