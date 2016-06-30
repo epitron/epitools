@@ -2,6 +2,9 @@
  TODOs
 ===========================
 
++ Array#histogram
+  |_ Algorithm blows up when there's only 1 bucket (the `range` becomes 0)
+
 + Path
   |_ Fix rename/mv
   |_ Full README with more real-world examples (grep scripts/)
