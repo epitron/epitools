@@ -546,6 +546,9 @@ describe Path do
     attrs["user.diff_element"] = "newtest"
     file.attrs = attrs
     file["user.diff_element"].should == "newtest"
+
+    file["user.null-terminated-string"] = "stuff\u0000"
+    file["user.null-terminated-string"].should == "stuff"
   end
 
   it "changes mtime/atime" do

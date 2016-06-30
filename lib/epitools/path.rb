@@ -546,7 +546,7 @@ class Path
       cmd += ["-x", key]
     else
       # set
-      cmd += ["-n", key, "-v", value]
+      cmd += ["-n", key, "-v", value.to_s.strip]
     end
 
     cmd << path
@@ -1293,7 +1293,7 @@ class Path
   # the directory for the duration of the block, then puts you back where you
   # came from once the block is finished.
   #
-  def self.cd(dest, &block)
+  def self.cd(dest)
     dest = Path[dest]
 
     raise "Can't 'cd' into #{dest}" unless dest.dir?
