@@ -304,6 +304,22 @@ class Integer
   end
 
   #
+  # Return a specified number of primes (optionally starting at the argument)
+  #
+  def primes(starting_at=2)
+    result  = []
+    current = starting_at
+
+    loop do
+      if current.prime?
+        result << current 
+        return result if result.size >= self
+      end
+      current += 1
+    end
+  end
+
+  #
   # Returns the all the prime factors of a number.
   #
   def factors
@@ -430,4 +446,33 @@ class Time
     amount
   end
   
+end
+
+
+class Prime
+
+  #
+  # Return an array of prime numbers within the specified range
+  #
+  def [](range)
+    ubound    = range.end
+    lbound    = range.begin
+    ubound   -= 1 if range.exclude_end?
+    generator = each(ubound)
+    n         = nil
+
+    loop do
+      break if (n = generator.succ) >= lbound
+    end
+
+    [n, *generator.to_a]
+  end
+
+end
+
+#
+# Return an infinite enumerable of primes
+#
+def primes
+  Prime.instance
 end
