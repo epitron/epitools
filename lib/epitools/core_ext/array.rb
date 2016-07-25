@@ -142,11 +142,13 @@ class Array
   #
   # Convert the array to a hash
   #
-  def to_h
-    if self.first.is_a? Array
-      Hash[self]
-    else
-      Hash[*self]
+  unless defined? [].to_h
+    def to_h
+      if self.first.is_a? Array
+        Hash[self]
+      else
+        Hash[*self]
+      end
     end
   end
 
