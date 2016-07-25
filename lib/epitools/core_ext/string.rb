@@ -299,6 +299,13 @@ class String
   end
   
   #
+  # SHA256 the string
+  #  
+  def sha256
+    Digest::SHA256.hexdigest self
+  end
+  
+  #
   # gzip the string
   #
   def gzip(level=nil)
