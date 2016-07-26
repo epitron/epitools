@@ -1018,16 +1018,22 @@ class Path
   def sha1
     Digest::SHA1.file(self).hexdigest
   end
+  alias_method :sha1sum, :sha1
 
   def sha2
     Digest::SHA2.file(self).hexdigest
   end
+  alias_method :sha2sum, :sha2
 
   def md5
     Digest::MD5.file(self).hexdigest
   end
   alias_method :md5sum, :md5
 
+  def sha256
+    Digest::SHA256.file(self).hexdigest
+  end
+  alias_method :sha256sum, :sha256
 
   ## http://ruby-doc.org/stdlib/libdoc/zlib/rdoc/index.html
 
