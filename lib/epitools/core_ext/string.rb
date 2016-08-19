@@ -56,7 +56,7 @@ class String
   #
   # A Regexp to recognize ANSI escape sequences
   #
-  COLOR_REGEXP = /\e\[.*?(\d)+m/
+  COLOR_REGEXP = /\e\[.*?(\d)*[mA-Z]/
 
   #
   # This string contains ANSI (VT100) control codes
