@@ -691,6 +691,7 @@ class Path
   # Append data to this file (accepts a string, an IO, or it can yield the file handle to a block.)
   #
   def append(data=nil)
+    # FIXME: copy_stream might be inefficient if you're calling it a lot. Investigate!
     self.open("ab") do |f|
       if data and not block_given?
         if data.is_an? IO
@@ -705,6 +706,14 @@ class Path
     self
   end
   alias_method :<<, :append
+
+  #
+  # Append data, with a newline at the end
+  #
+  def puts(data=nil)
+    append data
+    append "\n" unless data and data[-1] == "\n"
+  end
 
   #
   # Overwrite the data in this file (accepts a string, an IO, or it can yield the file handle to a block.)
@@ -722,6 +731,7 @@ class Path
       end
     end
   end
+
 
   ###############################################################################
   # Parsing files
