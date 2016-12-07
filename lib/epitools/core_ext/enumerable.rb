@@ -410,8 +410,9 @@ module Enumerable
   #
   def sort_numerically
     sort_by do |e|
-      case e
-      when String
+      e = e.path if e.is_a? Path
+
+      if e.is_a? String
         e.split(/(\d+)/).map { |s| s =~ /^\d+$/ ? s.to_i : s }
       else
         [e]

@@ -627,8 +627,13 @@ describe Enumerable do
 
   it "sorts strings numerically" do
     a  = ["a1", "a11", "a2", "a3"]
-    a.sort_numerically.should == ["a1", "a2", "a3", "a11"]
+    proper = ["a1", "a2", "a3", "a11"]
+
+    a.sort_numerically.should == proper
     a.sort.should_not == a.sort_numerically
+
+    ps = a.map(&:to_Path)
+    ps.sort_numerically.map(&:filename).should == proper
   end
 
 end
