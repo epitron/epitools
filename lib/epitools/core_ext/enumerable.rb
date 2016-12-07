@@ -406,6 +406,20 @@ module Enumerable
   alias_method :grouped, :groups
 
   #
+  # Sort strings by their numerical values
+  #
+  def sort_numerically
+    sort_by do |e|
+      case e
+      when String
+        e.split(/(\d+)/).map { |s| s =~ /^\d+$/ ? s.to_i : s }
+      else
+        [e]
+      end
+    end
+  end
+
+  #
   # Multiplies this Enumerable by something. (Same behaviour as Enumerator#*)
   #
   def *(other)
