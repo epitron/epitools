@@ -11,10 +11,13 @@ end
 
 RbConfig = Config unless defined? RbConfig
 
+Infinity = Float::INFINITY
+Inf      = Float::INFINITY
+
 class Object
 
   unless defined?(__DIR__)
-    # 
+    #
     # This method is convenience for the `File.expand_path(File.dirname(__FILE__))` idiom.
     # (taken from Michael Fellinger's Ramaze... thanx, dood! :D)
     #
@@ -24,7 +27,7 @@ class Object
       ::File.expand_path(::File.join(dir, *args.map{|a| a.to_s}))
     end
   end
-  
+
   #
   # 'autoreq' is a replacement for autoload that can load gems.
   #
@@ -38,7 +41,7 @@ class Object
   #
   def autoreq(const, path=nil, &block)
     raise "Error: autoreq must be supplied with a file to load, or a block." unless !!path ^ block_given?
-    
+
     if block_given?
       Module.autoreqs[const] = block
     else
@@ -67,7 +70,7 @@ class Object
         raise "Error: don't know how to 'del #{x.inspect}'"
     end
   end
-  
+
   # The hidden singleton lurks behind everyone
   if defined? singleton_class
     alias metaclass singleton_class
@@ -179,12 +182,12 @@ end
 class Module
 
   @@autoreq_is_searching_for = nil
-  
+
   alias const_missing_without_autoreq const_missing
-  
+
   def const_missing(const)
     return if const == @@autoreq_is_searching_for
-    
+
     if thing = autoreqs[const]
       case thing
       when String, Symbol
@@ -195,15 +198,15 @@ class Module
         raise "Error: Don't know how to autoload a #{thing.class}: #{thing.inspect}"
       end
     end
-    
+
     @@autoreq_is_searching_for = const
     const_get(const) || const_missing_without_autoreq(const)
   end
-  
+
   def autoreqs
     @@autoreqs ||= {}
   end
-  
+
 end
 
 
@@ -225,7 +228,7 @@ module Kernel
   # Same as Kernel#run, but includes stderr in the result.
   #
   def run_with_stderr(*cmd)
-    result = IO.popen(cmd, err: [:child, :out]) do |io| 
+    result = IO.popen(cmd, err: [:child, :out]) do |io|
       block_given? ? yield(io) : io.read
     end
     String === result && result.empty? ? nil : result
@@ -252,6 +255,36 @@ end
 #
 def Path(arg)
   Path[arg]
+end
+
+####################################################################
+
+class << ARGV
+  def paths_R
+    the_expander = proc do |paths|
+      paths.map { |path| path.dir? ? the_expander.(path.ls_R) : path }
+    end
+
+    the_expander.(paths)
+  end
+  alias_method :recursive_paths, :paths_R
+
+  def paths
+    map(&:to_Path)
+  end
+
+  def opts
+    partition { |arg| arg[/^--?\w{1,2}/].nil? }
+  end
+
+  def args
+    self - opts
+  end
+
+  def regexes
+    map { |arg| /#{Regexp.escape arg}/i }
+  end
+
 end
 
 ####################################################################
