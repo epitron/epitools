@@ -851,6 +851,11 @@ describe Range do
     (10..30).overlaps?(1..15).should == true
   end
 
+  it "optimizes" do
+    ranges = [ 1..5, 2..6, 7..10, 7..20, 25...50, 50..55 ].shuffle
+    Range.optimize(ranges).should == [ 1..6, 7..20, 25...50, 50..55 ]
+  end
+
 end
 
 
