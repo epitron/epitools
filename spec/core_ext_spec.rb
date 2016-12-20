@@ -831,10 +831,24 @@ describe Range do
   end
 
   it "does | and &" do
-    a = (1..10)
-    b = (5...21)
-    a & b == (5..10)
-    a | b == (1..20)
+    a = 1..10
+    b = 5...21
+    (a & b).should == (5..10)
+    (a | b).should == (1..20)
+
+    c = 1..2
+    d = 5..6
+
+    (c | d).should == (c.first..d.last)
+    a.merge(b).should == [a.first..b.last-1]
+    c.merge(d).should == [c, d]
+  end
+
+  it "overlaps?" do
+    (1..10).overlaps?(20..30).should == false
+    (1..10).overlaps?(10..30).should == true
+    (10..30).overlaps?(1..10).should == true
+    (10..30).overlaps?(1..15).should == true
   end
 
 end
