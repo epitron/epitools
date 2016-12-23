@@ -336,6 +336,16 @@ describe String do
     5.mulmod(2).should == [10, 0]
   end
 
+  it "to_i_from_byteses" do
+    i = 2**31
+
+    big_endian_bytes    = [i].pack("L>")
+    little_endian_bytes = [i].pack("L<")
+
+    big_endian_bytes.to_i_from_bytes(true).should == i
+    little_endian_bytes.to_i_from_bytes.should == i
+  end
+
 end
 
 

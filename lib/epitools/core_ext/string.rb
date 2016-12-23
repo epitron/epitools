@@ -10,7 +10,7 @@ class String
   def to_unix
     gsub("\r\n", "\n")
   end
-  
+
   #
   # Remove redundant whitespaces (not including newlines).
   #
@@ -63,7 +63,7 @@ class String
   #
   def contains_color?
     self[COLOR_REGEXP]
-  end  
+  end
   alias_method :contains_colors?, :contains_color?
   alias_method :contains_ansi?,  :contains_color?
 
@@ -73,7 +73,7 @@ class String
   def strip_color
     gsub(COLOR_REGEXP, '')
   end
-  alias_method :strip_ansi, :strip_color 
+  alias_method :strip_ansi, :strip_color
 
   #
   # Like #each_line, but skips empty lines and removes \n's.
@@ -82,7 +82,7 @@ class String
     # note: $/ is the platform's newline separator
     split($/).select{|l| not l.blank? }
   end
-  
+
   alias_method :nicelines,   :nice_lines
   alias_method :clean_lines, :nice_lines
 
@@ -171,7 +171,7 @@ class String
 
 
   #
-  # Wrap all lines at window size, and indent 
+  # Wrap all lines at window size, and indent
   #
   def wrap_and_indent(prefix, width=nil)
     prefix = " "*prefix if prefix.is_a? Numeric
@@ -207,14 +207,14 @@ class String
   def rot13
     tr('n-za-mN-ZA-M', 'a-zA-Z')
   end
-  
+
   #
   # Convert non-URI characters into %XXes.
   #
   def urlencode
     URI.escape(self)
   end
-  
+
   #
   # Convert an URI's %XXes into regular characters.
   #
@@ -241,19 +241,27 @@ class String
   end
 
   #
+  # Raw bytes to an integer (as big as necessary)
+  #
+  def to_i_from_bytes(big_endian=false)
+    bs = reverse ? bytes.reverse_each : bytes.each
+    bs.with_index.inject(0) { |sum,(b,i)| (b << (8*i)) + sum }
+  end
+
+  #
   # Cached constants for base62 decoding.
-  #  
+  #
   BASE62_DIGITS  = Hash[ Integer::BASE62_DIGITS.zip((0...Integer::BASE62_DIGITS.size).to_a) ]
   BASE62_BASE    = Integer::BASE62_BASE
-  
+
   #
   # Convert a string (encoded in base16 "hex" -- for example, an MD5 or SHA1 hash)
-  # into "base62" format. (See Integer#to_base62 for more info.)  
+  # into "base62" format. (See Integer#to_base62 for more info.)
   #
   def to_base62
     to_i(16).to_base62
   end
-  
+
   #
   # Convert a string encoded in base62 into an integer.
   # (See Integer#to_base62 for more info.)
@@ -273,8 +281,8 @@ class String
   def from_base64
     unpack("m").first
   end
-  alias_method :decode64, :from_base64 
-  
+  alias_method :decode64, :from_base64
+
   #
   # Encode into a mime64/base64 string
   #
@@ -286,25 +294,25 @@ class String
 
   #
   # MD5 the string
-  #  
+  #
   def md5
     Digest::MD5.hexdigest self
   end
-  
+
   #
   # SHA1 the string
-  #  
+  #
   def sha1
     Digest::SHA1.hexdigest self
   end
-  
+
   #
   # SHA256 the string
-  #  
+  #
   def sha256
     Digest::SHA256.hexdigest self
   end
-  
+
   #
   # gzip the string
   #
@@ -313,7 +321,7 @@ class String
     Zlib::GzipWriter.wrap(zipped, level) { |io| io.write(self) }
     zipped.string
   end
-  
+
   #
   # gunzip the string
   #
@@ -321,31 +329,31 @@ class String
     data = StringIO.new(self)
     Zlib::GzipReader.new(data).read
   end
-  
+
   #
   # deflate the string
   #
   def deflate(level=nil)
     Zlib::Deflate.deflate(self, level)
   end
-  
+
   #
   # inflate the string
   #
   def inflate
     Zlib::Inflate.inflate(self)
   end
-  
-  # `true` if this string starts with the substring 
-  #  
+
+  # `true` if this string starts with the substring
+  #
   def startswith?(substring)
     self[0...substring.size] == substring
   end
   alias_method :startswith, :startswith?
-  
+
   #
-  # `true` if this string ends with the substring 
-  #  
+  # `true` if this string ends with the substring
+  #
   def endswith?(substring)
     self[-substring.size..-1] == substring
   end
@@ -357,7 +365,7 @@ class String
   def from_json
     JSON.parse(self)
   end
-  
+
   #
   # Parse this string as YAML
   #
@@ -367,7 +375,7 @@ class String
 
   #
   # Unmarshal the string (transform it into Ruby datatypes).
-  #  
+  #
   def unmarshal
     Marshal.restore self
   end
@@ -385,7 +393,7 @@ class String
   #
   def amount(n)
     case n
-    when 0 
+    when 0
       "0 #{self}s"
     when 1, -1
       "#{n} #{self}"
@@ -393,7 +401,7 @@ class String
       "#{n} #{self}s"
     end
   end
-  
+
   #
   # Converts time duration strings (mm:ss, mm:ss.dd, hh:mm:ss, or dd:hh:mm:ss) to seconds.
   # (The reverse of Integer#to_hms)
@@ -407,7 +415,7 @@ class String
     nums_and_units = nums.reverse.zip %w[seconds minutes hours days]
     nums_and_units.map { |num, units| num.send(units) }.sum
   end
-  
+
   #
   # Print a hexdump of the string to STDOUT (coloured, if the terminal supports it)
   #
@@ -415,10 +423,9 @@ class String
     Hex.dump(self)
   end
 
-
   unless public_method_defined? :to_proc
-  
-    #  
+
+    #
     # String#to_proc
     #
     # See http://weblog.raganwald.com/2007/10/stringtoproc.html
@@ -430,7 +437,7 @@ class String
     #
     # (c) 2007 Reginald Braithwaite
     # Portions Copyright (c) 2006 Oliver Steele
-    # 
+    #
     # Permission is hereby granted, free of charge, to any person obtaining
     # a copy of this software and associated documentation files (the
     # "Software"), to deal in the Software without restriction, including
@@ -438,10 +445,10 @@ class String
     # distribute, sublicense, and/or sell copies of the Software, and to
     # permit persons to whom the Software is furnished to do so, subject to
     # the following conditions:
-    # 
+    #
     # The above copyright notice and this permission notice shall be
     # included in all copies or substantial portions of the Software.
-    # 
+    #
     # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
     # EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
     # MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -475,22 +482,21 @@ class String
                   /(?:\b[A-Z]|\.[a-zA-Z_$])[a-zA-Z_$\d]*|[a-zA-Z_$][a-zA-Z_$\d]*:|self|arguments|'(?:[^'\\]|\\.)*'|"(?:[^"\\]|\\.)*"/, ''
               ).scan(
                 /([a-z_$][a-z_$\d]*)/i
-              ) do |v|  
+              ) do |v|
                 params.push(v) unless params.include?(v)
               end
           end
           eval_block("Proc.new { |#{params.join(', ')}| #{expr} }", block)
       end
     end
-    
+
     private
-    
+
     def eval_block(code, block)
       eval code, block && block.binding
     end
-    
+
   end # unless public_method_defined? :to_proc
 
+
 end
-
-
