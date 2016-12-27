@@ -37,11 +37,20 @@ module Enumerable
   end
 
   #
-  # Add reverse_each to old Ruby versions
+  # Convert the Enumerable to an array and return a reversed copy
+  #
+  unless defined? reverse
+    def reverse
+      to_a.reverse
+    end
+  end
+
+  #
+  # Iterate over the Enumerable backwards (after converting it to an array)
   #
   unless defined? reverse_each
     def reverse_each
-      to_a.to_enum(:reverse_each)
+      to_a.reverse_each
     end
   end
 

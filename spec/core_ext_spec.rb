@@ -1012,6 +1012,8 @@ describe File do
     tmp << "hi\nthere\neveryone!\n"
     f = open(tmp)
     f.reverse_each.to_a.should == ["everyone!\n", "there\n", "hi\n"]
+
+    [1,2,3].to_enum(:each).reverse_each { |x| x.class.should == Integer }
   end
 
 end
