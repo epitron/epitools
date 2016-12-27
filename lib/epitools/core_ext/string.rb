@@ -244,7 +244,7 @@ class String
   # Raw bytes to an integer (as big as necessary)
   #
   def to_i_from_bytes(big_endian=false)
-    bs = reverse ? bytes.reverse_each : bytes.each
+    bs = big_endian ? bytes.reverse_each : bytes.each
     bs.with_index.inject(0) { |sum,(b,i)| (b << (8*i)) + sum }
   end
 
