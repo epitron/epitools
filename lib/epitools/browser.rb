@@ -18,7 +18,7 @@ class Mechanize::File
     response['content-type']
   end
 end
-  
+
 
 #
 # A mechanize class that emulates a web-browser, with cache and everything.
@@ -43,8 +43,9 @@ class Browser
     @use_cache    = !!(options[:cache] || options[:cached] || options[:use_cache])
     @use_logs     = options[:logs]           || false
     @cookie_file  = options[:cookiefile]     || "cookies.txt"
-    
-    # TODO: @progress, @user_agent, @logfile, @cache_file (default location: ~/.epitools?) 
+    @cache_file   = options[:cache_file]     || "browser-cache.db"
+
+    # TODO: @progress, @user_agent, @logfile, @cache_file (default location: ~/.epitools?)
 
     if options[:proxy]
       host, port = options[:proxy].split(':')
@@ -59,7 +60,7 @@ class Browser
   def init_agent!
     @agent = Mechanize.new do |a|
       # ["Mechanize", "Mac Mozilla", "Linux Mozilla", "Windows IE 6", "iPhone", "Linux Konqueror", "Windows IE 7", "Mac FireFox", "Mac Safari", "Windows Mozilla"]
-      a.max_history = 10 
+      a.max_history = 10
       a.user_agent_alias = "Windows IE 7"
       a.log = Logger.new "mechanize.log" if @use_logs
     end
@@ -80,7 +81,7 @@ class Browser
 
   def init_cache!
     # TODO: Rescue "couldn't load" exception and disable caching
-    @cache = Cache.new(agent) if @use_cache
+    @cache = Cache.new(@cache_file, agent) if @use_cache
   end
 
   def load_cookies!
@@ -91,23 +92,23 @@ class Browser
       false
     end
   end
-  
+
   def save_cookies!
     agent.cookie_jar.save_as @cookie_file
     true
   end
-  
+
   def relative?(url)
     not url[ %r{^https?://} ]
   end
-  
+
   def cacheable?(page)
     case page.content_type
     when %r{^(text|application)}
       true
     end
-  end    
-  
+  end
+
   def cache_put(page, url)
     if cache.valid_page?(page)
       if page.content_type =~ %r{(^text/|^application/javascript|javascript)}
@@ -117,9 +118,9 @@ class Browser
     end
   end
 
-  
+
   #
-  # Retrieve an URL, and return a Mechanize::Page instance (which acts a 
+  # Retrieve an URL, and return a Mechanize::Page instance (which acts a
   # bit like a Nokogiri::HTML::Document instance.)
   #
   # Options:
@@ -128,7 +129,7 @@ class Browser
   def get(url, options={})
 
     # TODO: Have a base-URL option
-    
+
     #if relative?(url)
     #  url = URI.join("http://base-url/", url).to_s
     #end
@@ -140,13 +141,13 @@ class Browser
 
     puts
     puts "[ GET #{url} (using cache: #{!!use_cache}) ]"
-    
+
     delay unless cached_already
     max_retries = 4
     retries = 0
 
     begin
-      
+
       if use_cache and page = cache.get(url)
         puts "  |_ cached (#{page.content_type})"
       else
@@ -165,11 +166,11 @@ class Browser
 
       puts "  |_ ERROR: #{e.inspect} -- retrying"
       delay(5)
-      retry 
-      
-=begin      
+      retry
+
+=begin
     rescue Mechanize::ResponseCodeError => e
-      
+
       case e.response_code
         when "401" #=> Net::HTTPUnauthorized
           p e
@@ -193,7 +194,7 @@ class Browser
     page
   end
 
-  
+
   #
   # Delegate certain methods to @agent
   #
@@ -202,7 +203,7 @@ class Browser
       agent.send(meth, *args)
     end
   end
-  
+
 end
 
 
@@ -217,11 +218,11 @@ class BrowserOptions < OpenStruct
     :use_logs => false,
     :cookie_file => "cookies.txt"
   }
-  
+
   def initialize(extra_opts)
-    
+
     @opts = DEFAULTS.dup
-    
+
     for key, val in opts
       if key.in? DEFAULTS
         @opts[key] = val
@@ -230,7 +231,7 @@ class BrowserOptions < OpenStruct
       end
     end
   end
-  
+
 end
 =end
 

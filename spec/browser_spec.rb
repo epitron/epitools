@@ -11,7 +11,7 @@ end
 describe Browser do
 
   before :all do
-    @browser = Browser.new
+    @browser = Browser.new use_cache: true
   end
 
   after :all do
@@ -23,16 +23,16 @@ describe Browser do
     page = @browser.get(url)
     @browser.cache.get(url).should_not == nil
   end
-  
+
   it "googles" do
     page = @browser.get("http://google.com")
     page.body["Feeling Lucky"].should_not be_empty
   end
-  
+
   it "googles (cached)" do
     lambda{ @browser.get("http://google.com").body }.should_not raise_error
   end
-  
+
   it "delegates" do
     lambda{ @browser.head("http://google.com").body }.should_not raise_error
     @browser.respond_to?(:post).should == true
@@ -46,9 +46,10 @@ end
 describe Browser::Cache do
 
   before :all do
+    cache_file = "temp-cache.db"
     @agent = Mechanize.new
-    Browser::Cache.new(@agent).delete!
-    @cache = Browser::Cache.new(@agent)
+    Browser::Cache.new(cache_file, @agent).delete!
+    @cache = Browser::Cache.new(cache_file, @agent)
   end
 
   after :all do
