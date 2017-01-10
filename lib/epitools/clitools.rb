@@ -170,32 +170,37 @@ def sudoifnotroot
   end
 end
 
+#
+# Lookup GeoIP information (city, state, country, etc.) for an IP address or hostname
+#
+# (Note: Must be able to find one of /usr/share/GeoIP/GeoIP{,City}.dat, or specified manually
+#        as (an) extra argument(s).)
+#
+def geoip(addr, city_data='/usr/share/GeoIP/GeoIPCity.dat', country_data='/usr/share/GeoIP/GeoIP.dat')
+  (
+    $geoip ||= begin
+      if city_data and File.exists? city_data
+        geo = GeoIP.new city_data
+        proc { |addr| geo.city(addr) }
 
-GEOIP_COUNTRY_DATA = '/usr/share/GeoIP/GeoIP.dat'
-GEOIP_CITY_DATA    = '/usr/share/GeoIP/GeoIPCity.dat'
+      elsif country_data and File.exists? country_data
+        geo = GeoIP.new country_data
+        proc { |addr| geo.country(addr) }
 
-def geoip(addr)
-  $geoip ||= begin
-    if File.exists? GEOIP_CITY_DATA
-      geo = GeoIP.new GEOIP_CITY_DATA
-      proc { |addr| geo.city(addr) }
-
-    elsif File.exists? GEOIP_COUNTRY_DATA
-      geo = GeoIP.new GEOIP_COUNTRY_DATA
-      proc { |addr| geo.country(addr) }
-
-    else
-      raise "Can't find GeoIP data in /usr/share/GeoIP."
+      else
+        raise "Can't find GeoIP data files."
+      end
     end
-  end
-
-  $geoip.call(addr)
+  ).call(addr)
 end
 
 
+#
+# Search the PATH environment variable for binaries, returning the first one that exists
+#
 def which(*bins)
-  ENV["PATH"].split(":").each do |dir|
-    bins.flatten.each do |bin|
+  bins.flatten.each do |bin|
+    ENV["PATH"].split(":").each do |dir|
       full_path = File.join(dir, bin)
       return full_path if File.exists? full_path
     end

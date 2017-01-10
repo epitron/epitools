@@ -1,3 +1,4 @@
+require 'epitools/minimal'
 require 'epitools/clitools'
 
 describe Object do
@@ -31,6 +32,15 @@ describe Object do
     which("totally nonexistant", "probably nonexistant", "ls", "df").should_not == nil
     which("totally nonexistant", "probably nonexistant").should == nil
     which("ls", "df").should =~ /\/ls$/
+  end
+
+  it "'geoip's" do
+    geoip("128.100.100.128").country_name.should == "Canada"
+
+    -> { geoip("butt"*20) }.should raise_error(SocketError)
+
+    $geoip = nil
+    -> { geoip("8.8.4.4", nil, nil) }.should raise_error(RuntimeError)
   end
 
 end
