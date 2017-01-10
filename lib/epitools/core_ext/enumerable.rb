@@ -178,6 +178,35 @@ module Enumerable
 
   alias_method :cut_between, :split_between
 
+
+  #
+  # Map elements of this Enumerable in parallel using a pool full of Threads
+  #
+  # eg: repos.parallel_map { |repo| system "git pull #{repo}" }
+  #
+  def parallel_map(num_workers=8, &block)
+    require 'thread'
+
+    queue = Queue.new
+    each { |e| queue.push e }
+
+    Enumerator.new do |y|
+      workers = (0...num_workers).map do
+        Thread.new do
+          begin
+            while e = queue.pop(true)
+              y << block.call(e)
+            end
+          rescue ThreadError
+          end
+        end
+      end
+
+      workers.map(&:join)
+    end
+  end
+
+
   #
   # Sum the elements
   #
