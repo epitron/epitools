@@ -14,7 +14,7 @@
 # * Allow colour
 # * Don't wrap lines longer than the screen
 # * Quit immediately (without paging) if there's less than one screen of text.
-# 
+#
 # You can change these options by passing a hash to `lesspipe`, like so:
 #
 #   lesspipe(:wrap=>false) { |less| less.puts essay.to_s }
@@ -30,9 +30,9 @@ def lesspipe(*args)
   else
     options = {}
   end
-  
+
   output = args.first if args.any?
-  
+
   params = []
   params << "-R" unless options[:color] == false
   params << "-S" unless options[:wrap] == true
@@ -42,7 +42,7 @@ def lesspipe(*args)
     $stderr.puts "Seeking to end of stream..."
   end
   params << "-X"
-  
+
   IO.popen("less #{params * ' '}", "w") do |less|
     if output
       less.puts output
@@ -50,7 +50,7 @@ def lesspipe(*args)
       yield less
     end
   end
-  
+
 rescue Errno::EPIPE, Interrupt
   # less just quit -- eat the exception.
 end
@@ -74,14 +74,14 @@ end
 def cmd(*args)
 
   cmd_args = []
-  
+
   for arg in args
-    
+
     case arg
-      
+
       when Array
         cmd_literals = arg.shift.split(/\s+/)
-        
+
         for cmd_literal in cmd_literals
           if cmd_literal == "?"
             raise "Not enough substitution arguments" unless cmd_args.any?
@@ -90,22 +90,22 @@ def cmd(*args)
             cmd_args << cmd_literal
           end
         end
-        
+
         raise "More parameters than ?'s in cmd string" if arg.any?
-        
+
       when String
         cmd_args << arg
-        
+
       else
         cmd_args << arg.to_s
-        
+
     end
-    
-  end        
+
+  end
 
   p [:cmd_args, cmd_args] if $DEBUG
-  
-  system(*cmd_args)    
+
+  system(*cmd_args)
 end
 
 
@@ -126,11 +126,11 @@ def prompt(message="Are you sure?", options="Yn")
   default = defaults.first
 
   loop do
-  
+
     print "#{message} (#{optstring}) "
-    
+
     response = STDIN.gets.strip.downcase
-    
+
     case response
     when *opts
       return response
@@ -139,13 +139,13 @@ def prompt(message="Are you sure?", options="Yn")
     else
       puts "  |_ Invalid option: #{response.inspect}. Try again."
     end
-    
+
   end
 end
 
 
 #
-# Automatically install a required commandline tool using the platform's package manager (incomplete -- only supports debian :) 
+# Automatically install a required commandline tool using the platform's package manager (incomplete -- only supports debian :)
 #
 # * apt-get on debian/ubuntu
 # * yum on fedora
@@ -154,7 +154,7 @@ end
 #
 def autoinstall(*packages)
   all_packages_installed = packages.all? { |pkg| Path.which pkg }
-  
+
   unless all_packages_installed
     cmd(["sudo apt-get install ?", packages.join(' ')])
   end
@@ -190,4 +190,15 @@ def geoip(addr)
   end
 
   $geoip.call(addr)
+end
+
+
+def which(*bins)
+  ENV["PATH"].split(":").each do |dir|
+    bins.flatten.each do |bin|
+      full_path = File.join(dir, bin)
+      return full_path if File.exists? full_path
+    end
+  end
+  nil
 end
