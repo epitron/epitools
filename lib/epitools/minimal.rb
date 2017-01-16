@@ -173,6 +173,9 @@ class Object
   end
   alias_method :fap, :self
 
+  def ancestors
+    self.class.ancestors
+  end
 end
 
 
