@@ -28,13 +28,13 @@ describe Object do
 
     lambda {
       time("time test") { raise "ERROR" }
-    }.should raise_error
+    }.should raise_error(RuntimeError)
   end
 
   it "benches" do
     lambda { bench { rand }                 }.should_not raise_error
     lambda { bench(20) { rand }             }.should_not raise_error
-    lambda { bench                          }.should raise_error
+    lambda { bench                          }.should raise_error(RuntimeError)
     lambda { bench(:rand => proc { rand }, :notrand => proc { 1 })        }.should_not raise_error
     lambda { bench(200, :rand => proc { rand }, :notrand => proc { 1 })   }.should_not raise_error
   end
@@ -49,15 +49,15 @@ describe Object do
     s.try(:c).should == nil
 
     lambda { s.try(:c) }.should_not raise_error
-    lambda { s.c }.should raise_error
+    lambda { s.c }.should raise_error(NoMethodError)
 
     def s.test(a); a; end
 
-    s.test(1).should                == 1
-    s.try(:test, 1).should          == 1
+    s.test(1).should       == 1
+    s.try(:test, 1).should == 1
 
-    lambda { s.test }.should raise_error
-    lambda { s.try(:test) }.should raise_error
+    lambda { s.test }.should raise_error(ArgumentError)
+    lambda { s.try(:test) }.should raise_error(ArgumentError)
 
     def s.blocky; yield; end
 
