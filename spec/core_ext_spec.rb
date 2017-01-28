@@ -468,7 +468,15 @@ describe Array do
   end
 
   it "rzips" do
-    [5,39].rzip([:hours, :mins, :secs]).to_a.should == [ [5, :mins], [39, :secs] ]
+    in_times  = [:hours, :mins, :secs]
+    in_tegers =          [   5,    39]
+    out_put   = [[5, :mins], [39, :secs]]
+
+    in_tegers.rzip(in_times).should == out_put
+
+    enum = in_tegers.to_enum.rzip(in_times)
+    enum.is_a?(Enumerator).should == true
+    enum.to_a.should == [ [5, :mins], [39, :secs] ]
   end
 
   it "middles" do
@@ -612,6 +620,13 @@ describe Enumerable do
     a = [1,2,5,6,7,10,11,13]
     result = a.group_neighbours_by { |a,b| b-a <= 1 }
     result.should == [[1,2],[5,6,7],[10,11],[13]]
+  end
+
+  it "grouped_to_h's" do
+    [[:a, 1], [:b, 2], [:a, 0]].grouped_to_h.should == {
+      a: [1,0],
+      b: [2]
+    }
   end
 
   it "includes?s" do

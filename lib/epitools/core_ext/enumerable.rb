@@ -374,6 +374,19 @@ module Enumerable
   end
 
   #
+  # Reverse zip (aligns the ends of two arrays, and zipping them from the right-hand side)
+  #
+  # eg:
+  #   >> [5,39].rzip([:hours, :mins, :secs])
+  #   => [ [:mins, 5], [:secs, 39] ]
+  #
+  # Note: Like zip, it will pad the second array if it's shorter than the first
+  #
+  def rzip(other)
+    reverse_each.zip(other.reverse_each).reverse_each
+  end
+
+  #
   # Does the opposite of #zip -- converts [ [:a, 1], [:b, 2] ] to [ [:a, :b], [1, 2] ]
   #
   def unzip
