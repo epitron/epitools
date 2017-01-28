@@ -123,9 +123,6 @@ class Path
   ###############################################################################
 
   def initialize(newpath, hints={})
-    send("path=", newpath, hints)
-
-    # p hints
     if hints[:unlink_when_garbage_collected]
       backup_path = path.dup
       puts "unlinking #{backup_path} after gc!"
@@ -133,6 +130,8 @@ class Path
         File.unlink backup_path
       end
     end
+
+    send("path=", newpath, hints)
   end
 
   def initialize_copy(other)
@@ -591,6 +590,28 @@ class Path
       end
     end
   end
+
+  def media_tags
+    require 'taglib'
+
+    tags = nil
+
+    TagLib::FileRef.open(path) do |fileref|
+      unless fileref.null?
+        tags = fileref.tag
+        result = {}
+        getters = tags.class.instance_methods(false).group_by {|m| m[/^.+[^=]/] }.map { |k,vs| vs.size == 2 ? k.to_sym : nil }.compact
+        getters.each do |getter|
+          tags[getter] = tags.public_send(getter)
+        end
+      end
+    end
+
+    tags
+  end
+
+  alias_method :id3, :media_tags
+  alias_method :id3tags, :media_tags
 
   #
   # Retrieve one of this file's xattrs
