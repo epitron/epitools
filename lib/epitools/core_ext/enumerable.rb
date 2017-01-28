@@ -409,6 +409,20 @@ module Enumerable
   end
   alias_method :group_neighbors_by, :group_neighbours_by
 
+
+  #
+  # Converts an array of 2-element key/value pairs into a Hash, grouped by key.
+  # (Like to_h, but the pairs can have duplicate keys.)
+  #
+  def grouped_to_h
+    result = Hash.of_arrays
+    each {|k,v| result[k] << v }
+    result
+  end
+  alias_method :group_to_h, :grouped_to_h
+  alias_method :to_h_in_groups, :grouped_to_h
+  alias_method :to_h_grouped, :grouped_to_h
+
   #
   # Convert the array into a stable iterator (Iter) object.
   #
