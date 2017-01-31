@@ -215,8 +215,8 @@ end
 # Note: the 'icon' argument is the path to an image file
 #
 def notify_send(title, body=nil, icon: nil, time: 5)
-  puts "* #{title}"
-  puts "  |_ #{body}"
+  $stderr.puts "* #{title}"
+  $stderr.puts "  |_ #{body}" if body
 
   time_in_ms = time * 1000
 

@@ -374,7 +374,7 @@ module Enumerable
   end
 
   #
-  # Reverse zip (aligns the ends of two arrays, and zipping them from the right-hand side)
+  # Reverse zip (aligns the ends of two arrays, and zips them from right to left)
   #
   # eg:
   #   >> [5,39].rzip([:hours, :mins, :secs])
