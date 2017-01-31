@@ -26,5 +26,9 @@ describe String do
     lambda { cmd( ["test -f ? ?", __FILE__] ) }.should raise_error  # too many ?'s
     lambda { cmd( ["test -f", __FILE__] ) }.should raise_error      # too few ?'s
   end
+
+  it "notifies" do
+    notify_send("butt", "hello i am a butt\nbuttbuttbutt")
+  end
     
 end

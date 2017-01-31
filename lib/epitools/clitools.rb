@@ -174,6 +174,9 @@ end
 GEOIP_COUNTRY_DATA = '/usr/share/GeoIP/GeoIP.dat'
 GEOIP_CITY_DATA    = '/usr/share/GeoIP/GeoIPCity.dat'
 
+#
+# Returns GeoIP city/country information for an IP address or hostname.
+#
 def geoip(addr)
   $geoip ||= begin
     if File.exists? GEOIP_CITY_DATA
@@ -191,3 +194,25 @@ def geoip(addr)
 
   $geoip.call(addr)
 end
+
+
+#
+# Executes notify-send to create a desktop notification on the user's desktop
+#
+# Note: the 'icon' argument is the path to an image file
+#
+def notify_send(title, body, icon: nil, time: 5)
+  puts "* #{title}"
+  puts "  |_ #{body}"
+
+  time_in_ms = time * 1000
+
+  cmd = ["notify-send"]
+  cmd << "--expire-time=#{time_in_ms}"
+  cmd << "--app-name=#{Process.argv0}"
+  cmd << "--icon=#{icon}" if icon
+  cmd += [title, body].map {|s| CGI.escapeHTML s }
+
+  fork { system *cmd }
+end
+
