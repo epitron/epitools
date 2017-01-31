@@ -30,13 +30,13 @@ class Numeric
   #
   # Examples:
   #    234234234523.clamp(0..100)   #=> 100
-  #    12.clamp(0..100)             #=> 12  
+  #    12.clamp(0..100)             #=> 12
   #    -38817112.clamp(0..100)      #=> 0
   #
   def clamp(range)
     if self < range.first
       range.first
-    elsif self >= range.last 
+    elsif self >= range.last
       if range.exclude_end?
         range.last - 1
       else
@@ -51,7 +51,7 @@ class Numeric
   # Time methods
   #
   {
-  
+
     'second'  => 1,
     'minute'  => 60,
     'hour'    => 60 * 60,
@@ -59,23 +59,23 @@ class Numeric
     'week'    => 60 * 60 * 24 * 7,
     'month'   => 60 * 60 * 24 * 30,
     'year'    => 60 * 60 * 24 * 365,
-    
+
   }.each do |unit, scale|
     define_method(unit)     { self * scale }
     define_method(unit+'s') { self * scale }
   end
-  
+
   def ago
     Time.now - self
   end
-  
+
   def from_now
     Time.now + self
   end
 
   #
-  # If `n.times` is like `each`, `n.things` is like `map`. Return 
-  #  
+  # If `n.times` is like `each`, `n.things` is like `map`. Return
+  #
   def things(&block)
     if block_given?
       Array.new(self, &block)
@@ -255,25 +255,25 @@ class Integer
   def to_hex
     "%0.2x" % self
   end
-    
+
   #
   # Convert the number to an array of bits (least significant digit first, or little-endian).
   #
   def to_bits
-    # TODO: Why does thos go into an infinite loop in 1.8.7?
+    # TODO: Why does this go into an infinite loop in 1.8.7?
     ("%b" % self).chars.to_a.reverse.map(&:to_i)
   end
   alias_method :bits, :to_bits
-  
+
   #
   # Cached constants for base62 encoding
   #
-  BASE62_DIGITS   = ['0'..'9', 'A'..'Z', 'a'..'z'].map(&:to_a).flatten 
+  BASE62_DIGITS   = ['0'..'9', 'A'..'Z', 'a'..'z'].map(&:to_a).flatten
   BASE62_BASE     = BASE62_DIGITS.size
 
   #
   # Convert a number to a string representation (in "base62" encoding).
-  # 
+  #
   # Base62 encoding represents the number using the characters: 0..9, A..Z, a..z
   #
   # It's the same scheme that url shorteners and YouTube uses for their
@@ -283,16 +283,16 @@ class Integer
     result = []
     remainder = self
     max_power = ( Math.log(self) / Math.log(BASE62_BASE) ).floor
-    
+
     max_power.downto(0) do |power|
       divisor = BASE62_BASE**power
-      #p [:div, divisor, :rem, remainder]      
+      #p [:div, divisor, :rem, remainder]
       digit, remainder = remainder.divmod(divisor)
       result << digit
     end
-    
+
     result << remainder if remainder > 0
-    
+
     result.map{|digit| BASE62_DIGITS[digit]}.join ''
   end
 
@@ -312,7 +312,7 @@ class Integer
 
     loop do
       if current.prime?
-        result << current 
+        result << current
         return result if result.size >= self
       end
       current += 1
@@ -324,7 +324,7 @@ class Integer
   #
   def factors
     Prime # autoload the prime module
-    prime_division.map { |n,count| [n]*count }.flatten 
+    prime_division.map { |n,count| [n]*count }.flatten
   end
 
   #
@@ -352,31 +352,32 @@ class Integer
 end
 
 #
-# Monkeypatch [] into Bignum and Fixnum using class_eval.
+# Adds integer silcing (returning the bits) and raw-bytes
 #
 # (This is necessary because [] is defined directly on the classes, and a mixin
 #  module will still be overridden by Big/Fixnum's native [] method.)
 #
-[Bignum, Fixnum].each do |klass|
-  
+(RUBY_VERSION >= "2.4" ? [Integer] : [Bignum, Fixnum]).each do |klass|
   klass.class_eval do
-    
+
     alias_method :bit, :"[]"
-    
+
     #
-    # Extends [] so that Integers can be sliced as if they were arrays.
+    # Slice the bits of an integer by passing a range (eg: 1217389172842[0..5] #=> [0, 1, 0, 1, 0, 1])
     #
     def [](arg)
       case arg
       when Integer
-        self.bit(arg)
+        bit(arg)
       when Range
-        self.bits[arg]
+        bits[arg]
       end
     end
-    
+
     #
     # Convert the integer into its sequence of bytes (little endian format: lowest-order-byte first)
+    #
+    # TODO: This could be made much more efficient!
     #
     def bytes
       nbytes = (bit_length / 8.0).ceil
@@ -386,6 +387,9 @@ end
       end
     end
 
+    def big_endian_bytes
+      bytes.reverse
+    end
   end
 end
 
@@ -415,7 +419,7 @@ class Time
   def in_words
     delta   = (Time.now-self).to_i
     a       = delta.abs
-    
+
     amount  = case a
       when 0
         'just now'
@@ -436,16 +440,16 @@ class Time
       else
         "year".amount(a/1.year)
     end
-    
+
     if delta < 0
       amount += " from now"
     elsif delta > 0
       amount += " ago"
     end
-    
+
     amount
   end
-  
+
 end
 
 

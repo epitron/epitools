@@ -51,15 +51,15 @@ class Matrix
   alias_method :draw, :print
 
   #
-  # Allow mathematical operations (*, /, +, -) with a regular number on the right side.
+  # Allow mathematical operations (*, /, +, -) with a scalar (integer or float) on the right side.
   #
   # eg: Matrix.zero(3) + 5
   #
-  %w[* / + -].each do |op|
+  %i[* / + -].each do |op|
     class_eval %{
       def #{op}(other)
         case other
-        when Fixnum, Float
+        when Numeric
           map { |e| e #{op} other }
         else
           super(other)

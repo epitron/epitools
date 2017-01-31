@@ -37,11 +37,20 @@ module Enumerable
   end
 
   #
-  # Add reverse_each to old Ruby versions
+  # Convert the Enumerable to an array and return a reversed copy
+  #
+  unless defined? reverse
+    def reverse
+      to_a.reverse
+    end
+  end
+
+  #
+  # Iterate over the Enumerable backwards (after converting it to an array)
   #
   unless defined? reverse_each
     def reverse_each
-      to_a.to_enum(:reverse_each)
+      to_a.reverse_each
     end
   end
 
@@ -168,6 +177,35 @@ module Enumerable
   end
 
   alias_method :cut_between, :split_between
+
+
+  #
+  # Map elements of this Enumerable in parallel using a pool full of Threads
+  #
+  # eg: repos.parallel_map { |repo| system "git pull #{repo}" }
+  #
+  def parallel_map(num_workers=8, &block)
+    require 'thread'
+
+    queue = Queue.new
+    each { |e| queue.push e }
+
+    Enumerator.new do |y|
+      workers = (0...num_workers).map do
+        Thread.new do
+          begin
+            while e = queue.pop(true)
+              y << block.call(e)
+            end
+          rescue ThreadError
+          end
+        end
+      end
+
+      workers.map(&:join)
+    end
+  end
+
 
   #
   # Sum the elements
@@ -336,6 +374,19 @@ module Enumerable
   end
 
   #
+  # Reverse zip (aligns the ends of two arrays, and zipping them from the right-hand side)
+  #
+  # eg:
+  #   >> [5,39].rzip([:hours, :mins, :secs])
+  #   => [ [:mins, 5], [:secs, 39] ]
+  #
+  # Note: Like zip, it will pad the second array if it's shorter than the first
+  #
+  def rzip(other)
+    reverse_each.zip(other.reverse_each).reverse_each
+  end
+
+  #
   # Does the opposite of #zip -- converts [ [:a, 1], [:b, 2] ] to [ [:a, :b], [1, 2] ]
   #
   def unzip
@@ -371,6 +422,20 @@ module Enumerable
   end
   alias_method :group_neighbors_by, :group_neighbours_by
 
+
+  #
+  # Converts an array of 2-element key/value pairs into a Hash, grouped by key.
+  # (Like to_h, but the pairs can have duplicate keys.)
+  #
+  def grouped_to_h
+    result = Hash.of_arrays
+    each {|k,v| result[k] << v }
+    result
+  end
+  alias_method :group_to_h, :grouped_to_h
+  alias_method :to_h_in_groups, :grouped_to_h
+  alias_method :to_h_grouped, :grouped_to_h
+
   #
   # Convert the array into a stable iterator (Iter) object.
   #
@@ -404,6 +469,21 @@ module Enumerable
     group_by(&:self)
   end
   alias_method :grouped, :groups
+
+  #
+  # Sort strings by their numerical values
+  #
+  def sort_numerically
+    sort_by do |e|
+      e = e.path if e.is_a? Path
+
+      if e.is_a? String
+        e.split(/(\d+)/).map { |s| s =~ /^\d+$/ ? s.to_i : s }
+      else
+        [e]
+      end
+    end
+  end
 
   #
   # Multiplies this Enumerable by something. (Same behaviour as Enumerator#*)

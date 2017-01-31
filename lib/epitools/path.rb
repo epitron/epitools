@@ -124,6 +124,15 @@ class Path
 
   def initialize(newpath, hints={})
     send("path=", newpath, hints)
+
+    # p hints
+    if hints[:unlink_when_garbage_collected]
+      backup_path = path.dup
+      puts "unlinking #{backup_path} after gc!"
+      ObjectSpace.define_finalizer self do |object_id|
+        File.unlink backup_path
+      end
+    end
   end
 
   def initialize_copy(other)
@@ -969,9 +978,11 @@ class Path
     if dest.startswith("/")
       Path.ln_s(self, dest)
     else
-      Path.ln_s(self, self / dest )
+      Path.ln_s(self, self / dest)
     end
   end
+
+  alias_method :symlink_to, :ln_s
 
   ## Owners and permissions
 
@@ -1054,7 +1065,7 @@ class Path
     Zlib.deflate(read, level)
   end
   alias_method :gzip, :deflate
-  
+
 
   #
   # gunzip the file, returning the result as a string
@@ -1270,21 +1281,24 @@ class Path
   # TODO: Remove the tempfile when the Path object is garbage collected or freed.
   #
   def self.tmpfile(prefix="tmp")
-    path = Path[ Tempfile.new(prefix).path ]
+    path = Path.new Tempfile.new(prefix).path, unlink_when_garbage_collected: true
     yield path if block_given?
     path
   end
   alias_class_method :tempfile, :tmpfile
   alias_class_method :tmp,      :tmpfile
 
+
+  #
+  # Create a uniqely named directory in /tmp
+  #
   def self.tmpdir(prefix="tmp")
     t = tmpfile
-
-    # FIXME: These operations should be atomic
-    t.rm; t.mkdir
-
+    t.rm; t.mkdir # FIXME: These two operations should be made atomic
     t
   end
+  alias_class_method :tempdir, :tmpdir
+
 
   def self.home
     Path[ENV['HOME']]

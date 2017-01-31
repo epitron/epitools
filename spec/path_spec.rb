@@ -234,7 +234,7 @@ describe Path do
 
     path.touch
     lambda { path.rename(:ext=>".dat") }.should raise_error
-    
+
     dest.rm
     path.rename!(:ext=>".dat")
     path.to_s.should_not == old_name
@@ -483,16 +483,15 @@ describe Path do
   end
 
   it 'symlinks relative dirs' do
-    raise "Path.ln_s arguments are backwards. It needs to be something easier to remember, like 'Path#symlink_to'"
     tmpdir = Path.tmpdir
 
     symlink = (tmpdir/"a_new_link")
-    symlink.ln_s "../../etc/passwd"
+    Path["../../etc/passwd"].ln_s symlink
 
     symlink.symlink?.should == true
 
     symlink.rm
-    dir.rm
+    tmpdir.rm
   end
 
   it 'swaps two files' do

@@ -44,14 +44,11 @@ class Array
   end
 
   #
-  # zip from the right (or reversed zip.)
-  #
-  # eg:
-  #   >> [5,39].rzip([:hours, :mins, :secs])
-  #   => [ [:mins, 5], [:secs, 39] ]
+  # see: Enumerable#rzip
   #
   def rzip(other)
-    reverse_each.zip(other.reverse_each).reverse_each
+    super.to_a
+    # reverse_each.zip(other.reverse_each).reverse_each.to_a
     # reverse.zip(other.reverse).reverse # That's a lotta reverses!
   end
 
@@ -166,7 +163,7 @@ class Array
   #          }
   #
   def histogram(n_buckets=10, options={})
-    
+
     use_ranges = options[:ranges] || options[:hash]
 
     min_val     = min
