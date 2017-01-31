@@ -214,7 +214,7 @@ end
 #
 # Note: the 'icon' argument is the path to an image file
 #
-def notify_send(title, body, icon: nil, time: 5)
+def notify_send(title, body=nil, icon: nil, time: 5)
   puts "* #{title}"
   puts "  |_ #{body}"
 
@@ -224,7 +224,8 @@ def notify_send(title, body, icon: nil, time: 5)
   cmd << "--expire-time=#{time_in_ms}"
   cmd << "--app-name=#{Process.argv0}"
   cmd << "--icon=#{icon}" if icon
-  cmd += [title, body].map {|s| CGI.escapeHTML s }
+  cmd << CGI.escapeHTML(title)
+  cmd << CGI.escapeHTML(body) if body
 
   fork { system *cmd }
 end
