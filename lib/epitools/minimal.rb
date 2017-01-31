@@ -262,38 +262,38 @@ end
 
 ####################################################################
 
-class << ARGV
+# class << ARGV
 
-  def opts
-    partition { |arg| arg[/^--?\w{1,2}/].nil? }
-  end
+#   def opts
+#     @opts, @args ||= partition { |arg| arg[/^--?\w{1,2}/].nil? }
+#   end
 
-  def args
-    self - opts
-  end
+#   def args
+#     @args ? @args : opts && @args
+#   end
 
-  def paths
-    map(&:to_Path)
-  end
+#   def paths
+#     map(&:to_Path)
+#   end
 
-  def paths_R
-    recursive_proc = proc do |paths|
-      paths.map { |path| path.dir? ? the_expander.(path.ls_R) : path }
-    end
+#   def paths_R
+#     recursive_proc = proc do |paths|
+#       paths.map { |path| path.dir? ? the_expander.(path.ls_R) : path }
+#     end
 
-    recursive_proc.(paths)
-  end
-  alias_method :recursive_paths, :paths_R
+#     recursive_proc.(paths)
+#   end
+#   alias_method :recursive_paths, :paths_R
 
-  def regexes(escaped: true, case_sensitive: false)
-    if case_sensitive
-      map { |arg| /#{escaped ? Regexp.escape(arg) : arg}/ } # NO 'i'
-    else
-      map { |arg| /#{escaped ? Regexp.escape(arg) : arg}/i }
-    end
-  end
+#   def regexes(escaped: true, case_sensitive: false)
+#     if case_sensitive
+#       map { |arg| /#{escaped ? Regexp.escape(arg) : arg}/ } # NO 'i'
+#     else
+#       map { |arg| /#{escaped ? Regexp.escape(arg) : arg}/i }
+#     end
+#   end
 
-end
+# end
 
 ####################################################################
 
