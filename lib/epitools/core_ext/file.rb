@@ -102,7 +102,7 @@ class File
   # Scan through the file until `string` is found, and set the IO's +pos+ to the first character of the matched string.
   #
   def seek_to(string, blocksize=512)
-    raise "Error: blocksize must be at least as large as the string" if string.size < blocksize
+    raise "Error: blocksize must be at least as large as the string" if blocksize < string.size
 
     loop do
       data = read(blocksize)
@@ -111,18 +111,20 @@ class File
         seek(-(data.size - index), IO::SEEK_CUR)
         break
       elsif eof?
-        break
+        return nil
       else
         seek(-(string.size - 1), IO::SEEK_CUR)
       end
     end
+
+    pos
   end
 
   #
   # Scan backwards in the file until `string` is found, and set the IO's +pos+ to the first character after the matched string.
   #
   def seek_backwards_to(string, blocksize=512, rindex_end=-1)
-    raise "Error: blocksize must be at least as large as the string" if string.size < blocksize
+    raise "Error: blocksize must be at least as large as the string" if blocksize < string.size
 
     loop do
       data = reverse_read(blocksize)
@@ -131,11 +133,13 @@ class File
         seek(index+string.size, IO::SEEK_CUR)
         break
       elsif pos == 0
-        break
+        return nil
       else
         seek(string.size - 1, IO::SEEK_CUR)
       end
     end
+
+    pos
   end
   alias_method :reverse_seek_to, :seek_backwards_to
 
