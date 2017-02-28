@@ -125,14 +125,13 @@ class Path
   def initialize(newpath, hints={})
     send("path=", newpath, hints)
 
-    # p hints
-    if hints[:unlink_when_garbage_collected]
-      backup_path = path.dup
-      puts "unlinking #{backup_path} after gc!"
-      ObjectSpace.define_finalizer self do |object_id|
-        File.unlink backup_path
-      end
-    end
+    # if hints[:unlink_when_garbage_collected]
+    #   backup_path = path.dup
+    #   puts "unlinking #{backup_path} after gc!"
+    #   ObjectSpace.define_finalizer self do |object_id|
+    #     File.unlink backup_path
+    #   end
+    # end
   end
 
   def initialize_copy(other)

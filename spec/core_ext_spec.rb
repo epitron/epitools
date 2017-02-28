@@ -1022,6 +1022,24 @@ end
 
 describe File do
 
+  it "seeks_to" do
+    tmp = Path.tmp
+    tmp << "012345hello7890"
+    f = open(tmp)
+
+    f.seek_to("hell", 4)
+
+    f.pos.should == 6
+    f.read(4).should == "hell"
+
+    f.seek(-1, IO::SEEK_END)
+
+    f.seek_backwards_to("hell", 5)
+
+    f.pos.should == 10
+    f.read(4).should == "o789"
+  end
+
   it "reverse_eaches" do
     tmp = Path.tmp
     tmp << "hi\nthere\neveryone!\n"
