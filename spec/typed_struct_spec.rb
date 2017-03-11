@@ -1,7 +1,7 @@
 require 'epitools'
 
 describe TypedStruct do
-  
+
   it "works" do
     t = TypedStruct["a:int b c:boolean d:timestamp"].new
 
@@ -10,7 +10,7 @@ describe TypedStruct do
     t.b = "111"; t.b.should == "111"
     t.c = "yes"; t.c.should == true
     #t.c?.should == true
-  end    
+  end
 
   it "compact syntaxes" do
     t = TypedStruct["a,b:int c,d:bool"].new(1,2,1,0)
@@ -36,8 +36,8 @@ describe TypedStruct do
     lambda { ts.new a: 1, b: 2 }.should raise_error
 
     ts = TypedStruct["a:int -"]
-    lambda { 
-      t = ts.new a: 1, b: 2 
+    lambda {
+      t = ts.new a: 1, b: 2
       t.a.should == 1
       lambda { t.b }.should raise_error
     }.should_not raise_error
@@ -46,6 +46,6 @@ describe TypedStruct do
   it "can't use wildcard and drop unknown at once" do
     lambda { TypedStruct["a:int - *"].new }.should raise_error
   end
-  
+
 end
 

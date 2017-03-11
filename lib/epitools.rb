@@ -15,7 +15,7 @@ end
 # Load the things that can't be autoloaded
 #
 %w[
-  core_ext 
+  core_ext
   zopen
   colored
   clitools

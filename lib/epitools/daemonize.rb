@@ -20,7 +20,7 @@ module Kernel
     STDIN.reopen("/dev/null")
     STDOUT.reopen("/dev/null", "a")
     STDERR.reopen(STDOUT)
-    
+
     Dir.chdir(chdir) if chdir
     File.umask 0033 # FIXME ask somebody knowledgable about a sensible value
 

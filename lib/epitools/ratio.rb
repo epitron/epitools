@@ -1,7 +1,7 @@
 #
 # The ratio between two numbers (eg: 2:1, 3:4)
 #
-# Can be compared, added, "percent"ed, "to_f"ed, and displayed. 
+# Can be compared, added, "percent"ed, "to_f"ed, and displayed.
 #
 class Ratio
 

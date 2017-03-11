@@ -1,11 +1,11 @@
 
 class Object
-  
+
   #
   # Default "integer?" behaviour.
   #
   def integer?; false; end
-   
+
   #
   # Default "float?" behaviour.
   #
@@ -26,7 +26,7 @@ class Object
       not nil?
     end
   end
-  
+
 end
 
 
@@ -50,7 +50,7 @@ class Numeric
 
   def number?; true; end
 
-end  
+end
 
 
 class Integer
@@ -98,7 +98,7 @@ end
 
 
 class String
-  
+
   #
   # Could this string be cast to an integer?
   #

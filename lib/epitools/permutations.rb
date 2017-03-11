@@ -1,9 +1,9 @@
 require 'epitools'
 
 class Array
-  
+
   alias_method :mult, :"*"
-  
+
   #
   # Overloaded * operator.
   #
@@ -26,14 +26,14 @@ class Array
       send(:mult, other)
     end
   end
-  
+
   #
   # Multiply the array by itself 'exponent'-times.
   #
   def **(exponent)
     ([self] * exponent).foldl(:*)
   end
-  
+
   def all_pairs(reflexive=false)
     (0...size).each do |a|
       start = reflexive ? a : a+1
@@ -42,9 +42,9 @@ class Array
       end
     end
   end
-  
+
   enumerable :all_pairs
-  
+
 end
 
 
@@ -55,7 +55,7 @@ end
 # permute is passed in as a block. For example:
 #
 #   >> perms(1) { [1,2,3,4] }
-#   => [[1], [2], [3], [4]] 
+#   => [[1], [2], [3], [4]]
 #   >> perms(2) { [1,2,3,4] }
 #   => [[1, 1], [1, 2], [1, 3], [1, 4], [2, 1], [2, 2], [2, 3], [2, 4],
 #       [3, 1], [3, 2], [3, 3], [3, 4], [4, 1], [4, 2], [4, 3], [4, 4]]
@@ -68,14 +68,14 @@ def perms(size, n=0, stack=[], &block)
   results = []
   if n >= size
     results << stack
-  else  
+  else
     ps.each do |p|
       results += perms(size, n+1, stack + [p], &block)
     end
   end
   results
 end
-  
+
 
 if $0 == __FILE__
   puts "-------------- foldl ---"

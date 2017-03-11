@@ -15,14 +15,14 @@ describe Term do
     #puts "columns"
     #puts table.by_columns :border=>true
     #puts "rows"
-    #puts table.by_rows 
+    #puts table.by_rows
     puts table.by_rows
 
     table.by_columns.should_not be_nil
     table.by_rows.should_not be_nil
 
     table.border = true
-    
+
     table.by_columns.should_not be_nil
     table.by_rows.should_not be_nil
 
@@ -37,22 +37,22 @@ describe Term do
     # end
 
     # Term::Table[
-    #   [1,2,3], 
-    #   [4,5,6] 
+    #   [1,2,3],
+    #   [4,5,6]
     # ]
-    
+
     table = Term::Table.new
     table.rows = [ [1,2,3], [4,5,6] ]
     table.rows << [1,2,3]
     table.rows << [4,5,6]
     table.add_row [1,2,3,4,5]
   end
-  
+
   it "tables nothing" do
     table = Term::Table.new []
     lambda { table.by_rows }.should_not raise_error
     lambda { table.by_columns }.should_not raise_error
   end
-  
+
 end
 

@@ -8,30 +8,30 @@ class Line # :nodoc:
   attr_accessor :path, :num, :meth, :dir, :filename
 
   def initialize(path, num, meth)
-    
+
     @path = path
     @num = num
     @meth = meth
     @gem = false
-    
+
     @dir, @filename = File.split(path)
-    
+
     if @dir =~ %r{^/usr/lib/ruby/gems/1.8/gems/(.+)}
       @dir = "[gem] #{$1}"
       @gem = true
     end
-    
+
   end
 
   def gem?
-    @gem 
+    @gem
   end
 
   def codeline
     l = @num.to_i - 1
     open(path).readlines[l]
   end
-  
+
 end
 
 
@@ -76,7 +76,7 @@ def color_backtrace_2(lines, options={})
     groups.map! { |group| group.first.gem? ? [] : group }
   end
 
-  
+
   for group in groups
     if group.empty?
       puts " ... ignored ... "
@@ -92,7 +92,7 @@ def color_backtrace_2(lines, options={})
 
     #puts "#{firstline.filename.green} (#{firstline.dir.light_white})"
     puts "#{firstline.filename.underline} (#{firstline.dir.light_white})"
-    
+
     max_methsize = group.map { |line| line.meth.size}.max
     group.each do |line|
       pad = " " * (max_methsize - line.meth.size)
@@ -101,7 +101,7 @@ def color_backtrace_2(lines, options={})
     end
     puts
   end
-  
+
 end
 
 
@@ -252,13 +252,13 @@ if $0 == __FILE__
       /usr/local/lib/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
       script/server:3
   }.lines
-  
+
   begin
     String.new nil
   rescue => e
     backtrace = e.backtrace
   end
-  
+
   lines = parse_lines(backtrace)
   #debug_backtrace(lines)
   #color_backtrace_1(lines)

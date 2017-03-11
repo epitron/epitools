@@ -14,10 +14,10 @@ end
 
 
 def longest_common_subsequence(s1, s2)
- 
+
   num = Array.new(s1.size) { Array.new(s2.size) }
   len, ans = 0
- 
+
   s1.chars.each_with_index do |l1, i|
     s2.chars.each_with_index do |l2, j|
       unless l1==l2
@@ -34,6 +34,6 @@ def longest_common_subsequence(s1, s2)
   end
 
   ans
- 
+
 end
 
