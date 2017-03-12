@@ -67,7 +67,7 @@ if $0 == __FILE__
 
   puts "Random data (now in colour!):"
   Hex.dump(data)
-  
+
   puts
 
   data = "1234567890"*10

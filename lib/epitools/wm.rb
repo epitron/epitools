@@ -18,7 +18,7 @@ module WM
       # check the children
       results = windows.select { |w| w.process.children.any? {|pr| pr.pid == pid } }
     end
-    
+
     results
   end
 
@@ -39,11 +39,11 @@ module WM
       fields = line.split
       fields[1] = (fields[1] == "*") # cast to boolean
       fields[5] = nil if fields[5] == "N/A" # N/A becomes nil
-      
+
       name = fields[9..-1].join(" ")
-      
+
       new *(fields.values_at(0,1,3,5,8) + [name])
-    end    
+    end
 
     def current?
       current
@@ -70,7 +70,7 @@ module WM
       # 0x048001f8  5 4080   311  186  1316 835  fizz Gorillaz - Highway (Under Construction)
       # 0x02c28577  4 3012   66   461  1143 548  fizz Terminal
       # 0x07c00003  0 14117  12   73   1298 948  fizz tr1984001_comp_soft.pdf
-      # 0x02d767d8  2 3012   520  470  1143 548  fizz Terminal    
+      # 0x02d767d8  2 3012   520  470  1143 548  fizz Terminal
 
       fields = line.split
       title  = fields[8..-1].join ' '
@@ -371,7 +371,7 @@ module WM
         # p events
         eventstring = events.map { |e| e + "\n" }.join("")
 
-        temp.write eventstring 
+        temp.write eventstring
         temp.flush
         temp.seek 0
         # p [:temp, temp.read]

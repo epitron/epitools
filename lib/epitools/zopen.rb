@@ -38,7 +38,7 @@ def zopen(path, mode="rb")
   else
     io = open(path)
   end
-  
+
   if block_given?
     result = yield(io)
     io.close
@@ -46,5 +46,5 @@ def zopen(path, mode="rb")
   else
     io
   end
-  
+
 end

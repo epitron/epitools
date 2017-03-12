@@ -21,11 +21,11 @@
 #   ["bigdecimal"]               => BigDecimal
 #   ["hex"]                      => Integer
 #   ["date", "time", "datetime"] => DateTime (using DateTime.parse)
-#   ["timestamp", "unixtime"]    => Time (using Time.at) 
+#   ["timestamp", "unixtime"]    => Time (using Time.at)
 #   ["bool", "boolean"]          => Boolean, using the following rules:
-#                                    false when: false, nil, 0, "0", "off", "no", 
+#                                    false when: false, nil, 0, "0", "off", "no",
 #                                                "false", "disabled", "disable"
-#                                     true when: true, 1, "1", "on",  "yes", 
+#                                     true when: true, 1, "1", "on",  "yes",
 #                                                "true", "enabled", "enable"
 #
 class TypedStruct < Struct
@@ -48,7 +48,7 @@ class TypedStruct < Struct
     ["hex"]                      => proc { |me| me.to_i(16) },
     ["date", "time", "datetime"] => proc { |me| DateTime.parse me },
     ["timestamp", "unixtime"]    => proc { |me| Time.at me },
-    ["bool", "boolean"]          => proc do |me| 
+    ["bool", "boolean"]          => proc do |me|
       case me
       when false, nil, 0, /^(0|off|no|false|disabled?)$/
         false
@@ -93,7 +93,7 @@ class TypedStruct < Struct
     struct = new(*pairs.transpose.first)
 
     # overload setter methods to call the proc
-    pairs.each do |field, converter| 
+    pairs.each do |field, converter|
       next if converter == :passthru
       struct.send(:define_method, "#{field}=") do |val|
         self[field] = ( val and converter.call val )

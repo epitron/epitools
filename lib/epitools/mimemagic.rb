@@ -1,16 +1,16 @@
 #
 # MimeMagic is a library to detect the mime type of a file by extension or by content.
-# 
+#
 # Usage
 # =====
-# 
+#
 #    require 'mimemagic'
 #    MimeMagic.by_extension('html').text?
 #    MimeMagic.by_extension('.html').child_of? 'text/plain'
 #    MimeMagic.by_path('filename.txt')
 #    MimeMagic.by_magic(File.open('test.html'))
 #    etc...
-# 
+#
 # Authors
 # =======
 # Daniel Mendler
@@ -73,7 +73,7 @@ class MimeMagic
   def extensions
     TYPES.key?(type) ? TYPES[type][0] : []
   end
-  
+
   # Default extension
   def ext
     extensions.first
@@ -116,12 +116,12 @@ class MimeMagic
     type == x.to_s
   end
 
-  # allow comparison with hashes  
+  # allow comparison with hashes
   def hash
     type.hash
   end
-  
-  # allow comparison with something else  
+
+  # allow comparison with something else
   def eql?(other)
     self.type == other.type
   end

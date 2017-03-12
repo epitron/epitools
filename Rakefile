@@ -3,7 +3,7 @@ gem_version = File.read("VERSION").strip
 task :build do
   system "gem build .gemspec"
 end
- 
+
 task :release => :build do
   system "gem push epitools-#{gem_version}.gem"
 end
@@ -18,7 +18,7 @@ end
 
 task :spec do
   cmd = %w[rspec -fd -c spec]
-  
+
   if system *%w[which rescue]
     system *(["rescue"]+cmd)
   else

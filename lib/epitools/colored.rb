@@ -32,7 +32,7 @@
 #
 # Since the presence of a terminal is detected automatically, the colors will be
 # disabled when you pipe your program to another program. However, if you want to
-# show colors when piped (eg: when you pipe to `less -R`), you can force it: 
+# show colors when piped (eg: when you pipe to `less -R`), you can force it:
 #
 #   >> Colored.enable!
 #   >> Colored.disable!
@@ -49,10 +49,10 @@ module Colored
 
   @@is_tty = STDOUT.isatty
 
-  COLORS = { 
+  COLORS = {
     'black'   => 30,
-    'red'     => 31, 
-    'green'   => 32, 
+    'red'     => 31,
+    'green'   => 32,
     'yellow'  => 33,
     'blue'    => 34,
     'magenta' => 35,
@@ -62,13 +62,13 @@ module Colored
   }
 
   EXTRAS = {
-    'clear'     => 0, 
+    'clear'     => 0,
     'bold'      => 1,
     'light'     => 1,
     'underline' => 4,
     'reversed'  => 7
   }
-  
+
   #
   # BBS-style numeric color codes.
   #
@@ -99,9 +99,9 @@ module Colored
 
     Set.new(normal + lights + brights + on_backgrounds + ["grey", "gray"])
   end
-  
+
   COLORS.each do |color, value|
-    define_method(color) do 
+    define_method(color) do
       colorize(self, :foreground => color)
     end
 
@@ -133,10 +133,10 @@ module Colored
 
   alias_method :gray, :light_black
   alias_method :grey, :light_black
-  
+
   EXTRAS.each do |extra, value|
     next if extra == 'clear'
-    define_method(extra) do 
+    define_method(extra) do
       colorize(self, :extra => extra)
     end
   end
@@ -173,7 +173,7 @@ module Colored
     if string == nil
       return self.tagged_colors
     end
-    
+
     if @@is_tty
       colored = [color(options[:foreground]), color("on_#{options[:background]}"), extra(options[:extra])].compact * ''
       colored << string
@@ -221,7 +221,7 @@ module Colored
     background = color_name.to_s =~ /on_/
     color_name = color_name.to_s.sub('on_', '')
     return unless color_name && COLORS[color_name]
-    "\e[#{COLORS[color_name] + (background ? 10 : 0)}m" 
+    "\e[#{COLORS[color_name] + (background ? 10 : 0)}m"
   end
 
   #
@@ -231,7 +231,7 @@ module Colored
     @@is_tty
   end
 
-  alias_method :is_tty?, :enabled? 
+  alias_method :is_tty?, :enabled?
 
   #
   # Color commands will always produce colored strings, regardless
@@ -240,7 +240,7 @@ module Colored
   def enable!
     @@is_tty = true
   end
-  
+
   alias_method :force!, :enable!
 
   #
@@ -263,12 +263,12 @@ module Colored
 
   #
   # Is this string legal?
-  #     
+  #
   def valid_tag?(tag)
     VALID_COLORS.include?(tag) or
       (tag =~ /^\d+$/ and BBS_COLOR_TABLE.include?(tag.to_i) )
   end
-    
+
   #
   # Colorize a string that has "color tags".
   #
@@ -278,18 +278,18 @@ module Colored
     # split the string into tags and literal strings
     tokens          = self.split(/(<\/?[\w\d_]+>)/)
     tokens.delete_if { |token| token.size == 0 }
-    
+
     result        = ""
 
     tokens.each do |token|
 
       # token is an opening tag!
-      
+
       if /<([\w\d_]+)>/ =~ token and valid_tag?($1)
         stack.push $1
 
-      # token is a closing tag!      
-      
+      # token is a closing tag!
+
       elsif /<\/([\w\d_]+)>/ =~ token and valid_tag?($1)
 
         # if this color is on the stack somwehere...
@@ -301,19 +301,19 @@ module Colored
         end
 
       # token is a literal string!
-      
+
       else
 
         color = (stack.last || "white")
         color = BBS_COLOR_TABLE[color.to_i] if color =~ /^\d+$/
         result << token.send(color)
-        
+
       end
-      
+
     end
-    
+
     result
-  end  
+  end
 
 end unless Object.const_defined? :Colored
 
