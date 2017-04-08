@@ -771,6 +771,13 @@ class Path
     end
   end
 
+  #
+  # Treat each line of the file as a json object, and parse them all, returning an array of hashes
+  #
+  def parse_lines
+    each_line.map { |line| JSON.parse line }
+  end
+
   # Parse the file as JSON
   def read_json
     JSON.load(io)
