@@ -63,6 +63,20 @@ class Hash
   end
 
   #
+  # Convert the keys to symbols in-place, for fun and profit
+  #
+  def symbolize_keys!
+    map_keys! { |k| k.to_sym }
+  end
+
+  #
+  # Return a hash with its keys converted to symbols, for great justice
+  #
+  def symbolize_keys
+    dup.symbolize_keys!
+  end
+
+  #
   # Returns a hash containing only the keys passed as arguments.
   #
   def slice(*keys)
