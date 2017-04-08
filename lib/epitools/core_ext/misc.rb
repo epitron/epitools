@@ -209,12 +209,12 @@ module URI
 
 end
 
+#
+# Stupid workaround for URI blowing up when it receives a [ or ] character
+#
 module Better_URI_RFC3986_Parser # ::RFC3986_relative_ref
   ESCAPE_ME_PLZ = "[]{}!"
 
-  #
-  # Stupid workaround for URI blowing up when it receives a [ or ] character
-  #
   def split(uri)
     subsitutions = ESCAPE_ME_PLZ.chars.map { |c| [c, CGI.escape(c)] }
     subsitutions << [" ", "%20"]
