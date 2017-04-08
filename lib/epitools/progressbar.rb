@@ -36,7 +36,7 @@ class ProgressBar
     clear
     show
   end
-  
+
   attr_reader   :title
   attr_reader   :current
   attr_reader   :total
@@ -45,8 +45,8 @@ class ProgressBar
   private
   def fmt_bar
     bar_width = do_percentage * @terminal_width / 100
-    sprintf("|%s%s|", 
-            @bar_mark * bar_width, 
+    sprintf("|%s%s|",
+            @bar_mark * bar_width,
             " " *  (@terminal_width - bar_width))
   end
 
@@ -61,14 +61,14 @@ class ProgressBar
   def fmt_stat_for_file_transfer
     if !@total or @finished_p then
       sprintf("%s %s %s", bytes, transfer_rate, elapsed)
-    else 
+    else
       sprintf("%s %s %s", bytes, transfer_rate, eta)
     end
   end
 
   def fmt_title
     title = (@title[0,(@title_width - 1)] + ":")
-    @total ? "%-#{@title_width}s" % title : title 
+    @total ? "%-#{@title_width}s" % title : title
   end
 
   def convert_bytes(bytes)
@@ -115,7 +115,7 @@ class ProgressBar
     elapsed = Time.now - @start_time
     sprintf("Time: %s", format_time(elapsed))
   end
-  
+
   def eol
     if @finished_p then "\n" else "\r" end
   end
@@ -165,7 +165,7 @@ class ProgressBar
 #    end
     @out.print(line + eol)
     @out.flush
-    
+
     @previous_time = Time.now
   end
 

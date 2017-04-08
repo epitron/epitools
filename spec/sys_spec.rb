@@ -11,11 +11,11 @@ describe Sys::ProcessInfo do
     proc { Sys.windows? }.should_not raise_error
 
     %w[Linux Windows Darwin BSD].include?(Sys.os).should == true
-    
+
     [:linux?, :mac?, :windows?, :bsd?].any?{|os| Sys.send(os)}.should == true
   end
-    
-  
+
+
   specify "list all processes" do
 #    procs = Sys.ps
 #
@@ -35,7 +35,7 @@ describe Sys::ProcessInfo do
 #    matches.should > 1
   end
 
-  
+
   specify "refresh processes" do
 
 #    STDOUT.sync = true
@@ -61,9 +61,9 @@ describe Sys::ProcessInfo do
     Sys.cross_platform_method(:cross_platform_test)
     proc{ Sys.cross_platform_test }.should raise_error
   end
-  
+
   specify "interfaces" do
     Sys.interfaces.should_not be_blank
   end
-  
+
 end

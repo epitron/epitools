@@ -5,11 +5,11 @@ require 'epitools/minimal'
 # Includes: process listing, platform detection, etc.
 #
 module Sys
-  
+
   #-----------------------------------------------------------------------------
 
   #
-  # Return the current operating system: Darwin, Linux, or Windows. 
+  # Return the current operating system: Darwin, Linux, or Windows.
   #
   def self.os
     return @os if @os
@@ -20,7 +20,7 @@ module Sys
     else
       host_os = Config::CONFIG['host_os']
     end
-    
+
     case host_os
       when /darwin/
         @os = "Darwin"
@@ -36,7 +36,7 @@ module Sys
 
     @os
   end
-  
+
   #
   # Is this Linux?
   #
@@ -85,10 +85,10 @@ module Sys
     [:minflt, :to_i],
     [:command,:to_s],
   ]
-  
+
   PS_FIELDS             = PS_FIELD_TABLE.map { |name, func| name }
   PS_FIELD_TRANSFORMS   = Hash[ *PS_FIELD_TABLE.flatten ]
-  
+
   class ProcessNotFound < Exception; end
 
   #
@@ -124,7 +124,7 @@ module Sys
       "U"=>:wait,
       "Z"=>:zombie,
       "W"=>:swapped,
-      
+
       "s"=>:session_leader,
       "X"=>:debugging,
       "E"=>:exiting,
@@ -133,7 +133,7 @@ module Sys
       "+"=>:foreground,
       "L"=>:locked_pages,
     }
-    
+
     LINUX_STATES = {
       "R"=>:running,
       "S"=>:sleeping,
@@ -150,7 +150,7 @@ module Sys
       "L"=>:locked_pages,
       "l"=>:multithreaded,
     }
-    
+
     def initialize(*args)
       @dead = false
       args << stat_to_state(args[PS_FIELDS.index(:stat)])
@@ -168,11 +168,11 @@ module Sys
 
     #
     # Convert all the process information to a hash.
-    #    
+    #
     def to_hash
       Hash[ *members.zip(values).flatten(1) ]
     end
-    
+
     #
     # Send the TERM signal to this process.
     #
@@ -181,61 +181,61 @@ module Sys
       Process.kill(signal, pid)
       # TODO: handle exception Errno::ESRCH (no such process)
     end
-    
+
     #
     # Has this process been killed?
     #
     def dead?
       @dead ||= Sys.pid(pid).empty?
     end
-    
+
     #
     # Refresh this process' statistics.
     #
     def refresh
       processes = Sys.ps(pid)
-      
+
       if processes.empty?
         @dead = true
         raise ProcessNotFound
       end
-      
+
       updated_process = processes.first
       members.each { |member| self[member] = updated_process[member] }
       self
     end
-    
+
     alias_method :name, :command
 
-    # Linux-specific methods    
+    # Linux-specific methods
     if Sys.linux?
-      
+
       def exename
         @exename ||= File.readlink("/proc/#{pid}/exe") rescue :unknown
         @exename == :unknown ? nil : @exename
       end
-      
+
       def fds
         Dir["/proc/#{pid}/fd/*"].map { |fd| File.readlink(fd) rescue nil }
       end
-      
+
     end
-    
-    private 
-    
+
+    private
+
     def stat_to_state(str)
       states = case Sys.os
         when "Linux"  then LINUX_STATES
         when "Darwin" then DARWIN_STATES
         else raise "Unsupported platform: #{Sys.os}"
       end
-      
+
       str.scan(/./).map { |char| states[char] }.compact
     end
   end
 
   #-----------------------------------------------------------------------------
-  
+
   def self.tree
     tree = Sys.ps.group_by(&:ppid)
     Hash[tree.map do |ppid, children|
@@ -246,35 +246,35 @@ module Sys
 
   #
   # List all (or specified) processes, and return ProcessInfo objects.
-  # (Takes an optional list of pids as arguments.) 
+  # (Takes an optional list of pids as arguments.)
   #
   def self.ps(*pids)
     #return @@cache if @@cache
 
     options = PS_FIELDS.join(',')
-    
+
     pids = pids.map(&:to_i)
-    
+
     if pids.any?
       command = "ps -p #{pids.join(',')} -o #{options}"
     else
       command = "ps awx -o #{options}"
     end
 
-    lines = `#{command}`.lines.to_a        
+    lines = `#{command}`.lines.to_a
 
     lines[1..-1].map do |line|
       fields = line.split
       if fields.size > PS_FIELDS.size
-        fields = fields[0..PS_FIELDS.size-2] + [fields[PS_FIELDS.size-1..-1].join(" ")] 
+        fields = fields[0..PS_FIELDS.size-2] + [fields[PS_FIELDS.size-1..-1].join(" ")]
       end
-      
+
       fields = PS_FIELDS.zip(fields).map { |name, value| value.send(PS_FIELD_TRANSFORMS[name]) }
-      
+
       ProcessInfo.new(*fields)
     end
   end
-  
+
   #-----------------------------------------------------------------------------
 
   def self.refresh
@@ -288,7 +288,7 @@ module Sys
   # (Execute Signal.list to see what's available.)
   #
   # No paramters defaults to all signals except VTALRM, CHLD, CLD, and EXIT.
-  #  
+  #
   def self.trap(*args, &block)
     options = if args.last.is_a?(Hash) then args.pop else Hash.new end
     args = [args].flatten
@@ -304,14 +304,14 @@ module Sys
       Signal.trap(signal) { yield signal }
     end
   end
-  
+
   #-----------------------------------------------------------------------------
 
   #
   # A metaprogramming helper that allows you to write platform-specific methods
   # which the user can call with one name. Here's how to use it:
   #
-  # Define these methods: 
+  # Define these methods:
   #   reboot_linux, reboot_darwin, reboot_windows
   #
   # Call the magic method:
@@ -321,7 +321,7 @@ module Sys
   #
   # (Note: If you didn't create a method for a specific platform, then you'll get
   # NoMethodError exception when the "reboot" method is called on that platform.)
-  #  
+  #
   def self.cross_platform_method(name)
     platform_method_name = "#{name}_#{os.downcase}"
     metaclass.instance_eval do
@@ -342,11 +342,11 @@ module Sys
   def self.hostname_linux
     `uname -n`.strip
   end
-  
+
   def self.hostname_mac
     `uname -n`.strip.gsub(/\.local$/, '')
   end
-  
+
   def self.hostname_windows
     raise NotImplementedError
   end
@@ -394,7 +394,7 @@ module Sys
 
     device_ips
   end
-  
+
   #
   # Windows: Return a hash of (device name, IP address) pairs.
   #
@@ -411,7 +411,7 @@ module Sys
     end
     result
   end
-  
+
   #-----------------------------------------------------------------------------
 
   cross_platform_method :browser_open
@@ -440,11 +440,11 @@ module Sys
     #Mem:       4124380    3388548     735832          0     561888     968004
     #-/+ buffers/cache:    1858656    2265724
     #Swap:      2104504     166724    1937780
-    
+
     #$ vmstat
-    raise "Not implemented"    
+    raise "Not implemented"
   end
-  
+
   def self.memstat_darwin
     #$ vm_stat
     #Mach Virtual Memory Statistics: (page size of 4096 bytes)
@@ -462,7 +462,7 @@ module Sys
     #Object cache: 16 hits of 255782 lookups (0% hit rate)
 
     #$ iostat
-    raise "Not implemented"    
+    raise "Not implemented"
   end
 
   #-----------------------------------------------------------------------------
@@ -477,10 +477,10 @@ module Sys
     #SMC DRIVE BAY 1: 41 C
     #SMC NORTHBRIDGE POS 1: 46 C
     #SMC WLAN CARD: 45 C
-    raise "Not implemented"    
+    raise "Not implemented"
   end
 
-end  
+end
 
 if $0 == __FILE__
   require 'pp'

@@ -1,7 +1,7 @@
 class Object
 
   #
-  # Return a hash of local variables in the caller's scope: {:variable_name=>value} 
+  # Return a hash of local variables in the caller's scope: {:variable_name=>value}
   #
   def locals
     require 'binding_of_caller'
@@ -10,7 +10,7 @@ class Object
     vals = caller.eval("[ #{vars.join(",")} ]")
     Hash[ vars.zip(vals) ]
   end
-  
+
 
   #
   # Gives you a copy of the object with its attributes changed to whatever was
@@ -35,7 +35,7 @@ class Object
   #   => 5
   #
   # Good for chaining lots of operations together in a REPL.
-  #  
+  #
   def with(options={})
     if block_given?
       yield self
@@ -60,7 +60,7 @@ class Object
       end
     end
   end
-  
+
   #
   # Return a copy of the class with modules mixed into it.
   #
@@ -78,14 +78,14 @@ class Object
   # Cache (memoize) the result of an instance method the first time
   # it's called, storing this value in the "@methodname" instance variable,
   # and always return this value on subsequent calls.
-  #  
+  #
   def self.memoize(*methods)
     methods.each do |meth|
       old_method = instance_method(meth)
 
       if old_method.arity == 0
         ivarname = "@#{meth}"
-        
+
         define_method meth do
           instance_variable_get(ivarname) or instance_variable_set(ivarname, old_method.bind(self).call)
         end
@@ -105,14 +105,14 @@ class Object
 
   #
   # Serialize this object to YAML.
-  #  
+  #
   def to_yaml
     YAML::dump(self)
   end
-  
+
   #
   # Serialize this object to JSON (defaults to "pretty" indented JSON).
-  #  
+  #
   def to_json(pretty=true)
     pretty ? JSON::pretty_generate(self) : JSON.dump(self)
   end
@@ -130,7 +130,7 @@ class Object
       end
     end
   end
-  
+
   #
   # Time a block.
   #
@@ -138,12 +138,12 @@ class Object
     start = Time.now
     result = yield
     elapsed = Time.now - start
-    
+
     print "[#{message}] " if message
     puts "elapsed time: %0.5fs" % elapsed
     result
   end
-  
+
   #
   # Quick and easy benchmark.
   #
@@ -156,13 +156,13 @@ class Object
   #   bench fast: ->{ fast_method }, slow: ->{ slow_method }
   #
   def bench(*args, &block)
-      
+
     # Shitty perl-esque hack to let the method take all the different kind of arguments.
     opts  = Hash === args.last ? args.pop : {}
     n     = args.first || 100
-  
+
     if opts.any?
-    
+
       raise "Error: Supply either a do/end block, or procs as options. Not both." if block_given?
       raise "Error: Options must be procs." unless opts.all? { |k, v| v.is_a?(Proc) }
 
@@ -171,17 +171,17 @@ class Object
           bm.report(name.to_s) { n.times &blk }
         end
       end
-      
+
     elsif block_given?
-    
+
       benchblock = proc do |bm|
         bm.report { n.times &block }
       end
-      
+
     else
       raise "Error: Must supply some code to benchmark."
     end
-    
+
     puts "* Benchmarking #{n} iterations..."
     Benchmark.bmbm(&benchblock)
   end

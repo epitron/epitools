@@ -80,11 +80,11 @@
 #       ''
 #       /
 #      r
-#     / \ 
+#     / \
 #    o   u
-#   /     \ 
+#   /     \
 #  w       b
-#           \ 
+#           \
 #            y
 #
 # are actually stored as
@@ -92,7 +92,7 @@
 #      ''
 #      /
 #     r
-#    / \ 
+#    / \
 #  ow  uby
 #
 # Because of this implementation (and to allow Trie.find to be called on

@@ -24,4 +24,4 @@
      |_ eg: [file:line:method]
   |_ "gsmartcontrol" has good warning messages
       ie: "|13<warn>  |07[hz] Warning: exit: The device error log contains records of errors."
- 
+
