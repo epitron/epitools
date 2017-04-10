@@ -428,7 +428,7 @@ class String
     #
     # String#to_proc
     #
-    # See http://weblog.raganwald.com/2007/10/stringtoproc.html
+    # See: http://weblog.raganwald.com/2007/10/stringtoproc.html
     #
     # Ported from the String Lambdas in Oliver Steele's Functional Javascript
     # http://osteele.com/sources/javascript/functional/
@@ -438,6 +438,105 @@ class String
     # (c) 2007 Reginald Braithwaite
     # Portions Copyright (c) 2006 Oliver Steele
     #
+    #
+    # ## Basic Usage
+    #
+    # 'x+1'.to_proc[2];
+    #      → 3
+    # 'x+2*y'.to_proc[2, 3];
+    #      → 8
+    # or (more usefully) later:
+    #
+    # square = 'x*x'.to_proc;
+    # square(3);
+    #      → 9
+    # square(4);
+    #      → 16
+    #
+    # ## Explicit parameters
+    #
+    # If the string contains a ->, this separates the parameters from the body.
+    #
+    # 'x y -> x+2*y'.to_proc[2, 3];
+    #      → 8
+    # 'y x -> x+2*y'.to_proc[2, 3];
+    #      → 7
+    # Otherwise, if the string contains a _, it’s a unary function and _ is name of the parameter:
+    #
+    # '_+1'.to_proc[2];
+    #      → 3
+    # '_*_'.to_proc[3];
+    #      → 9
+    # ## Implicit parameters
+    #
+    # If the string doesn’t specify explicit parameters, they are implicit.
+    #
+    # If the string starts with an operator or relation besides -, or ends with an operator or relation, then its implicit arguments are placed at the beginning and/or end:
+    #
+    # '*2'.to_proc[2];
+    #      → 4
+    # '/2'.to_proc[4];
+    #      → 2
+    # '2/'.to_proc[4];
+    #      → 0.5
+    # '/'.to_proc[2, 4];
+    #      → 0.5
+    # ’.’ counts as a right operator:
+    #
+    # '.abs'.to_proc[-1];
+    #  → 1
+    #
+    #
+    # Otherwise, the variables in the string, in order of occurrence, are its parameters.
+    #
+    # 'x+1'.to_proc[2];
+    #      → 3
+    # 'x*x'.to_proc[3];
+    #      → 9
+    # 'x + 2*y'.to_proc[1, 2];
+    #      → 5
+    # 'y + 2*x'.to_proc[1, 2];
+    #      → 5
+    #
+    # ## Chaining
+    #
+    # Chain -> to create curried functions.
+    #
+    # 'x y -> x+y'.to_proc[2, 3];
+    #      → 5
+    # 'x -> y -> x+y'.to_proc[2][3];
+    #      → 5
+    # plus_two = 'x -> y -> x+y'.to_proc[2];
+    # plus_two[3]
+    #      → 5
+    #
+    # Using String#to_proc in Idiomatic Ruby
+    #
+    # Ruby on Rails popularized Symbol#to_proc, so much so that it will be part of Ruby 1.9.
+    #
+    # If you like:
+    #
+    # %w[dsf fgdg fg].map(&:capitalize)
+    #     → ["Dsf", "Fgdg", "Fg"]
+    # then %w[dsf fgdg fg].map(&'.capitalize') isn’t much of an improvement.
+    #
+    # But what about doubling every value in a list:
+    #
+    # (1..5).map &'*2'
+    #     → [2, 4, 6, 8, 10]
+    #
+    # Or folding a list:
+    #
+    # (1..5).inject &'+'
+    #     → 15
+    #
+    # Or having fun with factorial:
+    #
+    # factorial = "(1.._).inject &'*'".to_proc
+    # factorial[5]
+    #     → 120
+    #
+    # LICENSE:
     # Permission is hereby granted, free of charge, to any person obtaining
     # a copy of this software and associated documentation files (the
     # "Software"), to deal in the Software without restriction, including
