@@ -7,15 +7,15 @@ class Hash
   def blank?
     not any?
   end
-  
+
   #
   # Runs "remove_blank_values" on self.
-  #  
+  #
   def remove_blank_values!
     delete_if{|k,v| v.blank?}
     self
   end
-  
+
   #
   # Returns a new Hash where blank values have been removed.
   # (It checks if the value is blank by calling #blank? on it)
@@ -23,10 +23,10 @@ class Hash
   def remove_blank_values
     dup.remove_blank_values!
   end
-  
+
   #
-  # Runs map_values on self. 
-  #  
+  # Runs map_values on self.
+  #
   def map_values!(&block)
     keys.each do |key|
       value = self[key]
@@ -34,7 +34,7 @@ class Hash
     end
     self
   end
-  
+
   #
   # Transforms the values of the hash by passing them into the supplied
   # block, and then using the block's result as the new value.
@@ -45,7 +45,7 @@ class Hash
 
   #
   # Runs map_keys on self.
-  #  
+  #
   def map_keys!(&block)
     keys.each do |key|
       value = delete(key)
@@ -53,13 +53,27 @@ class Hash
     end
     self
   end
-  
+
   #
   # Transforms the keys of the hash by passing them into the supplied block,
   # and then using the blocks result as the new key.
   #
   def map_keys(&block)
     dup.map_keys!(&block)
+  end
+
+  #
+  # Convert the keys to symbols in-place, for fun and profit
+  #
+  def symbolize_keys!
+    map_keys! { |k| k.to_sym }
+  end
+
+  #
+  # Return a hash with its keys converted to symbols, for great justice
+  #
+  def symbolize_keys
+    dup.symbolize_keys!
   end
 
   #
@@ -140,14 +154,14 @@ class Hash
         end
       end
     end
-  end  
-  
+  end
+
   #
   # `key?` and `includes?` is an alias for `include?`
-  #  
+  #
   alias_method :key?,       :include?
   alias_method :includes?,  :include?
-  
+
   #
   # Makes each element in the `path` array point to a hash containing the next element in the `path`.
   # Useful for turning a bunch of strings (paths, module names, etc.) into a tree.
@@ -164,7 +178,7 @@ class Hash
     self[dir].mkdir_p(path[1..-1])
     self
   end
-  
+
   #
   # Turn some nested hashes into a tree (returns an array of strings, padded on the left with indents.)
   #
@@ -176,8 +190,8 @@ class Hash
       result += val.tree(level+1) if val.any?
     end
     result
-  end  
-  
+  end
+
   #
   # Print the result of `tree`
   #
@@ -188,15 +202,15 @@ class Hash
       puts block_given? ? yield(key, level) : "#{dent}#{key}"
       val.print_tree(level+1, indent, &block) if val.any?
     end
-  end  
-  
+  end
+
   #
   # Convert the hash into a GET query.
   #
   def to_query
     params = ''
     stack = []
-  
+
     each do |k, v|
       if v.is_a?(Hash)
         stack << [k,v]
@@ -204,7 +218,7 @@ class Hash
         params << "#{k}=#{v}&"
       end
     end
-  
+
     stack.each do |parent, hash|
       hash.each do |k, v|
         if v.is_a?(Hash)
@@ -214,15 +228,15 @@ class Hash
         end
       end
     end
-  
+
     params.chop! # trailing &
     params
   end
-  
+
   #
   # Query a hash using MQL (see: http://wiki.freebase.com/wiki/MQL_operators for reference)
   #
-  # Examples: 
+  # Examples:
   #   > query(name: /steve/)
   #   > query(/title/ => ??)
   #   > query(articles: [{title: ??}])
@@ -230,21 +244,21 @@ class Hash
   #   > query("date_of_birth<" => "2000")
   #
   def query(template)
-    results = [] 
+    results = []
     template.each do |key,val|
       case key
       when Regexp, String
       when Array
       when Hash
-        results += hash.query(template)  
+        results += hash.query(template)
       end
     end
-    
+
     map do |key,val|
-    end    
+    end
   end
   alias_method :mql, :query
-  
+
 
   #
   # Return all the changes necessary to transform `self` into `other`. (Works on nested hashes.) The result is a hash of {:key => [old value, new value]} pairs.
@@ -257,7 +271,7 @@ class Hash
         if self[key].kind_of?(Hash) && other[key].kind_of?(Hash)
           memo[key] = self[key].diff(other[key])
         else
-          memo[key] = [self[key], other[key]] 
+          memo[key] = [self[key], other[key]]
         end
       end
       memo

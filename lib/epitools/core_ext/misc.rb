@@ -209,6 +209,26 @@ module URI
 
 end
 
+#
+# Stupid workaround for URI blowing up when it receives a [ or ] character
+#
+module Better_URI_RFC3986_Parser # ::RFC3986_relative_ref
+  ESCAPE_ME_PLZ = "[]{}!"
+
+  def split(uri)
+    subsitutions = ESCAPE_ME_PLZ.chars.map { |c| [c, CGI.escape(c)] }
+    subsitutions << [" ", "%20"]
+
+    subsitutions.each do |find, replace| 
+      uri = uri.gsub(find, replace)
+    end
+
+    super(uri)
+  end
+
+end
+
+URI::RFC3986_Parser.prepend(Better_URI_RFC3986_Parser)
 
 
 class Time

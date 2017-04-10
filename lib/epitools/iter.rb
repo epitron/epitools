@@ -2,10 +2,10 @@
 # A stable iterator class.
 # (You can reorder/remove elements in the container without affecting iteration.)
 #
-# For example, to reverse all the elements in a list: 
+# For example, to reverse all the elements in a list:
 #   >> i = Iter.new(1..10)
 #   >> i.each_cons(2) { |a,b| b.move_before(a) }
-#   >> i.to_a    #=> [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]  
+#   >> i.to_a    #=> [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
 #
 class Iter
 
@@ -15,7 +15,7 @@ class Iter
   def initialize(vals)
     @container = vals.map { |val| elem(val) }
   end
-  
+
   # Wrap a value in an Elem container
   def elem(val)
     Elem.new(self, val)
@@ -33,21 +33,21 @@ class Iter
       @container == other
     end
   end
-  
+
   def each
     @container.each do |elem|
       yield elem
       elem.visited = true
     end
   end
-  
+
   def each_cons(num=1)
     @container.each_cons(num) do |(*elems)|
-      yield *elems 
+      yield *elems
       elems.each { |e| e.visited = true }
     end
   end
-  
+
   alias_method :iterate,    :each_cons
   alias_method :every,      :each_cons
 
@@ -64,11 +64,11 @@ class Iter
       result
     end
   end
-  
+
 
 
   class Elem < BasicObject
-  
+
     attr_accessor :val, :visited
 
     def initialize(iter, val)
@@ -76,23 +76,23 @@ class Iter
       @val  = val.is_a?(Elem) ? val.value : val
       @visited = false
     end
-    
+
     def elem?
       true
     end
-    
+
     def container
       @iter.container
     end
-    
+
     def current
       self
     end
-    
+
     def visited?
       @visited
     end
-    
+
     def next
       p = pos+1
       if p >= container.size
@@ -101,7 +101,7 @@ class Iter
         container[p]
       end
     end
-    
+
     def prev
       p = pos-1
       if p < 0
@@ -110,50 +110,50 @@ class Iter
         container[p]
       end
     end
-    
+
     def remove
       container.delete_at(pos)
     end
     alias_method :delete, :remove
-    
+
     def replace_with(replacement)
       container[pos] = Elem.new(@iter, replacement)
     end
-    
+
     def pos
       container.index(self)
     end
-    
+
     def move_before(other)
       remove
       container.insert(other.pos, self) # insert at pos and shift everything over
     end
-    
+
     def move_after(other)
       remove
       container.insert(other.pos+1, self) # insert after pos
     end
-    
+
     def move_first
       remove
       container.insert(0, self) # insert at beginning
     end
     alias_method :move_start, :move_first
-    
+
     def move_last
       remove
       container.insert(-1, self) # insert at end
     end
     alias_method :move_end, :move_last
-    
+
     def value
       @val
     end
-    
+
     def method_missing(name, *args)
       @val.send(name, *args)
     end
-    
+
     def inspect
       "<Elem: #{@val.inspect}>"
     end
@@ -172,5 +172,5 @@ class Iter
 
   end
 
-  
+
 end
