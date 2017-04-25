@@ -190,7 +190,7 @@ module Enumerable
     queue = Queue.new
     each { |e| queue.push e }
 
-    Enumerator.new do |y|
+    Enumerator.new(queue.size) do |y|
       workers = (0...num_workers).map do
         Thread.new do
           begin
@@ -569,7 +569,7 @@ class Enumerator
   def +(other)
     raise "Can only concatenate Enumerable things to Enumerators" unless Enumerable === other
 
-    Enumerator.new do |yielder|
+    Enumerator.new(count + other.count) do |yielder|
       each { |e| yielder << e }
       other.each { |e| yielder << e }
     end
@@ -601,7 +601,7 @@ class Enumerator
   # returning a new Enumerator. (The argument must be some kind of Enumerable.)
   #
   def cross_product(other)
-    Enumerator.new do |yielder|
+    Enumerator.new(count + other.count) do |yielder|
       each { |a| other.each { |b| yielder << [a,b] } }
     end
   end
