@@ -7,6 +7,36 @@ require 'epitools/minimal'
 module Sys
 
   #-----------------------------------------------------------------------------
+  #
+  # List all (or specified) processes, and return ProcessInfo objects.
+  # (Takes an optional list of pids as arguments.)
+  #
+  def self.ps(*pids)
+    #return @@cache if @@cache
+
+    options = PS_FIELDS.join(',')
+
+    pids = pids.map(&:to_i)
+
+    if pids.any?
+      command = "ps -p #{pids.join(',')} -o #{options}"
+    else
+      command = "ps awx -o #{options}"
+    end
+
+    lines = `#{command}`.lines.to_a
+
+    lines[1..-1].map do |line|
+      fields = line.split
+      if fields.size > PS_FIELDS.size
+        fields = fields[0..PS_FIELDS.size-2] + [fields[PS_FIELDS.size-1..-1].join(" ")]
+      end
+
+      fields = PS_FIELDS.zip(fields).map { |name, value| value.send(PS_FIELD_TRANSFORMS[name]) }
+
+      ProcessInfo.new(*fields)
+    end
+  end
 
   #
   # Return the current operating system: Darwin, Linux, or Windows.
@@ -242,37 +272,6 @@ module Sys
       kvs = children.map { |child| [child.pid, tree.delete(child.pid)] }
       [ppid, Hash[kvs]]
     end]
-  end
-
-  #
-  # List all (or specified) processes, and return ProcessInfo objects.
-  # (Takes an optional list of pids as arguments.)
-  #
-  def self.ps(*pids)
-    #return @@cache if @@cache
-
-    options = PS_FIELDS.join(',')
-
-    pids = pids.map(&:to_i)
-
-    if pids.any?
-      command = "ps -p #{pids.join(',')} -o #{options}"
-    else
-      command = "ps awx -o #{options}"
-    end
-
-    lines = `#{command}`.lines.to_a
-
-    lines[1..-1].map do |line|
-      fields = line.split
-      if fields.size > PS_FIELDS.size
-        fields = fields[0..PS_FIELDS.size-2] + [fields[PS_FIELDS.size-1..-1].join(" ")]
-      end
-
-      fields = PS_FIELDS.zip(fields).map { |name, value| value.send(PS_FIELD_TRANSFORMS[name]) }
-
-      ProcessInfo.new(*fields)
-    end
   end
 
   #-----------------------------------------------------------------------------
