@@ -111,7 +111,7 @@ class File
         seek(-(data.size - index), IO::SEEK_CUR)
         break
       elsif eof?
-        break
+        return nil
       else
         seek(-(string.size - 1), IO::SEEK_CUR)
       end
@@ -133,7 +133,7 @@ class File
         seek(index+string.size, IO::SEEK_CUR)
         break
       elsif pos == 0
-        break
+        return nil
       else
         seek(string.size - 1, IO::SEEK_CUR)
       end

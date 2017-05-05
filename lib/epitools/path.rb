@@ -108,6 +108,8 @@ require 'epitools/core_ext/string'
 #
 class Path
 
+  include Enumerable
+
   # The directories in the path, split into an array. (eg: ['usr', 'src', 'linux'])
   attr_reader :dirs
 
@@ -637,10 +639,11 @@ class Path
   #
   # All the lines in this file, chomped.
   #
-  def each_line
+  def each
     io.each_line
   end
-  alias_method :lines, :each_line
+  alias_method :each_line, :each
+  alias_method :lines,     :each
 
   def grep(pat)
     return to_enum(:grep, pat).to_a unless block_given?

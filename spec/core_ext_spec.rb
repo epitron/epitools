@@ -674,9 +674,11 @@ describe Enumerator do
   it "concatenates" do
     e = [1,2,3].to_enum + [4,5,6].to_enum
     e.to_a.should == [1,2,3,4,5,6]
+    e.size.should == 6
 
     e = [1,2,3].to_enum + [4,5,6]
     e.to_a.should == [1,2,3,4,5,6]
+    e.size.should == 6
   end
 
   it "multiplies" do

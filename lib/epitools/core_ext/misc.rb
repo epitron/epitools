@@ -257,6 +257,19 @@ module ObjectSpace
 
 end
 
+
+#
+# Make OpenStruct a little tiny bit more like a Hash
+#
+class OpenStruct
+  def empty?; @table ? @table.empty? : true; end
+  def blank?; empty?; end
+  def any?;  !empty?; end
+
+  def keys; @table&.keys || []; end
+end
+
+
 #
 # Flush standard input's buffer.
 #
