@@ -60,6 +60,7 @@ module WM
   class Window < TypedStruct["window_id desktop_id:int pid:int x:int y:int w:int h:int hostname title"]
 
     def self.all
+      # FIXME: Windows owned by linux-namespaced processes (firejail) report their namspaced pid to X11. `window.process` ends up pointing at either nil, or the wrong process.
       `wmctrl -lpG`.lines.map(&:strip).map { |line| Window.from_line(line) }
     end
 
