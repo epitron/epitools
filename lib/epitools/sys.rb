@@ -12,7 +12,7 @@ module Sys
   # (Takes an optional list of pids as arguments.)
   #
   def self.ps(*pids)
-    #return @@cache if @@cache
+    raise "that's too many pids!" if pids.size > 999_999
 
     options = PS_FIELDS.join(',')
 
