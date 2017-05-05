@@ -223,6 +223,14 @@ class String
   end
 
   #
+  # URI.parse the string and return an URI object
+  #
+  def to_uri
+    URI.parse self
+  end
+  alias_method :to_URI, :to_uri
+
+  #
   # Convert a query string to a hash of params
   #
   def to_params
