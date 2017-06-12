@@ -21,6 +21,15 @@ describe Path do
     path2.path.should_not == path.path
   end
 
+  it "sizes" do
+    path = Path.tmpfile
+    path.write("asdfasdf")
+    path.size.should == 8
+
+    nonexistant = Path.new("/i/hope/this/doesn't/exist/man")
+    nonexistant.size.should == -1
+  end
+
   it "works with relative paths" do
     path = Path.new("../hello.mp3/blah")
 

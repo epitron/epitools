@@ -364,7 +364,9 @@ class Path
   end
 
   def size
-    File.size path
+    File.size(path)
+  rescue Errno::ENOENT
+    -1
   end
 
   def lstat
