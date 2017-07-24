@@ -143,4 +143,18 @@ class File
   end
   alias_method :reverse_seek_to, :seek_backwards_to
 
+  #
+  # Iterate over each line of the file, yielding the line and the byte offset of the start of the line in the file
+  #
+  def each_line_with_offset
+    return to_enum(:each_line_with_offset) unless block_given?
+
+    offset = 0
+
+    each_line do |line|
+      yield line, offset
+      offset = tell
+    end
+  end
+
 end
