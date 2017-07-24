@@ -29,7 +29,7 @@ module Term
   # Return the [width,height] of the terminal.
   #
   def size
-    STDIN.winsize.reverse
+    $stdout.winsize.reverse
   end
 
   def width;  size[0]; end
@@ -140,6 +140,7 @@ module Term
       render sliced_into(num_rows).transpose
     end
     alias_method :by_columns, :in_columns
+    alias_method :by_cols,    :in_columns
 
     def in_rows
       return '' if @data.empty?
