@@ -658,6 +658,7 @@ class Path
   def nicelines
     lines.map(&:chomp)
   end
+  alias_method :nice_lines, :nicelines
 
   def unmarshal
     read.unmarshal
@@ -666,7 +667,7 @@ class Path
   def ls
     Dir.foreach(path).
       reject {|fn| fn == "." or fn == ".." }.
-      map {|fn| Path.new(fn) }
+      flat_map {|fn| self / fn }
   end
 
   def ls_r(symlinks=false)
@@ -980,6 +981,20 @@ class Path
     dest
   end
 
+  #
+  # Copy a file to a destination, creating all intermediate directories if they don't already exist
+  #
+  def cp_p(dest)
+    FileUtils.mkdir_p(dest.dir) unless File.directory? dest.dir
+    if file?
+      FileUtils.cp(path, dest)
+    elsif dir?
+      FileUtils.cp_r(path, dest)
+    end
+
+    dest
+  end
+
   def cp(dest)
     FileUtils.cp(path, dest)
     dest
@@ -997,6 +1012,31 @@ class Path
 
   ## Owners and permissions
 
+  #
+  # Same usage as `FileUtils.chmod` (because it just calls `FileUtils.chmod`)
+  #
+  # eg:
+  #   path.chmod(0600) # mode bits in octal (can also be 0o600 in ruby)
+  #   path.chmod "u=wrx,go=rx", 'somecommand'
+  #   path.chmod "u=wr,go=rr", "my.rb", "your.rb", "his.rb", "her.rb"
+  #   path.chmod "ugo=rwx", "slutfile"
+  #   path.chmod "u=wrx,g=rx,o=rx", '/usr/bin/ruby', :verbose => true
+  #
+  # Letter things:
+  #   "a" :: is user, group, other mask.
+  #   "u" :: is user's mask.
+  #   "g" :: is group's mask.
+  #   "o" :: is other's mask.
+  #   "w" :: is write permission.
+  #   "r" :: is read permission.
+  #   "x" :: is execute permission.
+  #   "X" :: is execute permission for directories only, must be used in conjunction with "+"
+  #   "s" :: is uid, gid.
+  #   "t" :: is sticky bit.
+  #   "+" :: is added to a class given the specified mode.
+  #   "-" :: Is removed from a given class given mode.
+  #   "=" :: Is the exact nature of the class will be given a specified mode.
+  #
   def chmod(mode)
     FileUtils.chmod(mode, self)
     self
