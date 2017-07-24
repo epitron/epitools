@@ -2,7 +2,6 @@
 
 autoload :Set,        'set'
 autoload :URI,        'uri'
-autoload :CGI,        'cgi'
 autoload :Zlib,       'zlib'
 autoload :FileUtils,  'fileutils'
 autoload :Tempfile,   'tempfile'
@@ -95,6 +94,13 @@ autoreq :AwesomePrint do
   end
 end
 
+autoreq :CGI do
+  require 'cgi'
+
+  class CGI
+    @@accept_charset = "UTF-8" unless defined? @@accept_charset
+  end
+end
 
 ## YAML hacks (the module might not be loaded properly in older Rubies)
 
