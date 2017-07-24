@@ -298,17 +298,27 @@ describe String do
     s.deflate(9).size.should < s.deflate(0).size
   end
 
+  it "wordses" do
+    s = "This, is a bunch, of words."
+    s.words.should == ["This", "is", "a", "bunch", "of", "words"]
+  end
+
+  it "wordses without stopwords" do
+    s = "The answer to the ultimate question of life, the universe, and everything.".downcase
+    s.without_stopwords.should == ["answer", "ultimate", "question", "life", "universe"]
+  end
+
   it "starts/endswith" do
     "blahblahblah".startswith("blah").should == true
     "blahblahblah".endswith("blah").should == true
   end
 
   it "amounts" do
-    "cookie".amount(5).should == "5 cookies"
-    "cookie".amount(0).should == "0 cookies"
-    "shirt".amount(17).should == "17 shirts"
+      "cookie".amount(5).should == "5 cookies"
+      "cookie".amount(0).should == "0 cookies"
+      "shirt".amount(17).should == "17 shirts"
     "dollar".amount(-10).should == "-10 dollars"
-    "love".amount(1).should == "1 love"
+        "love".amount(1).should == "1 love"
   end
 
   it "slices" do

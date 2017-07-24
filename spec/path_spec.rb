@@ -578,4 +578,10 @@ describe Path do
     path.each_chunk(20) { |chunk| chunk.size.should == 20; break }
   end
 
+  it "cp_p's" do
+    # raises an exception if one of the path components is an existing file (mkdir_p will fail!)
+    # if the source is a directory, copies it recursively
+    # if the source is a file, copies it and builds the directory tree
+  end
+
 end
