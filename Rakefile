@@ -9,7 +9,7 @@ task :release => :build do
 end
 
 task :install => :build do
-  system "gem install epitools-#{gem_version}.gem"
+  system "gem install --local epitools-#{gem_version}.gem"
 end
 
 task :pry do
