@@ -137,6 +137,31 @@ class Array
   alias_method :unzip, :transpose
 
   #
+  # Transpose an array that could have rows of uneven length
+  #
+  def transpose_with_padding
+    max_width = map(&:size).max
+    map { |row| row.rpad(max_width) }.transpose
+  end
+
+  #
+  # Extend the array the target_width by adding nils to the end (right side)
+  #
+  def rpad!(target_width)
+    if target_width > size and target_width > 0
+      self[target_width-1] = nil
+    end
+    self
+  end
+
+  #
+  # Return a copy of this array which has been extended to target_width by adding nils to the end (right side)
+  #
+  def rpad(target_width)
+    dup.rpad!(target_width)
+  end
+
+  #
   # Convert the array to a hash
   #
   unless defined? [].to_h

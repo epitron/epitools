@@ -522,6 +522,26 @@ describe Array do
     [:a, :b, :c].includes?(5).should == false
   end
 
+  it "rpads" do
+    [1,2,3].rpad(5).should == [1,2,3,nil,nil]
+  end
+
+  it "transpose_with_padding" do
+    a = [
+      [1,2],
+      [1],
+      [1,2,3]
+    ]
+
+    a_transposed = [
+      [1,2,nil],
+      [1,nil,nil],
+      [1,2,3]
+    ].transpose
+
+    a.transpose_with_padding.should == a_transposed
+  end
+
 end
 
 
