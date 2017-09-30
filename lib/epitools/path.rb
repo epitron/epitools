@@ -463,6 +463,13 @@ class Path
     dirs == child.dirs[0...dirs.size]
   end
 
+  #
+  # Does the file or directory name start with a "."?
+  #
+  def hidden?
+    (dir? ? dirs.last : filename)[/^\../]
+  end
+
   ###############################################################################
   # Comparisons
   ###############################################################################
