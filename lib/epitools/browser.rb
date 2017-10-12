@@ -61,7 +61,7 @@ class Browser
     @agent = Mechanize.new do |a|
       # ["Mechanize", "Mac Mozilla", "Linux Mozilla", "Windows IE 6", "iPhone", "Linux Konqueror", "Windows IE 7", "Mac FireFox", "Mac Safari", "Windows Mozilla"]
       a.max_history = 10
-      a.user_agent_alias = "Windows IE 7"
+      a.user_agent_alias = "Windows Chrome"
       a.log = Logger.new "mechanize.log" if @use_logs
     end
 
