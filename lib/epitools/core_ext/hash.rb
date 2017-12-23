@@ -53,6 +53,7 @@ class Hash
     end
     self
   end
+  alias_method :transform_keys!, :map_keys!
 
   #
   # Transforms the keys of the hash by passing them into the supplied block,
@@ -60,6 +61,34 @@ class Hash
   #
   def map_keys(&block)
     dup.map_keys!(&block)
+  end
+  alias_method :transform_keys, :map_keys
+
+  #
+  # Translate keys to other keys, given a hash of old-key to new-key mappings.
+  #
+  # eg: hash.translate_keys!(
+  #       "Extreme Sports!!!!" => :extreme_sports,
+  #       "Mediocre sports"    => :sports,
+  #       "Pretty okay sports" => :sports,
+  #       "Golf"               => :liesure_activities,
+  #     )
+  #
+  def translate_keys!(mapping)
+    # TODO: Allow regexes and lambdas (eg: translate_keys!(/.+/ => ->(key) { key.to_sym })
+    mapping.each do |src,dest|
+      if includes? src
+        self[dest] = delete(src)
+      end
+    end
+    self
+  end
+
+  #
+  # Same as `translate_keys!`, except it returns a copy of the hash
+  #
+  def translate_keys(mapping)
+    dup.translate_keys!(mapping)
   end
 
   #
