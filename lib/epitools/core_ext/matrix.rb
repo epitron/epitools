@@ -1,3 +1,14 @@
+#
+# TODO: Reimplement Matrix so it's not so awful, and give it a new name (like Grid).
+#       (Goal: To be as nice as numpy)
+#
+# Features:
+# * Better constructors
+# * Pretty-printer support
+# * .rows, .cols, .each_{row,col}, .neighbourhood
+# * Vec class, Point class
+#
+
 require 'matrix'
 
 #
