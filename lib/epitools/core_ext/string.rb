@@ -29,6 +29,13 @@ class String
   end
 
   #
+  # Smash together all the characters in a string (removing whitespace)
+  #
+  def smash
+    downcase.scan(/\w+/).join
+  end
+
+  #
   # Remove redundant whitespace AND newlines.
   #
   def dewhitespace
