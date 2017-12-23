@@ -264,7 +264,7 @@ describe Path do
     dest.rm
 
     path.touch
-    p path.numbered_backup_file
+    # p path.numbered_backup_file
 
     dest = path.numbered_backup!
     path.touch
@@ -275,6 +275,14 @@ describe Path do
 
     dest.rm
     dest2.rm
+
+
+    path = Path.tmpdir
+    path.dir?.should == true
+    backup = path.numbered_backup!
+    backup.dir?.should == true
+    backup.dirs.last.should == "#{path.dirs.last} (1)"
+    backup.rm
   end
 
   it "rms" do

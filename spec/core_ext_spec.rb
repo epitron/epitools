@@ -196,6 +196,7 @@ describe Numeric do
 
 end
 
+
 describe String do
 
   it "anys?" do
@@ -203,8 +204,6 @@ describe String do
     "\n".should_not be_any
     "YAY".should be_any
   end
-
-
 
   it "rot13s" do
     message = "Unbreakable Code"
@@ -429,6 +428,7 @@ describe Integer do
 
 end
 
+
 describe Float do
 
   it "float?" do
@@ -461,6 +461,7 @@ describe Number do
   end
 
 end
+
 
 describe Array do
 
@@ -540,6 +541,21 @@ describe Array do
     ].transpose
 
     a.transpose_with_padding.should == a_transposed
+  end
+
+  it "rows and columnses" do
+    a = [
+      [  1,  2,  3,  4,  5 ],
+      [  6,  7,  8,  9, 10 ],
+      [ 11, 12             ],
+    ]
+
+    a.row(0).should   == [1,2,3,4,5]
+    a.col(0).should   == [1,6,11]
+    a.col(-1).should  == [5,10]
+    a.col(-10).should == nil
+
+    a.cols.map(&:size).should == [3,3,2,2,2]
   end
 
 end
@@ -692,6 +708,7 @@ describe Enumerable do
   end
 
 end
+
 
 describe Enumerator do
 
@@ -850,6 +867,7 @@ describe Binding do
   b.binding[:a].should  == 5
   b.call.should         == 5
 end
+
 
 describe Proc do
 
