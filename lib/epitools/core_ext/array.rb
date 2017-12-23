@@ -145,6 +145,53 @@ class Array
   end
 
   #
+  # Remove instances of "element" from the end of the array (using `Array#pop`)
+  #
+  def rtrim!(element=nil)
+    pop while last == element
+    self
+  end
+
+  #
+  # Like `rtrim!`, but returns a trimmed copy of the array
+  #
+  def rtrim(element=nil)
+    dup.rtrim!(element)
+  end
+
+  ####################################################################
+  # Pseudo-matrix methods
+  ####################################################################
+
+  def rows
+    self
+  end
+
+  def columns
+    cols = transpose_with_padding
+    cols.each &:rtrim!
+    cols
+  end
+  alias_method :cols, :columns
+
+  #
+  # Return row n of a 2D array
+  #
+  def row(n)
+    rows[n]
+  end
+
+  #
+  # Return column n of a 2D array
+  #
+  def column(n)
+    columns[n]&.rtrim!
+  end
+  alias_method :col, :column
+
+  ####################################################################
+
+  #
   # Extend the array the target_width by adding nils to the end (right side)
   #
   def rpad!(target_width)
