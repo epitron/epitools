@@ -480,7 +480,7 @@ class Path
   # An array of attributes which will be used sort paths (case insensitive, directories come first)
   #
   def sort_attrs
-    [filename ? 1 : 0, path.downcase]
+    [(filename ? 1 : 0), path.downcase]
   end
 
   def <=>(other)
@@ -497,7 +497,9 @@ class Path
   def ==(other)
     self.path == other.to_s
   end
+  alias_method :eql?, :==
 
+  def hash; path.hash; end
 
   ###############################################################################
   # Joining paths
@@ -930,7 +932,11 @@ class Path
 
     n = 1
     loop do
-      new_file = with(:basename => "#{basename} (#{n})")
+      if dir?
+        new_file = with(:dirs => dirs[0..-2] + ["#{dirs.last} (#{n})"])
+      else
+        new_file = with(:basename => "#{basename} (#{n})")
+      end
       return new_file unless new_file.exists?
       n += 1
     end
@@ -1077,6 +1083,8 @@ class Path
   ## Dangerous methods.
 
   def rm
+    raise "Error: #{self} does not exist" unless exists?
+
     if directory? and not symlink?
       Dir.rmdir(self) == 0
     else
