@@ -650,11 +650,11 @@ class Path
   #
   # All the lines in this file, chomped.
   #
-  def each
-    io.each_line
+  def each_line(&block)
+    open { |io| io.each_line { |line| block.call(line.chomp) } }
   end
-  alias_method :each_line, :each
-  alias_method :lines,     :each
+  alias_method :each,  :each_line
+  alias_method :lines, :each_line
 
   def grep(pat)
     return to_enum(:grep, pat).to_a unless block_given?
