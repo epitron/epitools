@@ -623,6 +623,9 @@ class Path
   # Opening/Reading files
   ###############################################################################
 
+  #
+  # Open the file (default: read-only + binary mode)
+  #
   def open(mode="rb", &block)
     if block_given?
       File.open(path, mode, &block)
@@ -633,16 +636,19 @@ class Path
   alias_method :io, :open
   alias_method :stream, :open
 
+  #
+  # Read bytes from the file (just a wrapper around File.read)
+  #
   def read(length=nil, offset=nil)
     File.read(path, length, offset)
   end
 
   #
-  # Read the contents of the file, yielding it in 16k chunks. (default chunk size is 16k)
+  # Read the contents of a file one chunk at a time (default chunk size is 16k)
   #
   def each_chunk(chunk_size=2**14)
-    open do |f|
-      yield f.read(chunk_size) until f.eof?
+    open do |io|
+      yield io.read(chunk_size) until io.eof?
     end
   end
 
@@ -653,9 +659,15 @@ class Path
   def each_line(&block)
     open { |io| io.each_line { |line| block.call(line.chomp) } }
   end
-  alias_method :each,  :each_line
-  alias_method :lines, :each_line
+  alias_method :each,       :each_line
+  alias_method :lines,      :each_line
+  alias_method :nicelines,  :each_line
+  alias_method :nice_lines, :each_line
 
+
+  #
+  # Yields all matching lines in the file (by returning an Enumerator, or receiving a block)
+  #
   def grep(pat)
     return to_enum(:grep, pat).to_a unless block_given?
 
@@ -664,21 +676,22 @@ class Path
     end
   end
 
-  def nicelines
-    lines.map(&:chomp)
-  end
-  alias_method :nice_lines, :nicelines
-
   def unmarshal
     read.unmarshal
   end
 
+  #
+  # Returns all the files in the directory that this path points to
+  #
   def ls
     Dir.foreach(path).
       reject {|fn| fn == "." or fn == ".." }.
       flat_map {|fn| self / fn }
   end
 
+  #
+  # Returns all files in this path's directory and its subdirectories
+  #
   def ls_r(symlinks=false)
     # glob = symlinks ? "**{,/*/**}/*" : "**/*"
     # Path[File.join(path, glob)]
@@ -686,20 +699,33 @@ class Path
   end
   alias_method :ls_R, :ls_r
 
+  #
+  # Returns all the directories in this path
+  #
   def ls_dirs
     ls.select(&:dir?)
     #Dir.glob("#{path}*/", File::FNM_DOTMATCH).map { |s| Path.new(s, :type=>:dir) }
   end
 
+  #
+  # Returns all the files in this path
+  #
   def ls_files
     ls.select(&:file?)
     #Dir.glob("#{path}*", File::FNM_DOTMATCH).map { |s| Path.new(s, :type=>:file) }
   end
 
+  #
+  # Returns all neighbouring directories to this path
+  #
   def siblings
     Path[dir].ls - [self]
   end
 
+  #
+  # Like the unix `touch` command
+  # (if the file exists, update its timestamp, otherwise create a new file)
+  #
   def touch
     open("a") { }
     self
@@ -762,7 +788,7 @@ class Path
 
   #
   # Parse the file based on the file extension.
-  # (Handles json, html, yaml, xml, bson, and marshal.)
+  # (Handles json, html, yaml, xml, csv, marshal, and bson.)
   #
   def parse
     case ext.downcase
@@ -827,25 +853,27 @@ class Path
   end
   alias_method :from_csv, :read_csv
 
-
+  # Parse the file as XML
   def read_xml
     Nokogiri::XML(io)
   end
 
-
+  # Parse the file as a Ruby Marshal dump
   def read_marshal
     Marshal.load(io)
   end
 
+  # Serilize an object to Ruby Marshal format and write it to this path
   def write_marshal(object)
     write object.marshal
   end
 
-
+  # Parse the file as BSON
   def read_bson
     BSON.deserialize(read)
   end
 
+  # Serilize an object to BSON format and write it to this path
   def write_bson(object)
     write BSON.serialize(object)
   end
@@ -1082,6 +1110,9 @@ class Path
 
   ## Dangerous methods.
 
+  #
+  # Remove a file or directory
+  #
   def rm
     raise "Error: #{self} does not exist" unless exists?
 
@@ -1095,6 +1126,9 @@ class Path
   alias_method :unlink!, :rm
   alias_method :remove!, :rm
 
+  #
+  # Shrink or expand the size of a file in-place
+  #
   def truncate(offset=0)
     File.truncate(self, offset) if exists?
   end
@@ -1323,12 +1357,12 @@ class Path
     chown_R/1
     chmod_R/1
   ].each do |spec|
-    method, cardinality = spec.split("/")
-    cardinality = cardinality.to_i
+    meth, cardinality = spec.split("/")
+    cardinality       = cardinality.to_i
 
     class_eval %{
-      def self.#{method}(path#{", *args" if cardinality > 0})
-        Path[path].#{method}#{"(*args)" if cardinality > 0}
+      def self.#{meth}(path#{", *args" if cardinality > 0})
+        Path[path].#{meth}#{"(*args)" if cardinality > 0}
       end
     }
   end
@@ -1365,16 +1399,21 @@ class Path
   end
   alias_class_method :tempdir, :tmpdir
 
-
+  #
+  # User's current home directory
+  #
   def self.home
     Path[ENV['HOME']]
   end
 
+  #
+  # The current directory
+  #
   def self.pwd
     Path.new expand_path(Dir.pwd)
   end
 
-  def self.pushd
+  def self.pushd(destination)
     @@dir_stack ||= []
     @@dir_stack.push pwd
   end
