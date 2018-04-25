@@ -48,7 +48,7 @@ class Ratio
   # Returns a string representing the number in percent
   #
   def percent
-    "%0.1f%" % (to_f * 100)
+    "%0.1f%%" % (to_f * 100)
   end
   alias_method :to_percent, :percent
 
