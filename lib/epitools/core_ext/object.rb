@@ -190,4 +190,44 @@ class Object
     true
   end
 
+
+  #
+  # Negates a boolean, chained-method style.
+  #
+  # Example:
+  #   >> 10.even?
+  #   => true
+  #   >> 10.not.even?
+  #   => false
+  #
+  def not
+    NotWrapper.new(self)
+  end
+
+
 end
+
+
+class NotWrapper < BasicObject # :nodoc:
+  def initialize(orig)
+    @orig = orig
+  end
+
+  def inspect
+    "{NOT #{@orig.inspect}}"
+  end
+
+  def is_a?(other)
+    other === self
+  end
+
+  def method_missing(meth, *args, &block)
+    result = @orig.send(meth, *args, &block)
+    if result.is_a? ::TrueClass or result.is_a? ::FalseClass
+      !result
+    else
+      raise "Sorry, I don't know how to invert #{result.inspect}"
+    end
+  end
+end
+
