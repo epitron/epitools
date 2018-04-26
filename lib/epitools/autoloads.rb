@@ -84,6 +84,8 @@ autoreq  :ANSI,         'ansi'
 autoreq  :BSON,         'bson'
 autoreq  :JSON,         'json'
 autoreq  :GeoIP,        'geoip'
+autoreq  :RBTree,       'rbtree'
+autoreq  :MultiRBTree,  'rbtree'
 
 autoreq :AwesomePrint do
   require 'awesome_print'
