@@ -696,6 +696,11 @@ describe Enumerable do
     (a * b).to_a.should == [[1,3],[1,4],[2,3],[2,4]]
   end
 
+  it "rles" do
+           [1, 2, 3,3,3, 4].rle.to_a.should == [ [1,1], [1,2], [3,3], [1,4] ]
+    [5,5, 1, 2, 3,3,3, 4,4].rle.to_a.should == [ [2,5], [1,1], [1,2], [3,3], [2,4] ]
+  end
+
   it "sorts strings numerically" do
     a  = ["a1", "a11", "a2", "a3"]
     proper = ["a1", "a2", "a3", "a11"]

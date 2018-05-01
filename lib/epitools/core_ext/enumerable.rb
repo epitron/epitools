@@ -471,6 +471,32 @@ module Enumerable
   alias_method :grouped, :groups
 
   #
+  # run-length encode the array (returns an array of [count, element] pairs)
+  #
+  def rle
+    return to_enum(:rle) unless block_given?
+
+    last   = nil
+    result = []
+    count  = 1
+
+    each do |e|
+      if last
+        if last != e
+          yield [count, last]
+          count = 1
+        else
+          count += 1
+        end
+      end
+
+      last = e
+    end
+
+    yield [count, last]
+  end
+
+  #
   # Sort strings by their numerical values
   #
   def sort_numerically
