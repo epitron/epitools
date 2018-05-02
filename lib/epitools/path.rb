@@ -1502,9 +1502,9 @@ class Path::Relative < Path
 end
 
 #
-# A wrapper for URL objects.
+# A wrapper for URI objects.
 #
-class Path::URL < Path
+class Path::URI < Path
 
   attr_reader :uri
 
@@ -1534,6 +1534,12 @@ class Path::URL < Path
   #
   def scheme; uri.scheme; end
   alias_method :protocol, :scheme
+
+  %w[http https ftp magnet].each do |s|
+    define_method("#{s}?") { scheme[/^#{s}$/i] }
+  end
+
+  def http?; super or https?; end
 
   #
   # ...and this is: 'host.com'
