@@ -592,4 +592,12 @@ describe Path do
     # if the source is a file, copies it and builds the directory tree
   end
 
+  it "id3's" do
+    path = Path["test.mp3"]
+    if path.exists?
+      tags = path.id3
+      tags.title.should_not == nil
+      tags.artist.should_not == nil
+    end
+  end
 end

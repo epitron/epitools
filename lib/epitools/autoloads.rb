@@ -87,6 +87,7 @@ autoreq  :JSON,         'json'
 autoreq  :GeoIP,        'geoip'
 autoreq  :RBTree,       'rbtree'
 autoreq  :MultiRBTree,  'rbtree'
+autoreq  :ID3Tag,       'id3tag'
 
 autoreq :AwesomePrint do
   require 'awesome_print'

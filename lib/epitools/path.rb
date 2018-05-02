@@ -876,6 +876,18 @@ class Path
   end
 
   #
+  # Read ID3 tags (requires 'id3tag' gem)
+  #
+  # Available fields:
+  #    tag.artist, tag.title, tag.album, tag.year, tag.track_nr, tag.genre, tag.get_frame(:TIT2)&.content, 
+  #    tag.get_frames(:COMM).first&.content, tag.get_frames(:COMM).last&.language
+  #
+  def id3
+    ID3Tag.read(io)
+  end
+  alias_method :id3tags, :id3
+
+  #
   # Change into the directory. If a block is given, it changes into
   # the directory for the duration of the block, then puts you back where you
   # came from once the block is finished.
