@@ -157,10 +157,7 @@ class Path
     when String
 
       if path =~ %r{^[a-z\-]+://}i # URL?
-        Path::URL.new(path)
-
-      elsif path =~ /^javascript:/
-        Path::JS.new(path)
+        Path::URI.new(path)
 
       else
         # TODO: highlight backgrounds of codeblocks to show indent level & put boxes (or rules?) around (between?) double-spaced regions
@@ -452,13 +449,8 @@ class Path
     !!thing[/^\../]
   end
 
-  def uri?
-    false
-  end
-
-  def url?
-    uri?
-  end
+  def uri?; false; end
+  def url?; uri?; end
 
   def child_of?(parent)
     parent.parent_of? self
@@ -1119,7 +1111,7 @@ class Path
   # Remove a file or directory
   #
   def rm
-    raise "Error: #{self} does not exist" unless exists?
+    raise "Error: #{self} does not exist" unless symlink? or exists? 
 
     if directory? and not symlink?
       Dir.rmdir(self) == 0
@@ -1518,7 +1510,7 @@ class Path::URI < Path
   #       (eg: remove commands that write)
 
   def initialize(uri, hints={})
-    @uri = URI.parse(uri)
+    @uri = ::URI.parse(uri)
     self.path = @uri.path
   end
 

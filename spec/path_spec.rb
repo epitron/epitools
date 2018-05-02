@@ -242,7 +242,7 @@ describe Path do
     path.exists?.should == false
 
     path.touch
-    lambda { path.rename(:ext=>".dat") }.should raise_error
+    lambda { path.rename(:ext=>".dat") }.should raise_error(RuntimeError)
 
     dest.rm
     path.rename!(:ext=>".dat")
@@ -324,7 +324,7 @@ describe Path do
 
   it "mkdirs" do
     tmp = Path.tmpfile
-    lambda { tmp.mkdir }.should raise_error
+    lambda { tmp.mkdir }.should raise_error(RuntimeError)
     tmp.rm
     tmp.mkdir.should be_truthy
     tmp.rm.should be_truthy
@@ -417,7 +417,7 @@ describe Path do
   end
 
   it "modes" do
-    Path.tmpfile.mode.class.should == Fixnum
+    Path.tmpfile.mode.class.should == Integer
   end
 
   it "chmods and chmod_Rs" do
@@ -555,7 +555,7 @@ describe Path do
     file["user.test"].should == nil
     Path.getfattr(file)["user.test"].should == nil
 
-    lambda { file["blahblahblah"] = "whee" }.should raise_error
+    lambda { file["blahblahblah"] = "whee" }.should raise_error(RuntimeError)
 
     # Test assigning an entire hash of attributes, using diffing
     attrs = file.attrs
