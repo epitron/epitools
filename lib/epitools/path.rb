@@ -447,6 +447,11 @@ class Path
   alias_method :readlink, :symlink_target
   alias_method :target,   :symlink_target
 
+  def hidden?
+    thing = filename ? filename : dirs.last
+    !!thing[/^\../]
+  end
+
   def uri?
     false
   end

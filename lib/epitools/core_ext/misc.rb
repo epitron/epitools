@@ -96,7 +96,6 @@ class Proc
 end
 
 
-
 unless defined?(BasicObject)
   #
   # Backported BasicObject for Ruby 1.8
@@ -105,68 +104,6 @@ unless defined?(BasicObject)
     instance_methods.each { |m| undef_method m unless m =~ /^__/ }
   end
 end
-
-
-
-class Object
-
-  #
-  # Negates a boolean, chained-method style.
-  #
-  # Example:
-  #   >> 10.even?
-  #   => true
-  #   >> 10.not.even?
-  #   => false
-  #
-  def not
-    NotWrapper.new(self)
-  end
-
-end
-
-class NotWrapper < BasicObject # :nodoc:
-  def initialize(orig)
-    @orig = orig
-  end
-
-  def inspect
-    "{NOT #{@orig.inspect}}"
-  end
-
-  def is_a?(other)
-    other === self
-  end
-
-  def method_missing(meth, *args, &block)
-    result = @orig.send(meth, *args, &block)
-    if result.is_a? ::TrueClass or result.is_a? ::FalseClass
-      !result
-    else
-      raise "Sorry, I don't know how to invert #{result.inspect}"
-    end
-  end
-end
-
-
-
-unless IO.respond_to? :copy_stream
-
-  class IO
-
-    #
-    # IO.copy_stream backport
-    #
-    def self.copy_stream(input, output)
-      while chunk = input.read(8192)
-        output.write(chunk)
-      end
-    end
-
-  end
-
-end
-
 
 
 class Struct
