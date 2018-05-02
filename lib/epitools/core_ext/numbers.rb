@@ -405,7 +405,7 @@ class Float
   #    > 0.32786243.percent(2) # => "32.79%"
   #
   def percent(decimals=0)
-    "%0.#{decimals}f%" % (self * 100)
+    "%0.#{decimals}f%%" % (self * 100)
   end
 
 end
