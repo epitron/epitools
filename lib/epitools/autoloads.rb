@@ -21,6 +21,7 @@ autoload :Shellwords, 'shellwords'
 autoload :PTY,        'pty'
 autoload :CSV,        'csv'
 autoload :SDBM,       'sdbm'
+autoload :StringScanner, 'strscan'
 
 module Digest
   autoload :SHA1,     'digest/sha1'
