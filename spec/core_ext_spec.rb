@@ -300,6 +300,8 @@ describe String do
   it "wordses" do
     s = "This, is a bunch, of words."
     s.words.should == ["This", "is", "a", "bunch", "of", "words"]
+  
+    "Weird word-like things".words.should == ["Weird", "word", "like", "things"]
   end
 
   it "wordses without stopwords" do
@@ -353,6 +355,25 @@ describe String do
 
     big_endian_bytes.to_i_from_bytes(true).should == i
     little_endian_bytes.to_i_from_bytes.should == i
+  end
+
+  it "split_ats" do
+         "hello@@there@@whee".split_at("@@").to_a.should == ["hello", "there", "whee"]
+                      "hello".split_at("@@").to_a.should == ["hello"]
+    "whatAAAtheBBBheck???oic".split_at(/[AB\?]{1,3}/).to_a.should == ["what", "the", "heck", "oic"]
+                "hello@there".split_after("@").to_a.should == ["hello@", "there"]
+               "line\nline\n".split_at("\n", include_boundary: true).to_a.should == ["line\n", "line\n"]
+  end
+
+  it "sentences" do
+    string = "Sentence the first.  Sentence\nthe second. Sentence the third!!!\n\nThe end."
+
+    string.sentences.to_a.should == [
+      "Sentence the first.",
+      "Sentence the second.",
+      "Sentence the third!!!",
+      "The end.",
+    ]
   end
 
 end

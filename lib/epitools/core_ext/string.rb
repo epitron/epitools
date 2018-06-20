@@ -108,6 +108,36 @@ class String
   alias_method :chomp_lines,   :each_chomped
 
 
+  def split_at(boundary, options={})
+    include_boundary = options[:include_boundary] || false
+
+    boundary = Regexp.new(Regexp.escape(boundary)) if boundary.is_a?(String)
+    s        = StringScanner.new(self)
+
+    Enumerator.new do |yielder|
+      loop do
+        if match = s.scan_until(boundary)
+          if include_boundary
+            yielder << match
+          else
+            yielder << match[0..-(s.matched_size+1)]
+          end
+        else
+          yielder << s.rest if s.rest?
+          break
+        end
+      end
+    end
+  end
+
+  def split_after(boundary)
+    split_at(boundary, include_boundary: true)
+  end
+
+  def split_before(boundary)
+    raise "Why would you want this? Sorry, unimplemented. Send patches."
+  end
+
   #
   # Indent all the lines, if "prefix" is a string, prepend that string
   # to each lien. If it's an integer, prepend that many spaces.
@@ -199,9 +229,12 @@ class String
   end
   alias_method :wrapdent, :wrap_and_indent
 
+  def sentences
+    split_after(/[\.\!\?]+/).lazy.map {|s| s.strip.gsub(/\s+/, " ") }
+  end
+
   def words
-    scan /\w+/
-    # scan /^[a-z]+$|^\w+\-\w+|^[a-z]+[0-9]+[a-z]+$|^[0-9]+[a-z]+|^[a-z]+[0-9]+$/
+    scan /[[:alnum:]]+/
   end
 
   def words_without_stopwords
