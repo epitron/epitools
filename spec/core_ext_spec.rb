@@ -1140,3 +1140,25 @@ describe "Anything" do
   end
 
 end
+
+
+describe URI do
+
+  it "paramses" do
+    opts = {"q" => "hello", "p" => "whee"}
+    query = opts.to_query
+    query.should == "q=hello&p=whee"
+
+    uri = URI("http://blah.com/stuff?#{query}")
+
+    uri.params.should == opts
+  end
+
+  it "gets" do
+    response = URI("http://google.com/").get
+    response.body.size
+    (response.size > 0).should == true
+  end
+
+end
+
