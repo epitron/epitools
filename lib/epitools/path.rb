@@ -653,8 +653,9 @@ class Path
   #
   # All the lines in this file, chomped.
   #
-  def each_line(&block)
-    open { |io| io.each_line { |line| block.call(line.chomp) } }
+  def each_line
+    return to_enum(:each_line) unless block_given?
+    open { |io| io.each_line { |line| yield line.chomp } }
   end
   alias_method :each,       :each_line
   alias_method :lines,      :each_line
