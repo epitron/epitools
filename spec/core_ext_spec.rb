@@ -300,7 +300,7 @@ describe String do
   it "wordses" do
     s = "This, is a bunch, of words."
     s.words.should == ["This", "is", "a", "bunch", "of", "words"]
-  
+
     "Weird word-like things".words.should == ["Weird", "word", "like", "things"]
   end
 
@@ -664,6 +664,11 @@ describe Enumerable do
 
   it "uniqs lazily" do
     [0,0,0,1].cycle.uniq.take(2).to_a.should == [0,1]
+    [0,0,0,1].cycle.uniq_by(&:prime?).take(1).to_a.should == [0]
+  end
+
+  it "uniq_bys" do
+    [1,2,3,4].uniq_by(&:prime?).to_a.should == [1,2]
   end
 
   it "foldl's" do
