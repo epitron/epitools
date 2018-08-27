@@ -39,6 +39,9 @@
 #   >> Colored.enable_temporarily { puts "whee!".red }
 #
 
+# ANSI spec:
+#   https://github.com/tonyg/racket-ansi/blob/master/doc/all-escapes.txt
+
 require 'set'
 require 'rbconfig'
 require 'Win32/Console/ANSI' if RbConfig::CONFIG['host_os'] =~ /mswin|mingw/
