@@ -98,25 +98,28 @@ describe Object do
 
   it "memoizes" do
 
+    $sideffect = 0
+
     class Fake
 
-      def cacheme
-        @temp = !@temp
+      memoize def cached_value
+        $sideffect += 1
+        :value
       end
-      memoize :cacheme
 
     end
 
     f = Fake.new
-    f.instance_variable_get("@cacheme").should == nil
 
-    f.cacheme.should == true
-    f.instance_variable_get("@temp").should == true
-    f.instance_variable_get("@cacheme").should == true
+    $sideffect.should == 0
 
-    f.cacheme.should == true
-    f.instance_variable_get("@temp").should == true
-    f.instance_variable_get("@cacheme").should == true
+    f.cached_value.should == :value
+    $sideffect.should == 1
+
+    f.cached_value.should == :value
+    $sideffect.should == 1
+
+    $sideffect = nil
   end
 
 end
@@ -170,6 +173,8 @@ describe Numeric do
     5.days.ago.to_i.should      == (Time.now - 5.days).to_i
     1.year.ago.year.should      == Time.now.year - 1
     5.days.from_now.to_i.should == (Time.now + 5.days).to_i
+
+    1.day.ago.elapsed.should be_within(0.1).of(1.day)
   end
 
   it "thingses" do
