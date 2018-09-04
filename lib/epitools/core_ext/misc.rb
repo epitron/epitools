@@ -201,18 +201,6 @@ end
 URI::RFC3986_Parser.prepend(Better_URI_RFC3986_Parser)
 
 
-class Time
-
-  #
-  # Which "quarter" of the year does this date fall into?
-  #
-  def quarter
-    (month / 3.0).ceil
-  end
-
-end
-
-
 
 #
 # Give ObjectSpace Enumerable powers (select, map, etc.)
