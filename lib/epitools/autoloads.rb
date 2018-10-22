@@ -21,6 +21,7 @@ autoload :Shellwords, 'shellwords'
 autoload :PTY,        'pty'
 autoload :CSV,        'csv'
 autoload :SDBM,       'sdbm'
+autoload :StringScanner, 'strscan'
 
 module Digest
   autoload :SHA1,     'digest/sha1'
@@ -75,6 +76,7 @@ autoload :WM,           'epitools/wm'
 autoload :TypedStruct,  'epitools/typed_struct'
 autoload :Sys,          'epitools/sys'
 autoload :Matrix,       'epitools/core_ext/matrix'
+autoload :SemanticVersion, 'epitools/semantic_version'
 
 
 ## Gems (common)

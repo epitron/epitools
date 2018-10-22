@@ -6,6 +6,7 @@ class Array
   #
   alias_method :lpush, :unshift
   alias_method :lpop,  :shift
+  alias_method :uniq_by, :uniq
 
   #
   # flatten.compact.uniq

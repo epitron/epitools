@@ -238,6 +238,13 @@ module Kernel
   end
   alias_method :backtick_with_stderr, :run_with_stderr
 
+  #
+  # Print "self" with a linefeed at the end
+  #
+  def displayln
+    puts self
+  end
+
 end
 
 

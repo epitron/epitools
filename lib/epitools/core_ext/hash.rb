@@ -2,6 +2,20 @@
 class Hash
 
   #
+  # `hash1 + hash2` merge the two hashes, returning a new hash
+  #
+  def +(other)
+    merge(other)
+  end
+
+  #
+  # `hash1 - hash2` removes keys from hash1 that exist in hash2, returning a new hash
+  #
+  def -(other)
+    dup.delete_if { |k,v| other.includes?(k) }
+  end
+
+  #
   # 'true' if the Hash has no entries
   #
   def blank?
