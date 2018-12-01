@@ -135,8 +135,9 @@ describe Path do
   it "reads/writes various formats (json, yaml, etc.)" do
     data = { "hello" => "there", "amazing" => [1,2,3,4] }
 
-    yaml = Path.tmpfile
+    yaml = Path["/tmp/test.yaml"]
     yaml.write_yaml(data)
+    yaml.exists?.should == true
     yaml.read_yaml.should == data
 
     json = Path.tmpfile
@@ -147,6 +148,9 @@ describe Path do
     html = Path.tmpfile
     html.write data
     html.read_html.at("h1").to_s.should == data
+
+  ensure
+    yaml.rm
   end
 
   it "parses files" do
@@ -365,6 +369,34 @@ describe Path do
 
     tmp.gunzip!
     tmp.size.should == before
+  end
+
+  it "zopens" do
+    tmpjson = Path["/tmp/test.json"]
+
+    hash = {
+      "json" => true,
+      "jsonity" => 500
+    }
+
+    tmpjson.write(JSON.dump(hash))
+    tmpjson.read.from_json["json"].should == true
+
+    parsed = tmpjson.parse
+    parsed.should == hash
+
+    system("gzip -c < #{tmpjson} > #{tmpjson}.gz")
+
+    tmpgzip = Path["#{tmpjson}.gz"]
+    tmpgzip.exists?.should == true
+    tmpgzip.size.should be > 0
+
+    parsed = tmpgzip.parse
+    parsed.should_not be_nil
+    parsed.should == hash
+
+    tmpjson&.rm
+    tmpgzip&.rm
   end
 
   it "exts" do

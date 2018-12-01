@@ -596,7 +596,11 @@ class Path
       when String, Numeric, true, false, nil
         self[key] = new
       else
-        raise "Error: Can't use a #{new.class} as an xattr value. Try passing a String."
+        if new.respond_to? :to_str
+          self[key] = new.to_str
+        else
+          raise "Error: Can't use a #{new.class} as an xattr value. Try passing a String."
+        end
       end
     end
   end
@@ -670,7 +674,7 @@ class Path
     return to_enum(:grep, pat).to_a unless block_given?
 
     each_line do |line|
-      yield line if line =~ pat
+      yield line if line[pat]
     end
   end
 
@@ -779,6 +783,62 @@ class Path
     end
   end
 
+  ###############################################################################
+  # zopening files
+  ###############################################################################
+
+  COMPRESSORS = {
+    "gz"  => "gzip",
+    "xz"  => "xz",
+    "bz2" => "bzip2"
+  }
+
+  #
+  # A mutation of "open" that lets you read/write gzip files, as well as
+  # regular files.
+  #
+  # (NOTE: gzip detection is based on the filename, not the contents.)
+  #
+  # It accepts a block just like open()!
+  #
+  # Example:
+  #    zopen("test.txt")          #=> #<File:test.txt>
+  #    zopen("test.txt.gz")       #=> #<Zlib::GzipReader:0xb6c79424>
+  #    zopen("otherfile.gz", "w") #=> #<Zlib::GzipWriter:0x7fe30448>>
+  #    zopen("test.txt.gz") { |f| f.read } # read the contents of the .gz file, then close the file handle automatically.
+  #
+  def zopen(mode="rb")
+    # if ext == "gz"
+    #   io = open(mode)
+    #   case mode
+    #   when "r", "rb"
+    #     io = Zlib::GzipReader.new(io)
+    #     def io.to_str; read; end
+    #   when "w", "wb"
+    #     io = Zlib::GzipWriter.new(io)
+    #   else
+    #     raise "Unknown mode: #{mode.inspect}. zopen only supports 'r' and 'w'."
+    #   end
+    # elsif bin = COMPRESSORS[ext]
+    if bin = COMPRESSORS[ext]
+      if which(bin)
+        io = IO.popen([bin, "-d" ,"-c", path])
+      else
+        raise "Error: couln't find #{bin.inspect} in the path"
+      end
+    else
+      io = open(path)
+    end
+
+    if block_given?
+      result = yield(io)
+      io.close
+      result
+    else
+      io
+    end
+
+  end
 
   ###############################################################################
   # Parsing files
@@ -788,22 +848,24 @@ class Path
   # Parse the file based on the file extension.
   # (Handles json, html, yaml, xml, csv, marshal, and bson.)
   #
-  def parse
-    case ext.downcase
+  def parse(io=self.io, forced_ext=nil)
+    case (forced_ext or ext.downcase)
+    when 'gz', 'bz2', 'xz'
+      parse(zopen, exts[-2])
     when 'json'
-      read_json
+      read_json(io)
     when 'html', 'htm'
-      read_html
+      read_html(io)
     when 'yaml', 'yml'
-      read_yaml
+      read_yaml(io)
     when 'xml', 'rdf', 'rss'
-      read_xml
+      read_xml(io)
     when 'csv'
-      read_csv
+      read_csv(io)
     when 'marshal'
-      read_marshal
+      read_marshal(io)
     when 'bson'
-      read_bson
+      read_bson(io)
     else
       raise "Unrecognized format: #{ext}"
     end
@@ -816,8 +878,9 @@ class Path
     each_line.map { |line| JSON.parse line }
   end
 
+
   # Parse the file as JSON
-  def read_json
+  def read_json(io=self.io)
     JSON.load(io)
   end
   alias_method :from_json, :read_json
@@ -828,7 +891,7 @@ class Path
   end
 
 
-  def read_html
+  def read_html(io=self.io)
     Nokogiri::HTML(io)
   end
   alias_method :from_html, :read_html
@@ -840,10 +903,11 @@ class Path
   end
 
   # Parse the file as YAML
-  def read_yaml
+  def read_yaml(io=self.io)
     YAML.load(io)
   end
   alias_method :from_yaml, :read_yaml
+
 
   # Parse the file as CSV
   def read_csv(opts={})
@@ -852,12 +916,12 @@ class Path
   alias_method :from_csv, :read_csv
 
   # Parse the file as XML
-  def read_xml
+  def read_xml(io=self.io)
     Nokogiri::XML(io)
   end
 
   # Parse the file as a Ruby Marshal dump
-  def read_marshal
+  def read_marshal(io=self.io)
     Marshal.load(io)
   end
 
@@ -867,7 +931,7 @@ class Path
   end
 
   # Parse the file as BSON
-  def read_bson
+  def read_bson(io=self.io)
     BSON.deserialize(read)
   end
 
@@ -880,7 +944,7 @@ class Path
   # Read ID3 tags (requires 'id3tag' gem)
   #
   # Available fields:
-  #    tag.artist, tag.title, tag.album, tag.year, tag.track_nr, tag.genre, tag.get_frame(:TIT2)&.content, 
+  #    tag.artist, tag.title, tag.album, tag.year, tag.track_nr, tag.genre, tag.get_frame(:TIT2)&.content,
   #    tag.get_frames(:COMM).first&.content, tag.get_frames(:COMM).last&.language
   #
   def id3
@@ -1124,7 +1188,7 @@ class Path
   # Remove a file or directory
   #
   def rm
-    raise "Error: #{self} does not exist" unless symlink? or exists? 
+    raise "Error: #{self} does not exist" unless symlink? or exists?
 
     if directory? and not symlink?
       Dir.rmdir(self) == 0
@@ -1391,7 +1455,7 @@ class Path
   # TODO: Remove the tempfile when the Path object is garbage collected or freed.
   #
   def self.tmpfile(prefix="tmp")
-    path = Path.new Tempfile.new(prefix).path, unlink_when_garbage_collected: true
+    path = Path.new(Tempfile.new(prefix).path, unlink_when_garbage_collected: true)
     yield path if block_given?
     path
   end
@@ -1537,6 +1601,13 @@ class Path::URI < Path
   # When this is: http://host.com:port/path/filename.ext?param1=value1&param2=value2&...
   #
   def to_s; uri.to_s; end
+
+  #
+  # Print out an URI
+  #
+  def inspect
+    "<#Path::URI #{self}>"
+  end
 
 
   #
