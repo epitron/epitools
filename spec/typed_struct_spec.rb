@@ -33,18 +33,18 @@ describe TypedStruct do
   it "drops unknowns" do
 
     ts = TypedStruct["a:int"]
-    lambda { ts.new a: 1, b: 2 }.should raise_error
+    lambda { ts.new a: 1, b: 2 }.should raise_error(NoMethodError)
 
     ts = TypedStruct["a:int -"]
     lambda {
       t = ts.new a: 1, b: 2
       t.a.should == 1
-      lambda { t.b }.should raise_error
+      lambda { t.b }.should raise_error(NoMethodError)
     }.should_not raise_error
   end
 
   it "can't use wildcard and drop unknown at once" do
-    lambda { TypedStruct["a:int - *"].new }.should raise_error
+    lambda { TypedStruct["a:int - *"].new }.should raise_error(RuntimeError)
   end
 
 end
