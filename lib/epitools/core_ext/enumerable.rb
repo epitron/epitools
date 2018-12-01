@@ -240,9 +240,12 @@ module Enumerable
     already_seen = Set.new
 
     Enumerator::Lazy.new(self) do |yielder, value|
-      yielder << value if already_seen.add?(value)
+      key = block_given? ? yield(value) : value
+      yielder << value if already_seen.add?(key)
     end
   end
+
+  alias_method :uniq_by, :uniq
 
   #
   # The same as "map", except that if an element is an Array or Enumerable, map is called

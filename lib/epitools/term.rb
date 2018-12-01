@@ -41,6 +41,42 @@ module Term
     print "\e[H\e[J"
   end
 
+  def clear_line
+    print "\e[2K"
+  end
+
+  def clear_eol
+    print "\e[0K"
+  end
+
+  def move_to(row: 1, col: 1)
+    print "\e[#{row};#{col}H"
+  end
+
+  def home
+    move_to
+  end
+
+  def move_to_row(n)
+    move_to(row: n)
+  end
+
+  def move_to_bottom
+    move_to_row(height-1)
+  end
+
+  def move_to_top
+    move_to_row(1)
+  end
+
+  def hide_cursor
+    print "\e[?25l"
+  end
+
+  def show_cursor
+    print "\e[?25h"
+  end
+
   def color(fore, back=nil)
     @fore = fore
     @back = back if back

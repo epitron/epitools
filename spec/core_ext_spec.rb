@@ -98,25 +98,28 @@ describe Object do
 
   it "memoizes" do
 
+    $sideffect = 0
+
     class Fake
 
-      def cacheme
-        @temp = !@temp
+      memoize def cached_value
+        $sideffect += 1
+        :value
       end
-      memoize :cacheme
 
     end
 
     f = Fake.new
-    f.instance_variable_get("@cacheme").should == nil
 
-    f.cacheme.should == true
-    f.instance_variable_get("@temp").should == true
-    f.instance_variable_get("@cacheme").should == true
+    $sideffect.should == 0
 
-    f.cacheme.should == true
-    f.instance_variable_get("@temp").should == true
-    f.instance_variable_get("@cacheme").should == true
+    f.cached_value.should == :value
+    $sideffect.should == 1
+
+    f.cached_value.should == :value
+    $sideffect.should == 1
+
+    $sideffect = nil
   end
 
 end
@@ -170,6 +173,8 @@ describe Numeric do
     5.days.ago.to_i.should      == (Time.now - 5.days).to_i
     1.year.ago.year.should      == Time.now.year - 1
     5.days.from_now.to_i.should == (Time.now + 5.days).to_i
+
+    1.day.ago.elapsed.should be_within(0.1).of(1.day)
   end
 
   it "thingses" do
@@ -300,7 +305,7 @@ describe String do
   it "wordses" do
     s = "This, is a bunch, of words."
     s.words.should == ["This", "is", "a", "bunch", "of", "words"]
-  
+
     "Weird word-like things".words.should == ["Weird", "word", "like", "things"]
   end
 
@@ -664,6 +669,11 @@ describe Enumerable do
 
   it "uniqs lazily" do
     [0,0,0,1].cycle.uniq.take(2).to_a.should == [0,1]
+    [0,0,0,1].cycle.uniq_by(&:prime?).take(1).to_a.should == [0]
+  end
+
+  it "uniq_bys" do
+    [1,2,3,4].uniq_by(&:prime?).to_a.should == [1,2]
   end
 
   it "foldl's" do
@@ -1140,3 +1150,25 @@ describe "Anything" do
   end
 
 end
+
+
+describe URI do
+
+  it "paramses" do
+    opts = {"q" => "hello", "p" => "whee"}
+    query = opts.to_query
+    query.should == "q=hello&p=whee"
+
+    uri = URI("http://blah.com/stuff?#{query}")
+
+    uri.params.should == opts
+  end
+
+  it "gets" do
+    response = URI("http://google.com/").get
+    response.body.size
+    (response.size > 0).should == true
+  end
+
+end
+
