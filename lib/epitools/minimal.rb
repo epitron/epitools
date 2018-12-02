@@ -241,8 +241,8 @@ module Kernel
   #
   # Print "self" with a linefeed at the end
   #
-  def displayln
-    puts self
+  def displayln(out=$stdout)
+    out.puts self
   end
 
 end
