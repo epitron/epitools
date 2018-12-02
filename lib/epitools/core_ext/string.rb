@@ -311,10 +311,26 @@ class String
   end
 
   #
-  # Cached constants for base62 decoding.
+  # Cached constants for base conversion.
   #
-  BASE62_DIGITS  = Hash[ Integer::BASE62_DIGITS.zip((0...Integer::BASE62_DIGITS.size).to_a) ]
-  BASE62_BASE    = Integer::BASE62_BASE
+  BASE_DIGITS = Integer::BASE_DIGITS.map.with_index.to_h
+
+  #
+  # Convert a string encoded in some base <= 64 into an integer.
+  # (See Integer#to_base for more info.)
+  #
+  def from_base(base=10)
+    n = 0
+    chars.reverse_each.with_index do |c, power|
+      value = BASE_DIGITS[c]
+      n += (base**power) * value
+    end
+    n
+  end
+
+  def from_base62
+    from_base(62)
+  end
 
   #
   # Convert a string (encoded in base16 "hex" -- for example, an MD5 or SHA1 hash)
@@ -322,19 +338,6 @@ class String
   #
   def to_base62
     to_i(16).to_base62
-  end
-
-  #
-  # Convert a string encoded in base62 into an integer.
-  # (See Integer#to_base62 for more info.)
-  #
-  def from_base62
-    accumulator = 0
-    digits = chars.map { |c| BASE62_DIGITS[c] }.reverse
-    digits.each_with_index do |digit, power|
-      accumulator += (BASE62_BASE**power) * digit if digit > 0
-    end
-    accumulator
   end
 
   #

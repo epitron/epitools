@@ -266,34 +266,51 @@ class Integer
   alias_method :bits, :to_bits
 
   #
-  # Cached constants for base62 encoding
+  # Cached constants for encoding numbers into bases up to 64
   #
-  BASE62_DIGITS   = ['0'..'9', 'A'..'Z', 'a'..'z'].map(&:to_a).flatten
-  BASE62_BASE     = BASE62_DIGITS.size
+  BASE_DIGITS       = [*'0'..'9', *'A'..'Z', *'a'..'z', '_', '-']
+  SMALL_POWERS_OF_2 = {2=>1, 4=>2, 8=>3, 16=>4, 32=>5, 64=>6}
 
   #
-  # Convert a number to a string representation (in "base62" encoding).
+  # Convert a number into a string representation (encoded in a base <= 64).
   #
-  # Base62 encoding represents the number using the characters: 0..9, A..Z, a..z
+  # The number is represented usiing the characters: 0..9, A..Z, a..z, _, -
   #
-  # It's the same scheme that url shorteners and YouTube uses for their
-  # ID strings. (eg: http://www.youtube.com/watch?v=dQw4w9WgXcQ)
+  # (Setting base to 64 results in the encoding scheme that YouTube and url shorteners
+  # use for their ID strings, eg: http://www.youtube.com/watch?v=dQw4w9WgXcQ)
   #
-  def to_base62
-    result = []
-    remainder = self
-    max_power = ( Math.log(self) / Math.log(BASE62_BASE) ).floor
+  def to_base(base=10)
+    raise "Error: Can't handle bases greater than 64" if base > 64
 
-    max_power.downto(0) do |power|
-      divisor = BASE62_BASE**power
-      #p [:div, divisor, :rem, remainder]
-      digit, remainder = remainder.divmod(divisor)
-      result << digit
+    n        = self
+    digits   = []
+    alphabet = BASE_DIGITS[0...base]
+
+    if bits = SMALL_POWERS_OF_2[base]
+      # a slightly accelerated version for powers of 2
+      mask   = (2**bits)-1
+
+      loop do
+        digits << (n & mask)
+        n = n >> bits
+
+        break if n == 0
+      end
+    else
+      # generic base conversion
+      loop do
+        n, digit = n.divmod(base)
+        digits << digit
+
+        break if n == 0
+      end
     end
 
-    result << remainder if remainder > 0
+    digits.reverse.map { |d| alphabet[d] }.join
+  end
 
-    result.map{|digit| BASE62_DIGITS[digit]}.join ''
+  def to_base62
+    to_base(62)
   end
 
   #

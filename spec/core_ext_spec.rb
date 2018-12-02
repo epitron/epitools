@@ -423,12 +423,14 @@ describe Integer do
     i[0..-1].should == [1,1,0,1,1,1]
   end
 
-  it "converts to/from base62" do
-    Integer::BASE62_BASE.should == 62
-
+  it "converts to/from bases" do
     [1,20,500,501,34191923].each do |n|
       n.to_base62.from_base62.should == n
     end
+
+    "777".from_base(16).should == 1911
+    500.to_base(10).should == "500"
+    500.to_base(10).from_base(10).should == 500
 
     sum = "asdf".md5
     sum.to_base62.from_base62.to_s(16).should == sum
