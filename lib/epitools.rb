@@ -16,7 +16,6 @@ end
 #
 %w[
   core_ext
-  zopen
   colored
   clitools
   numwords
