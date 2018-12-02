@@ -807,7 +807,7 @@ class Path
   #    zopen("otherfile.gz", "w") #=> #<Zlib::GzipWriter:0x7fe30448>>
   #    zopen("test.txt.gz") { |f| f.read } # read the contents of the .gz file, then close the file handle automatically.
   #
-  def zopen(mode="rb")
+  def zopen(mode="rb", &block)
     # if ext == "gz"
     #   io = open(mode)
     #   case mode
@@ -822,21 +822,40 @@ class Path
     # elsif bin = COMPRESSORS[ext]
     if bin = COMPRESSORS[ext]
       if which(bin)
-        io = IO.popen([bin, "-d" ,"-c", path])
+        case mode
+        when "w", "wb"
+          # TODO: figure out how to pipe the compressor directly a file so we don't require a block
+          raise "Error: Must supply a block when writing" unless block_given?
+
+          IO.popen([bin, "-c"], "wb+") do |compressor|
+            yield(compressor)
+            compressor.close_write
+            open("wb") { |output| IO.copy_stream(compressor, output) }
+          end
+        when "r", "rb"
+          if block_given?
+            IO.popen([bin, "-d" ,"-c", path], "rb", &block)
+          else
+            IO.popen([bin, "-d" ,"-c", path], "rb")
+          end
+        else
+          raise "Error: Mode #{mode.inspect} not recognized"
+        end
       else
-        raise "Error: couln't find #{bin.inspect} in the path"
+        raise "Error: couldn't find #{bin.inspect} in the path"
       end
     else
-      io = open(path)
+      # io = open(path)
+      raise "Error: #{ext.inspect} is an unsupported format"
     end
 
-    if block_given?
-      result = yield(io)
-      io.close
-      result
-    else
-      io
-    end
+    # if block_given?
+    #   result = yield(io)
+    #   io.close
+    #   result
+    # else
+    #   io
+    # end
 
   end
 

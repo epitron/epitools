@@ -371,7 +371,7 @@ describe Path do
     tmp.size.should == before
   end
 
-  it "zopens" do
+  it "zopens for reading/writing" do
     tmpjson = Path["/tmp/test.json"]
 
     hash = {
@@ -385,9 +385,10 @@ describe Path do
     parsed = tmpjson.parse
     parsed.should == hash
 
-    system("gzip -c < #{tmpjson} > #{tmpjson}.gz")
+    # system("gzip -c < #{tmpjson} > #{tmpjson}.gz")
 
     tmpgzip = Path["#{tmpjson}.gz"]
+    tmpgzip.zopen("w") { |io| io.write(JSON.dump(hash)) }
     tmpgzip.exists?.should == true
     tmpgzip.size.should be > 0
 
