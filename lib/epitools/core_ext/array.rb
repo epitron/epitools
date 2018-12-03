@@ -190,6 +190,27 @@ class Array
   end
   alias_method :col, :column
 
+  #
+  # Create a 2D matrix out of arrays
+  #
+  def self.matrix(height, width, initial_value=nil)
+    if block_given?
+      height.times.map do |row|
+        width.times.map do |col|
+          yield(row, col)
+        end
+      end
+    else
+      height.times.map do
+        [initial_value] * width
+      end
+    end
+  end
+
+  alias_class_method :rect, :matrix
+  alias_class_method :of_arrays, :matrix
+
+
   ####################################################################
 
   #
