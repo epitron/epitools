@@ -1600,27 +1600,29 @@ class Path::URI < Path
   #
   # When this is: http://host.com:port/path/filename.ext?param1=value1&param2=value2&...
   #
-  def to_s; uri.to_s; end
-
-  #
-  # Print out an URI
-  #
-  def inspect
-    "<#Path::URI #{self}>"
+  def to_s
+    uri.to_s
   end
 
+  def inspect
+    "#<Path::URI:#{to_s}>"
+  end
 
-  #
-  # ...this is: 'http'
-  #
-  def scheme; uri.scheme; end
+  def scheme
+    uri.scheme
+  end
   alias_method :protocol, :scheme
 
   %w[http https ftp magnet].each do |s|
-    define_method("#{s}?") { scheme[/^#{s}$/i] }
+    define_method("#{s}?") { scheme.downcase == s }
   end
 
-  def http?; super or https?; end
+  #
+  # `http?` checks for 'http' OR 'https' schemes
+  #
+  def http?
+    super or https?
+  end
 
   #
   # ...and this is: 'host.com'
@@ -1653,22 +1655,27 @@ class Path::URI < Path
   def open(mode="r", &block)
     require 'open-uri'
     if block_given?
-      open(to_s, mode, &block)
+      Kernel.open(to_s, mode, &block)
     else
-      open(to_s, mode)
+      Kernel.open(to_s, mode)
     end
   end
 
-  # Note: open is already aliased to io in parent class.
+  alias_method :io, :open
+
   def read(*args)
-    require 'open-uri'
-    case scheme
-    when /https?/i
-      io.read(*args)
-    else
-      raise "No connector for #{scheme} yet. Please fix!"
-    end
+    open { |io| io.read(*args) }
   end
+
+  # def read(*args)
+  #   require 'open-uri'
+  #   case scheme
+  #   when /https?/i
+  #     io.read(*args)
+  #   else
+  #     raise "No connector for #{scheme} yet. Please fix!"
+  #   end
+  # end
 
 end
 
