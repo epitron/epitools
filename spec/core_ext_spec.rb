@@ -586,6 +586,18 @@ describe Array do
     a.cols.map(&:size).should == [3,3,2,2,2]
   end
 
+  it "matrixes" do
+    m = Array.matrix(2,2,0)
+    m.should == [[0,0],[0,0]]
+
+    m = Array.rect(2,2)
+    m.should == [[nil,nil],[nil,nil]]
+
+    m = Array.rect(2,2) {|x,y| rand }
+    pp m
+    m.should_not == [[0,0],[0,0]]
+  end
+
 end
 
 
@@ -1011,6 +1023,35 @@ describe Matrix do
     m[0,0].should == 0
     m[0,2] = 5
     m.to_a.should == [[0,0,5]]
+  end
+
+  it "'each_row's" do
+    m = Matrix.zeros(2,2)
+    m.each_row do |row|
+      row.size.should == 2
+      row.to_a.should == [0,0]
+    end
+
+    Enumerator.should === m.each_row
+  end
+
+  it "'ones'es" do
+    Matrix.ones(2).to_a == [1,1]
+    Matrix.ones(2,2).to_a.should == [[1,1],[1,1]]
+    proc { Matrix.ones(1,1,1) }.should raise_error(ArgumentError)
+  end
+
+  it "blits" do
+    m = Matrix.zeros(5,5)
+    s = Matrix.ones(2,2)
+    m.blit!(s, 2, 1)
+    m.to_a.should == [
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,1,1,0,0],
+      [0,1,1,0,0],
+      [0,0,0,0,0],
+    ]
   end
 
 end
