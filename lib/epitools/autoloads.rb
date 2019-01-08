@@ -79,6 +79,7 @@ autoload :Matrix,       'epitools/core_ext/matrix'
 autoload :SemanticVersion, 'epitools/semantic_version'
 
 
+
 ## Gems (common)
 
 autoreq  :Nokogiri,     'nokogiri'
@@ -90,6 +91,10 @@ autoreq  :GeoIP,        'geoip'
 autoreq  :RBTree,       'rbtree'
 autoreq  :MultiRBTree,  'rbtree'
 autoreq  :ID3Tag,       'id3tag'
+
+autoreq :Numo do
+  require 'numo/narray'
+end
 
 autoreq :AwesomePrint do
   require 'awesome_print'
