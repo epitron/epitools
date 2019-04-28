@@ -366,6 +366,17 @@ class Integer
   end
   alias_method :fibonacci, :fib
 
+
+  #
+  # Flip all bits except the sign bit.
+  #
+  # NOTE: This method should only be used with unsigned integers; if you use it with a signed
+  # integer, it will only flip the non-sign bits (I dunno if that's useful for anything; nothing comes to mind.)
+  #
+  def invert
+    to_s(2).tr("01","10").to_i(2)
+  end
+
 end
 
 #

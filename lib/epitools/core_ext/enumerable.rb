@@ -207,16 +207,19 @@ module Enumerable
   end
 
 
-  #
-  # Sum the elements
-  #
-  def sum(&block)
-    if block_given?
-      map(&block).reduce(:+)
-    else
-      reduce(:+)
+  unless defined? sum
+    #
+    # Sum the elements
+    #
+    def sum(&block)
+      if block_given?
+        map(&block).reduce(:+)
+      else
+        reduce(:+)
+      end
     end
   end
+
   alias_method :sum_by, :sum
 
   #
