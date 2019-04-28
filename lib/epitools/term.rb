@@ -137,7 +137,8 @@ module Term
       return @columns if @columns
       w = @width
       w -= indent
-      (w-2) / (@max_size + @padding)
+      cols = (w-2) / (@max_size + @padding)
+      cols > 0 ? cols : 1
     end
 
     def num_rows
