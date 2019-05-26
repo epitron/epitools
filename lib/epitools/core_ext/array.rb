@@ -243,6 +243,16 @@ class Array
     end
   end
 
+
+  #
+  # Convert an Array that contanis Hashes to a new Array that contains OpenStructs
+  #
+  def to_ostruct
+    map do |e|
+      e.respond_to?(:to_ostruct) ? e.to_ostruct : e
+    end
+  end
+
   #
   # Takes an array of numbers, puts them into equal-sized
   # buckets, and counts the buckets (aka. A Histogram!)

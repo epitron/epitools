@@ -893,13 +893,18 @@ describe Hash do
         c: {
           a: :woot
         }
-      }
+      },
+      d: [
+        {a: 5},
+        {a: 6},
+      ]
     }
 
     result = test.to_ostruct
     result.a.should == 1
     result.c.a.should == 3
     result.c.c.a.should == :woot
+    result.d.first.a.should == 5
   end
 
 end

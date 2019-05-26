@@ -367,11 +367,11 @@ class Hash
   end
 
   #
-  # Convert this Hash to an OpenStruct
+  # Convert this Hash (and all nested Hashes, and all nested Arrays containing Hashes) to OpenStruct(s)
   #
   def to_ostruct
     OpenStruct.new(self.map_values do |v|
-      v.is_a?(Hash) ? v.to_ostruct : v
+      v.respond_to?(:to_ostruct) ? v.to_ostruct : v
     end)
   end
 
