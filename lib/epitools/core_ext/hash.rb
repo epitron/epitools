@@ -366,5 +366,14 @@ class Hash
     duplicate
   end
 
+  #
+  # Convert this Hash to an OpenStruct
+  #
+  def to_ostruct
+    OpenStruct.new(self.map_values do |v|
+      v.is_a?(Hash) ? v.to_ostruct : v
+    end)
+  end
+
 end
 

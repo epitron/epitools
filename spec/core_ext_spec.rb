@@ -883,6 +883,25 @@ describe Hash do
     a.should == b
   end
 
+  it "to_ostructs" do
+    test = {
+      a: 1,
+      b: 2,
+      c: {
+        a: 3,
+        b: 4,
+        c: {
+          a: :woot
+        }
+      }
+    }
+
+    result = test.to_ostruct
+    result.a.should == 1
+    result.c.a.should == 3
+    result.c.c.a.should == :woot
+  end
+
 end
 
 
