@@ -82,14 +82,23 @@ autoload :SemanticVersion, 'epitools/semantic_version'
 
 ## Gems (common)
 
-autoreq  :Nokogiri,     'nokogiri'
 autoreq  :Mechanize,    'mechanize'
+autoreq  :HTTP,         'http'
+
+autoreq  :Nokogiri,     'nokogiri'
+autoreq  :Oga,          'oga'
+autoreq  :Ox,           'ox'
+
 autoreq  :ANSI,         'ansi'
+
 autoreq  :BSON,         'bson'
 autoreq  :JSON,         'json'
+
 autoreq  :GeoIP,        'geoip'
+
 autoreq  :RBTree,       'rbtree'
 autoreq  :MultiRBTree,  'rbtree'
+
 autoreq  :ID3Tag,       'id3tag'
 
 autoreq :Numo do
