@@ -78,6 +78,13 @@ autoload :Sys,          'epitools/sys'
 autoload :Matrix,       'epitools/core_ext/matrix'
 autoload :SemanticVersion, 'epitools/semantic_version'
 
+module Epi
+  autoload :Slop, 'epitools/slop'
+end
+
+autoreq :Slop do 
+  Slop = Epi::Slop
+end
 
 
 ## Gems (common)
