@@ -3,6 +3,8 @@ require 'epitools'
 ##############################################################################
 
 require 'epitools/core_ext/object'
+require 'epitools/core_ext/class'
+require 'epitools/core_ext/module'
 require 'epitools/core_ext/string'
 require 'epitools/core_ext/array'
 require 'epitools/core_ext/file'

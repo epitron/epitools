@@ -62,19 +62,6 @@ class Object
   end
 
   #
-  # Return a copy of the class with modules mixed into it.
-  #
-  def self.using(*args)
-    if block_given?
-      yield using(*args)
-    else
-      copy = self.dup
-      args.each { |arg| copy.send(:include, arg) }
-      copy
-    end
-  end
-
-  #
   # Serialize this object to a binary String, using Marshal.dump.
   #
   def marshal
