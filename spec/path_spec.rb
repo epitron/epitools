@@ -156,9 +156,16 @@ describe Path do
   it "parses files" do
     data = {"hello"=>"there"}
 
-    f = Path["/tmp/something.json"]
+    f = Path.tmpfile.with(ext: "json")
     f.write_json(data)
     f.parse.should == data
+  end
+
+  it "parses csvs" do
+    f = Path.tmpfile.with(ext: "csv")
+    f.write("1,2,3\n4,5,6\n")
+    rows = f.parse
+    rows.to_a.should == [ %w[1 2 3], %w[4 5 6] ]
   end
 
   it "makes paths THREE WAYS!" do

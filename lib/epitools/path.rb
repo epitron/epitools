@@ -867,7 +867,7 @@ class Path
   # Parse the file based on the file extension.
   # (Handles json, html, yaml, xml, csv, marshal, and bson.)
   #
-  def parse(io=self.io, forced_ext=nil)
+  def parse(io=self.io, forced_ext=nil, opts={})
     case (forced_ext or ext.downcase)
     when 'gz', 'bz2', 'xz'
       parse(zopen, exts[-2])
@@ -880,7 +880,7 @@ class Path
     when 'xml', 'rdf', 'rss'
       read_xml(io)
     when 'csv'
-      read_csv(io)
+      read_csv(io, opts)
     when 'marshal'
       read_marshal(io)
     when 'bson'
@@ -929,8 +929,8 @@ class Path
 
 
   # Parse the file as CSV
-  def read_csv(opts={})
-    CSV.open(io, opts).each
+  def read_csv(io=self.io, opts={})
+    open { |io| CSV.new(io.read, opts).each }
   end
   alias_method :from_csv, :read_csv
 
