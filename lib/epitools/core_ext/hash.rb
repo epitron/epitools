@@ -375,5 +375,13 @@ class Hash
     end)
   end
 
+  #
+  # Convert this Hash to indented JSON (using JSON.pretty_generate)
+  #
+  def to_nicejson
+    JSON.pretty_generate(self)
+  end
+  alias_method :to_nice_json, :to_nicejson
+
 end
 
