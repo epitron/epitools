@@ -358,6 +358,13 @@ class String
   alias_method :encode64, :to_base64
 
   #
+  # Convert Python serialized bencoded (pickled) objects to Ruby Objects
+  #
+  def from_bencode
+    BEncode.load(self)
+  end
+   
+  #
   # MD5 the string
   #
   def md5

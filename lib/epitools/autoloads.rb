@@ -75,17 +75,13 @@ autoload :Iter,         'epitools/iter'
 autoload :WM,           'epitools/wm'
 autoload :TypedStruct,  'epitools/typed_struct'
 autoload :Sys,          'epitools/sys'
-autoload :Matrix,       'epitools/core_ext/matrix'
 autoload :SemanticVersion, 'epitools/semantic_version'
 
-module Epi
-  autoload :Slop, 'epitools/slop'
-end
+autoload :Matrix, 'epitools/core_ext/matrix'
+autoreq(:Vector) { Matrix }
 
-autoreq :Slop do 
-  Slop = Epi::Slop
-end
-
+module Epi; autoload :Slop, 'epitools/slop'; end
+autoreq(:Slop) { Slop = Epi::Slop }
 
 ## Gems (common)
 
@@ -100,6 +96,7 @@ autoreq  :ANSI,         'ansi'
 
 autoreq  :BSON,         'bson'
 autoreq  :JSON,         'json'
+autoreq  :BEncode,      'bencode'
 
 autoreq  :GeoIP,        'geoip'
 
