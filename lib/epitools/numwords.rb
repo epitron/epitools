@@ -117,7 +117,7 @@ class Numeric
       factor    = 10**pow
 
       if is_a?(Float)
-        (BigDecimal.new(to_s) * factor).to_i
+        (BigDecimal(to_s) * factor).to_i
       else
         self * factor
       end
