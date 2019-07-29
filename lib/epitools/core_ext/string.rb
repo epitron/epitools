@@ -22,6 +22,13 @@ class String
   end
 
   #
+  # Escape shell characters (globs, quotes, parens, etc.)
+  #
+  def shellescape
+    Shellwords.escape(self)
+  end
+
+  #
   # Remove redundant whitespaces (not including newlines).
   #
   def tighten
