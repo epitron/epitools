@@ -1110,6 +1110,25 @@ class Path
     }
   end
 
+  #
+  # Path.mkcd(path) creates a path if it doesn't exist, and changes to it (temporarily, if a block is provided)
+  #
+  def self.mkcd(path, &block)
+    path = path.to_Path unless path.is_a? Path
+    path.mkdir_p unless path.exists?
+
+    raise "Error: #{path} couldn't be created." unless path.dir?
+
+    self.cd(path, &block)
+  end
+
+  #
+  # Path.mkcd(self)
+  #
+  def mkcd(&block)
+    Path.mkcd(self, &block)
+  end
+
   def cp_r(dest)
     FileUtils.cp_r(path, dest) #if Path[dest].exists?
     dest

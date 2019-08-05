@@ -348,6 +348,25 @@ describe Path do
     lambda { tmp2.mkdir_p }.should_not raise_error
   end
 
+  it "mkcds" do
+    tmp = Path.tmpdir
+    tmp.dir?.should == true
+    tmp.rm
+    tmp.exists?.should == false
+
+    Path.mkcd(tmp) do
+      Path.pwd.path.should == tmp.path
+    end
+
+    tmp.rm
+
+    tmp.mkcd do
+      Path.pwd.path.should == tmp.path
+    end
+
+    tmp.rm
+  end
+
   it "has classmethods" do
     path = Path.tmpfile
 
