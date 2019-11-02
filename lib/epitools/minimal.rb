@@ -1,8 +1,10 @@
+####################################################################################
 #
 # If you require 'epitools/minimal' instead of 'epitools',
 # this is what you get: core_ext monkeypatches and all the
 # autoloads; the barest essentials for survival.
 #
+####################################################################################
 
 if RUBY_VERSION[/^1.8/]
   require 'enumerator'
@@ -14,6 +16,7 @@ RbConfig = Config unless defined? RbConfig
 Infinity = Float::INFINITY
 Inf      = Float::INFINITY
 
+####################################################################################
 class Object
 
   unless defined?(__DIR__)
@@ -179,6 +182,7 @@ class Object
 end
 
 
+####################################################################################
 #
 # Patch 'Module#const_missing' to support 'autoreq' (which can autoload gems)
 #
@@ -213,6 +217,8 @@ class Module
 end
 
 
+
+####################################################################################
 module Kernel
 
   #
@@ -254,10 +260,8 @@ module Kernel
   end
 
 end
+
 ####################################################################################
-
-
-
 class String
 
   #
@@ -270,6 +274,7 @@ class String
 
 end
 
+####################################################################################
 #
 # Path("/some/path") is an alias for Path["/some/path"]
 #
@@ -277,43 +282,7 @@ def Path(arg)
   Path[arg]
 end
 
-####################################################################
-
-# class << ARGV
-
-#   def opts
-#     @opts, @args ||= partition { |arg| arg[/^--?\w{1,2}/].nil? }
-#   end
-
-#   def args
-#     @args ? @args : opts && @args
-#   end
-
-#   def paths
-#     map(&:to_Path)
-#   end
-
-#   def paths_R
-#     recursive_proc = proc do |paths|
-#       paths.map { |path| path.dir? ? the_expander.(path.ls_R) : path }
-#     end
-
-#     recursive_proc.(paths)
-#   end
-#   alias_method :recursive_paths, :paths_R
-
-#   def regexes(escaped: true, case_sensitive: false)
-#     if case_sensitive
-#       map { |arg| /#{escaped ? Regexp.escape(arg) : arg}/ } # NO 'i'
-#     else
-#       map { |arg| /#{escaped ? Regexp.escape(arg) : arg}/i }
-#     end
-#   end
-
-# end
 
 ####################################################################
-
 require 'epitools/autoloads'
-
 ####################################################################

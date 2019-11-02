@@ -147,6 +147,44 @@ describe Class do
     end
   end
 
+  it "traces messages (when $DEBUG is set)" do
+    $DEBUG = true
+
+    class TestButt
+      trace_messages_to :a, :b, :c
+
+      def a(x)
+      end
+
+      def b(x)
+      end
+
+      def c(x,y,z,&block)
+      end
+    end
+
+    class ButtTest
+      trace_messages_to :*
+
+      def d
+      end
+
+      def e
+      end
+    end
+
+    t = TestButt.new
+    t.a(1)
+    t.b(2)
+    t.c(3,4,5) { :butt }
+
+    b = ButtTest.new
+    b.a
+    b.b
+
+    $DEBUG = false
+  end
+
 end
 
 
@@ -1204,6 +1242,16 @@ describe File do
 
 end
 
+describe ARGV do
+
+#   it "parses args" do
+#     ARGV.clear
+#     ARGV << "-d"
+#     ARGV.parse!
+#     p ARGV.opts
+#   end
+
+end
 
 describe "Anything" do
 
@@ -1235,6 +1283,14 @@ describe URI do
     response = URI("http://google.com/").get
     response.body.size
     (response.size > 0).should == true
+  end
+
+  it "params=" do
+    u = "http://butt.com/?q=1".to_uri
+    u.query.should == "q=1"
+    u.params["q"] = 2
+    u.params["q"].should == 2
+    u.query.should == "q=2"
   end
 
 end
