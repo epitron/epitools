@@ -1,7 +1,6 @@
 ## Standard library
 
 autoload :Set,        'set'
-autoload :URI,        'uri'
 autoload :Zlib,       'zlib'
 autoload :FileUtils,  'fileutils'
 autoload :Tempfile,   'tempfile'
@@ -22,6 +21,10 @@ autoload :PTY,        'pty'
 autoload :CSV,        'csv'
 autoload :SDBM,       'sdbm'
 autoload :StringScanner, 'strscan'
+
+autoreq :URI do
+  require 'epitools/core_ext/uri'
+end
 
 module Digest
   autoload :SHA1,     'digest/sha1'

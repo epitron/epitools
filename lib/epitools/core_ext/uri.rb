@@ -1,10 +1,12 @@
+require 'uri'
+
 module URI
 
   #
   # Return a Hash of the variables in the query string
   #
   def params
-    @params ||= (query ? query.to_params : {})
+    (@query ? @query.to_params : {})
   end
 
   #
@@ -12,12 +14,13 @@ module URI
   # NB: This is super slow. To make it faster, store params directly in a locally cached dict, and only call `to_query` when query is accesed, or to_s/inspect are called
   #
   def params=(key, value)
-    class.alias_method :query_orig, :query
-    class.define_method(:query) { params.to_query }
-
-    current = params
+    current      = params
     current[key] = value
-    self.query = current.to_query
+    self.query   = current.to_query
+  end
+
+  def query
+    params.to_query
   end
 
   #

@@ -61,7 +61,7 @@ module WM
 
     def self.all
       # FIXME: Windows owned by linux-namespaced processes (firejail) report their namspaced pid to X11. `window.process` ends up pointing at either nil, or the wrong process.
-      `wmctrl -lpG`.lines.map(&:strip).map { |line| Window.from_line(line) }
+      `wmctrl -lpG`.lines.map(&:strip).map { |line| Window.from_line(line) unless line.blank? }.compact
     end
 
     def self.from_line(line)
