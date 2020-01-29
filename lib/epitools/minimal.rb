@@ -167,14 +167,13 @@ class Object
   #
   # eg: stuff.group_by(&:self)
   #
-  define_method :self do
+  def self 
     if block_given?
       yield self
     else
       self
     end
   end
-  alias_method :fap, :self
 
   def ancestors
     self.class.ancestors
