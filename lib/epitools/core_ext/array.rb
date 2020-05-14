@@ -324,6 +324,33 @@ class Array
     super.to_a
   end
 
+  module ToCSV
+    #
+    # Convert this enumerable into a CSV string (nb: enumerable must contain either all Hashes or all Arrays)
+    #
+    def to_csv(delimiter=",")
+      types = count_by(&:class)
+
+      unless types.size == 1 and (types[Array] > 0 or types[Hash] > 0)
+        raise "Error: this array must contain nothing but arrays, or nothing but hashes (actually contains: #{types.inspect})"
+      end
+
+      options = {}
+      options[:col_sep] = delimiter
+      options[:headers] = flat_map(&:keys).uniq if types[Hash] > 0
+
+      CSV.generate(nil, **options) do |csv|
+        each { |obj| csv << obj }
+      end
+    end
+
+    #
+    # Like #to_csv, but with tab-separated CSV fields
+    #
+    def to_tsv
+      to_csv("\t")
+    end
+  end
+
+  prepend ToCSV # dirty hack to stop the CSV module from clobbering the to_csv method
 end
-
-

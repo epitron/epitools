@@ -795,6 +795,38 @@ describe Enumerable do
     ps.sort_numerically.map(&:filename).should == proper
   end
 
+  it "to_csvs and to_tsvs" do
+    data = [
+      ["1", "2", "3"],
+      ["4", "5", "6"],
+      ["7", "8", "9", "10"],
+    ]
+
+    hash_data = [
+      {a: 1, b: 2, c: 3},
+      {a: 4, b: 5, c: 6},
+      {a: 7, b: 8, c: 9, d: 10},
+    ]
+
+    class EnumedData
+      include Enumerable
+      def initialize(data); @data=data; end
+      def each(&block); @data.each(&block); end
+    end
+
+    [data, hash_data, EnumedData.new(data)].each do |a|
+      str = a.to_csv
+      str.each_line.count.should == 3
+      str.should_not be_nil
+      str["1,2,3"].should_not be_nil
+
+      str = a.to_tsv
+      str.should_not be_nil
+      str["1\t2\t3"].should_not be_nil
+    end
+
+  end
+
 end
 
 
