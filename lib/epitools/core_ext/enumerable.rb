@@ -1,3 +1,5 @@
+require 'epitools/core_ext/array'
+
 module Enumerable
   include Array::ToCSV
 
