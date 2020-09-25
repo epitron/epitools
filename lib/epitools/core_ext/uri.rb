@@ -10,21 +10,30 @@ module URI
   end
 
   #
-  # Mutate the query
-  # NB: This is super slow. To make it faster, store params directly in a locally cached dict, and only call `to_query` when query is accesed, or to_s/inspect are called
+  # Update all the params at once
   #
-  def params=(key, value)
+  def params=(new_params)
+    self.query = new_params.to_params
+  end
+
+  #
+  # Update one URI parameter
+  #
+  def set_param(key, value)
     current      = params
     current[key] = value
     self.query   = current.to_query
   end
 
+  #
+  # Get the query string
+  #
   def query
     params.to_query
   end
 
   #
-  # URIs are strings, dammit!
+  # URIs *are* strings, dammit!
   #
   def to_str
     to_s
