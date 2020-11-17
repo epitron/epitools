@@ -1,29 +1,6 @@
 require 'uri'
 
-module URI
-
-  #
-  # Return a Hash of the variables in the query string
-  #
-  def params
-    (@query ? @query.to_params : {})
-  end
-
-  #
-  # Update all the params at once
-  #
-  def params=(new_params)
-    self.query = new_params.to_params
-  end
-
-  #
-  # Update one URI parameter
-  #
-  def set_param(key, value)
-    current      = params
-    current[key] = value
-    self.query   = current.to_query
-  end
+class URI::Generic
 
   #
   # Get the query string
@@ -33,11 +10,40 @@ module URI
   end
 
   #
+  # Return a Hash of the variables in the query string
+  #
+  def params
+    @params ||= (@query ? @query.to_params : {})
+  end
+
+  #
+  # Update all the params at once
+  #
+  def params=(new_params)
+    # self.query = new_params.to_params
+    raise "params must be a Hash" unless new_params.is_a? Hash
+    @params = new_params
+  end
+
+  # #
+  # # Update one URI parameter
+  # #
+  # def set_param(key, value)
+  #   current      = params
+  #   current[key] = value
+  #   self.query   = current.to_query
+  # end
+
+  #
   # URIs *are* strings, dammit!
   #
   def to_str
     to_s
   end
+
+end
+
+module URI
 
   #
   # Default user agent for the 'get' method
