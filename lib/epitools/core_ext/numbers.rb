@@ -1,5 +1,5 @@
 
-Number = Numeric # "obj.is_a? Number" just sounds better.
+Number = Numeric # because "obj.is_a? Number" sounds better!
 
 class Numeric
 
@@ -84,7 +84,8 @@ class Numeric
     end
   end
 
-  [:cos,
+  [
+   :cos,
    :sin,
    :tan,
    :acos,
@@ -186,7 +187,8 @@ class Numeric
   end
 
   BYTE_SIZE_TABLE = {
-    # power    # units
+    # power
+    # of 1024  #  units
     0          => "",
     1          => "KB",
     2          => "MB",
@@ -213,8 +215,8 @@ class Numeric
   def to_hms
     seconds = self
 
-    days, seconds    = seconds.divmod(86400)
-    hours, seconds   = seconds.divmod(3600)
+    days,    seconds = seconds.divmod(86400)
+    hours,   seconds = seconds.divmod(3600)
     minutes, seconds = seconds.divmod(60)
     seconds, frac    = seconds.divmod(1)
 
@@ -229,8 +231,8 @@ class Numeric
   def to_hms_in_words
     seconds = self
 
-    days, seconds    = seconds.divmod(86400)
-    hours, seconds   = seconds.divmod(3600)
+    days,    seconds = seconds.divmod(86400)
+    hours,   seconds = seconds.divmod(3600)
     minutes, seconds = seconds.divmod(60)
     seconds, frac    = seconds.divmod(1)
 
@@ -241,6 +243,14 @@ class Numeric
     # result += ("." + frac.round(2).to_s.split(".").last) if frac > 0
 
     result
+  end
+
+  def to_farenheit
+    (self * 9.0 / 5.0) + 32
+  end
+
+  def to_celcius
+    (self - 32) * 5.0 / 9.0
   end
 
 end
@@ -442,7 +452,8 @@ end
 class Prime
 
   #
-  # Return an array of prime numbers within the specified range
+  # Return an array of prime numbers within the specified range.
+  # (It still has to generate all the primes less than the lower bound, so, yeah... be warned.)
   #
   def [](range)
     ubound    = range.end
