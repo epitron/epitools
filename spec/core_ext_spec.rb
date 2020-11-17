@@ -127,26 +127,6 @@ end
 
 describe Class do
 
-  it "uses" do
-    module Test1
-      def test1; :test1; end
-    end
-
-    module Test2
-      def test2; :test2; end
-    end
-
-    Hash.using(Test1).new.test1.should == :test1
-    Hash.using(Test2).new.test2.should == :test2
-    h = Hash.using(Test1, Test2).new
-    h.test1.should == :test1
-    h.test2.should == :test2
-
-    Hash.using(Test1) do |h|
-      h.new.test1.should == :test1
-    end
-  end
-
   it "traces messages (when $DEBUG is set)" do
     $DEBUG = true
 
@@ -166,10 +146,10 @@ describe Class do
     class ButtTest
       trace_messages_to :*
 
-      def d
+      def a
       end
 
-      def e
+      def b
       end
     end
 
@@ -197,7 +177,7 @@ describe Numeric do
     -12983287123.commatize.should      == "-12,983,287,123"
     -12983287123.4411.commatize.should == "-12,983,287,123.4411"
     1111.1234567.commatize.should      == "1,111.1234567"
-    BigDecimal.new("1111.1234567").commatize.should == "1,111.1234567"
+    BigDecimal("1111.1234567").commatize.should == "1,111.1234567"
     -1234567.1234567.underscorize.should == "-1_234_567.1234567"
   end
 
@@ -235,6 +215,11 @@ describe Numeric do
     23984.human_size.should == "23KB"
     12983128.human_size.should == "12MB"
     32583128.human_size(2).should == "31.07MB"
+  end
+
+  it "temperatures" do
+    t = 18.0
+    t.to_farenheit.to_celcius.should be_within(0.001).of(t)
   end
 
 end
@@ -1318,10 +1303,12 @@ describe URI do
   end
 
   it "params=" do
-    u = "http://butt.com/?q=1".to_uri
+    u = "http://butt.cx/?q=1".to_uri
     u.query.should == "q=1"
+    u.params.should == {"q" => "1"}
     u.params["q"] = 2
     u.params["q"].should == 2
+    u.params.should == {"q" => 2}
     u.query.should == "q=2"
   end
 
