@@ -253,6 +253,14 @@ class Numeric
     (self - 32) * 5.0 / 9.0
   end
 
+  def to_lbs
+    self / 0.45359237
+  end
+
+  def to_kg
+    self * 0.45359237
+  end
+
 end
 
 
