@@ -26,11 +26,12 @@
 # end
 #
 class JobRunner
-  def initialize(*blocks)
+  def initialize(*blocks, debug: false)
     @threads = []
     @results = Thread::Queue.new
     @jobs    = []
     @started = false
+    @debug   = debug
 
     if blocks.any?
       blocks.each { |block| add &block }
@@ -39,20 +40,37 @@ class JobRunner
     end
   end
 
+  def dmsg(msg)
+    puts "[#{Time.now}] #{msg}" if @debug
+  end
+
   def add(&block)
+    dmsg("added job #{block}")
     @jobs << block
   end
 
   def reap!
-    @threads.delete_if { |t| not t.alive? } if @threads.any?
+    if @threads.any?
+      dmsg("reaping #{@threads.size} threads")
+      @threads.delete_if { |t| not t.alive? }
+    else
+      dmsg("reap failed: no threads")
+    end
   end
 
   def go!
-    raise "Error: already started" if @started
+    if @started
+      raise "Error: already started"
+    else
+      dmsg("starting #{@threads.size} jobs")
+    end
+
     @started = true
     @jobs.each do |job|
+      dmsg("adding #{job}")
       @threads << Thread.new do
         @results << job.call
+        dmsg("job #{job} complete")
       end
     end
   end
@@ -72,7 +90,7 @@ end
 
 
 if __FILE__ == $0
-  JobRunner.new do |jr|
+  JobRunner.new(debug: true) do |jr|
     jr.add { 3 }
     jr.add { sleep 0.1; 2 }
     jr.add { sleep 0.2; 1 }
