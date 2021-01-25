@@ -195,7 +195,7 @@ class Path
   # Note: The `hints` parameter contains options so `path=` doesn't have to touch the filesytem as much.
   #
   def path=(newpath, hints={})
-    if hints[:type] or File.exists? newpath
+    if hints[:type] or File.exist? newpath
       if hints[:type] == :dir or File.directory? newpath
         self.dir = newpath
       else
@@ -366,7 +366,7 @@ class Path
   ###############################################################################
 
   def exists?
-    File.exists? path
+    File.exist? path
   end
 
   def size
@@ -439,7 +439,7 @@ class Path
   end
 
   def broken_symlink?
-    File.symlink?(path) and not File.exists?(path)
+    File.symlink?(path) and not File.exist?(path)
   end
 
   def symlink_target
@@ -1650,7 +1650,7 @@ class Path::URI < Path
   def to_s; uri.to_s; end
   def to_path; to_s; end
   def to_str; to_s; end
- 
+
   def inspect
     "#<Path::URI:#{to_s}>"
   end
