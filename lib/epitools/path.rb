@@ -119,10 +119,19 @@ class Path
   # The file extension, including the . (eg: ".mp3")
   attr_reader :ext
 
+  URI_RE = %r{^[a-z\-]+://}i
 
   ###############################################################################
   # Initializers
   ###############################################################################
+
+  def self.new(*args)
+    if args.first =~ URI_RE and self != Path::URI
+      Path::URI.new(args.first)
+    else
+      super(*args)
+    end
+  end
 
   def initialize(newpath, hints={})
     send("path=", newpath, hints)
@@ -156,8 +165,8 @@ class Path
       path
     when String
 
-      if path =~ %r{^[a-z\-]+://}i # URL?
-        Path::URI.new(path)
+      if path =~ URI_RE
+        Path.new(path)
 
       else
         # TODO: highlight backgrounds of codeblocks to show indent level & put boxes (or rules?) around (between?) double-spaced regions
@@ -186,7 +195,7 @@ class Path
   # Note: The `hints` parameter contains options so `path=` doesn't have to touch the filesytem as much.
   #
   def path=(newpath, hints={})
-    if hints[:type] or File.exists? newpath
+    if hints[:type] or File.exist? newpath
       if hints[:type] == :dir or File.directory? newpath
         self.dir = newpath
       else
@@ -357,7 +366,7 @@ class Path
   ###############################################################################
 
   def exists?
-    File.exists? path
+    File.exist? path
   end
 
   def size
@@ -430,7 +439,7 @@ class Path
   end
 
   def broken_symlink?
-    File.symlink?(path) and not File.exists?(path)
+    File.symlink?(path) and not File.exist?(path)
   end
 
   def symlink_target
@@ -1638,9 +1647,9 @@ class Path::URI < Path
   #
   # When this is: http://host.com:port/path/filename.ext?param1=value1&param2=value2&...
   #
-  def to_s
-    uri.to_s
-  end
+  def to_s; uri.to_s; end
+  def to_path; to_s; end
+  def to_str; to_s; end
 
   def inspect
     "#<Path::URI:#{to_s}>"
@@ -1693,9 +1702,9 @@ class Path::URI < Path
   def open(mode="r", &block)
     require 'open-uri'
     if block_given?
-      Kernel.open(to_s, mode, &block)
+      ::URI.open(to_s, mode, &block)
     else
-      Kernel.open(to_s, mode)
+      ::URI.open(to_s, mode)
     end
   end
 

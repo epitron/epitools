@@ -65,19 +65,20 @@ autoload :IPAddr, 'ipaddr'
 
 ## Nonstandard library (epitools)
 
-autoload :Path,         'epitools/path'
-autoload :Ezdb,         'epitools/ezdb'
-autoload :Browser,      'epitools/browser'
-autoload :Rash,         'epitools/rash'
-autoload :Ratio,        'epitools/ratio'
-autoload :ProgressBar,  'epitools/progressbar'
-autoload :Trie,         'epitools/trie'
-autoload :MimeMagic,    'epitools/mimemagic'
-autoload :Term,         'epitools/term'
-autoload :Iter,         'epitools/iter'
-autoload :WM,           'epitools/wm'
-autoload :TypedStruct,  'epitools/typed_struct'
-autoload :Sys,          'epitools/sys'
+autoload :Path,            'epitools/path'
+autoload :Ezdb,            'epitools/ezdb'
+autoload :Browser,         'epitools/browser'
+autoload :Rash,            'epitools/rash'
+autoload :Ratio,           'epitools/ratio'
+autoload :ProgressBar,     'epitools/progressbar'
+autoload :Trie,            'epitools/trie'
+autoload :MimeMagic,       'epitools/mimemagic'
+autoload :Term,            'epitools/term'
+autoload :Iter,            'epitools/iter'
+autoload :WM,              'epitools/wm'
+autoload :TypedStruct,     'epitools/typed_struct'
+autoload :Sys,             'epitools/sys'
+autoload :JobRunner,       'epitools/job_runner'
 autoload :SemanticVersion, 'epitools/semantic_version'
 
 autoload :Matrix, 'epitools/core_ext/matrix'
@@ -87,7 +88,7 @@ autoreq(:Vector) { Matrix }
 module Epi
   autoload :Slop, 'epitools/slop'
 end
-autoreq(:Slop) do 
+autoreq(:Slop) do
   Slop = Epi::Slop
 end
 

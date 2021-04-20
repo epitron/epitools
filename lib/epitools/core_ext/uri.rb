@@ -1,34 +1,57 @@
 require 'uri'
 
-module URI
+class URI::Generic
 
   #
-  # Return a Hash of the variables in the query string
+  # Get the query string
   #
-  def params
-    (@query ? @query.to_params : {})
-  end
-
-  #
-  # Mutate the query
-  # NB: This is super slow. To make it faster, store params directly in a locally cached dict, and only call `to_query` when query is accesed, or to_s/inspect are called
-  #
-  def params=(key, value)
-    current      = params
-    current[key] = value
-    self.query   = current.to_query
-  end
-
   def query
     params.to_query
   end
 
   #
-  # URIs are strings, dammit!
+  # Set the query string
+  #
+  def query=(new_query)
+    @params = new_query.to_params
+    @query  = new_query
+  end
+
+  #
+  # Return a Hash of the variables in the query string
+  #
+  def params
+    @params ||= (@query ? @query.to_params : {})
+  end
+
+  #
+  # Update all the params at once
+  #
+  def params=(new_params)
+    # self.query = new_params.to_params
+    raise "params must be a Hash" unless new_params.is_a? Hash
+    @params = new_params
+  end
+
+  # #
+  # # Update one URI parameter
+  # #
+  # def set_param(key, value)
+  #   current      = params
+  #   current[key] = value
+  #   self.query   = current.to_query
+  # end
+
+  #
+  # URIs *are* strings, dammit!
   #
   def to_str
     to_s
   end
+
+end
+
+module URI
 
   #
   # Default user agent for the 'get' method

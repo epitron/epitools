@@ -1,4 +1,7 @@
+require 'epitools/core_ext/array'
+
 module Enumerable
+  include Array::ToCSV
 
   #
   # 'true' if the Enumerable has no elements
