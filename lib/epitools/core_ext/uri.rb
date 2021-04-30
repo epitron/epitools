@@ -13,7 +13,7 @@ class URI::Generic
   # Set the query string
   #
   def query=(new_query)
-    @params = new_query.to_params
+    @params = new_query&.to_params
     @query  = new_query
   end
 

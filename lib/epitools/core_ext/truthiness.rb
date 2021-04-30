@@ -130,10 +130,9 @@ class String
   #
   # Is there anything in the string? (ignoring whitespace/newlines)
   #
-  def any?
+  def present?
     not blank?
   end
-  alias_method :present?, :any?
 
   #
   # Does this string contain something that means roughly "true"?
