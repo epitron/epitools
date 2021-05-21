@@ -36,7 +36,7 @@ or check out the rdoc: http://rdoc.info/gems/epitools/frames
 
 == Copyright
 
-Copyright (c) 2009-2015 epitron
+Copyright (c) 2009-2016 epitron
 
 == License
 
