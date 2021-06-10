@@ -939,7 +939,7 @@ class Path
 
   # Parse the file as CSV
   def read_csv(io=self.io, opts={})
-    open { |io| CSV.new(io.read, opts).each }
+    CSV.new(io.read, **opts).each
   end
   alias_method :from_csv, :read_csv
 
