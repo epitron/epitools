@@ -67,7 +67,7 @@ end
 
 
 
-def color_backtrace_2(lines, options={})
+def color_backtrace_2(lines, **options)
 
   groups = lines.reverse.split_at { |line,nextline| line.path != nextline.path }
 

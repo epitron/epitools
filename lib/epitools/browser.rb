@@ -36,7 +36,7 @@ class Browser
   #  :use_logs => false,               # Don't log the detailed transfer info
   #  :cookie_file => "cookies.txt"     # Save cookies to file
   #
-  def initialize(options={})
+  def initialize(**options)
     @last_get     = Time.at(0)
     @delay        = options[:delay]          || 1
     @delay_jitter = options[:delay_jitter]   || 0.2
@@ -126,7 +126,7 @@ class Browser
   # Options:
   #   :cached => true/false   | check cache before getting page
   #
-  def get(url, options={})
+  def get(url, **options)
 
     # TODO: Have a base-URL option
 

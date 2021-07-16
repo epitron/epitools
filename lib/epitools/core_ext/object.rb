@@ -36,7 +36,7 @@ class Object
   #
   # Good for chaining lots of operations together in a REPL.
   #
-  def with(options={})
+  def with(**options)
     if block_given?
       yield self
     else

@@ -108,7 +108,7 @@ module Term
       self.new(data)
     end
 
-    def initialize(data, options={})
+    def initialize(data, **options)
       @data         = data.map(&:to_s)
       @strip_color = options[:ansi] || options[:colorized] || options[:colored] || options[:strip_color] || options[:strip_ansi]
 
@@ -185,7 +185,7 @@ module Term
     end
     alias_method :by_rows, :in_rows
 
-    def display #(opts={})
+    def display #(**opts)
       case @direction
       when :horizontal
         puts in_rows
@@ -198,7 +198,7 @@ module Term
       by_rows
     end
 
-    def render(rows, options={})
+    def render(rows, **options)
       num_cols  = rows.first.size
       result    = []
 

@@ -253,7 +253,7 @@ module Kernel
   #
   # Global AwesomePrint method (which triggers the loading of AwesomePrint the first time it's called)
   #
-  def ap(object, options={})
+  def ap(object, **options)
     AwesomePrint
     Kernel.ap(object, options)
   end

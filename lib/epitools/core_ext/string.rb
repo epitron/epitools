@@ -115,7 +115,7 @@ class String
   alias_method :chomp_lines,   :each_chomped
 
 
-  def split_at(boundary, options={})
+  def split_at(boundary, **options)
     include_boundary = options[:include_boundary] || false
 
     boundary = Regexp.new(Regexp.escape(boundary)) if boundary.is_a?(String)

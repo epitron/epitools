@@ -26,7 +26,7 @@ module Hex
     :default => 7
   )
 
-  def self.dump(data, options={})
+  def self.dump(data, **options)
     base_offset   = options[:base_offset] || 0
     color         = options[:color].nil? ? true : options[:color]
     highlight     = options[:highlight]

@@ -37,7 +37,7 @@ class Browser
     end
 
 
-    def put(page, original_url=nil, options={})
+    def put(page, original_url=nil, **options)
       dmsg [:put, original_url]
 
       raise "Invalid page" unless valid_page?(page)

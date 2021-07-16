@@ -234,7 +234,7 @@ def curl(url)
   curl_open(url).read
 end
 
-def curl_open(url, headers={})
+def curl_open(url, **headers)
   # headers["User-Agent"] ||= "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_5) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/85 Version/11.1.1 Safari/605.1.15"
   cmd = ["curl", "-LSs"]
   headers.each { |k,v| cmd += ["-H", "#{k}: #{v}"] }

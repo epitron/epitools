@@ -133,7 +133,7 @@ class Path
     end
   end
 
-  def initialize(newpath, hints={})
+  def initialize(newpath, **hints)
     send("path=", newpath, hints)
 
     # if hints[:unlink_when_garbage_collected]
@@ -155,7 +155,7 @@ class Path
     Shellwords.escape(str)
   end
 
-  def self.glob(str, hints={})
+  def self.glob(str, **hints)
     Dir[str].map { |entry| new(entry, hints) }
   end
 
@@ -194,7 +194,7 @@ class Path
   #
   # Note: The `hints` parameter contains options so `path=` doesn't have to touch the filesytem as much.
   #
-  def path=(newpath, hints={})
+  def path=(newpath, **hints)
     if hints[:type] or File.exist? newpath
       if hints[:type] == :dir or File.directory? newpath
         self.dir = newpath
@@ -876,7 +876,7 @@ class Path
   # Parse the file based on the file extension.
   # (Handles json, html, yaml, xml, csv, marshal, and bson.)
   #
-  def parse(io=self.io, forced_ext=nil, opts={})
+  def parse(io=self.io, forced_ext=nil, **opts)
     case (forced_ext or ext.downcase)
     when 'gz', 'bz2', 'xz'
       parse(zopen, exts[-2])
@@ -938,7 +938,7 @@ class Path
 
 
   # Parse the file as CSV
-  def read_csv(io=self.io, opts={})
+  def read_csv(io=self.io, **opts)
     CSV.new(io.read, **opts).each
   end
   alias_method :from_csv, :read_csv
@@ -1633,7 +1633,7 @@ class Path::URI < Path
   # TODO: only include certain methods from Path (delegate style)
   #       (eg: remove commands that write)
 
-  def initialize(uri, hints={})
+  def initialize(uri, **hints)
     @uri = ::URI.parse(uri)
     self.path = @uri.path
   end

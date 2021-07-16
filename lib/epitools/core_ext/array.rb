@@ -266,7 +266,7 @@ class Array
   #            5.0...9.0 => 5
   #          }
   #
-  def histogram(n_buckets=10, options={})
+  def histogram(n_buckets=10, **options)
 
     use_ranges = options[:ranges] || options[:hash]
 
