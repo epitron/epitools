@@ -125,16 +125,17 @@ class Path
   # Initializers
   ###############################################################################
 
+  alias_class_method :old_new, :new
   def self.new(*args)
     if args.first =~ URI_RE and self != Path::URI
       Path::URI.new(args.first)
     else
-      super(*args)
+      old_new(*args)
     end
   end
 
   def initialize(newpath, **hints)
-    send("path=", newpath, hints)
+    send("path=", newpath, **hints)
 
     # if hints[:unlink_when_garbage_collected]
     #   backup_path = path.dup

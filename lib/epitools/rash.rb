@@ -11,7 +11,7 @@ class Rash
 
   attr_accessor :optimize_every
 
-  def initialize(**initial)
+  def initialize(initial)
     @hash           = {}
     @regexes        = []
     @ranges         = []
