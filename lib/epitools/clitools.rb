@@ -247,3 +247,13 @@ end
 def curl_json(url)
   JSON.parse(curl(url))
 end
+
+def cached_curl(url)
+  cache = "/tmp/curl-#{url.sha1}.cache"
+  if File.exist?(cache)
+    puts "cached! => #{cache}"
+  else
+    File.write(cache, curl(url))
+  end
+  File.read(cache)
+end
