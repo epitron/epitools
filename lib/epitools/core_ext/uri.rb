@@ -10,6 +10,14 @@ class URI::Generic
   end
 
   #
+  # Set the query string
+  #
+  def query=(new_query)
+    @params = new_query&.to_params
+    @query  = new_query
+  end
+
+  #
   # Return a Hash of the variables in the query string
   #
   def params

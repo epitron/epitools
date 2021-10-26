@@ -1296,11 +1296,11 @@ describe URI do
     uri.params.should == opts
   end
 
-  it "gets" do
-    response = URI("http://google.com/").get
-    response.body.size
-    (response.size > 0).should == true
-  end
+  # it "gets" do
+  #   response = URI("http://google.com/").get
+  #   response.body.size
+  #   (response.size > 0).should == true
+  # end
 
   it "params=" do
     u = "http://butt.cx/?q=1".to_uri
@@ -1310,6 +1310,10 @@ describe URI do
     u.params["q"].should == 2
     u.params.should == {"q" => 2}
     u.query.should == "q=2"
+
+    subbed = u.with(query: u.params.reject{|k,v| u.params.keys.include? 'q' }.to_query)
+    subbed.params.should == {}
+    subbed.query.should == ""
   end
 
 end

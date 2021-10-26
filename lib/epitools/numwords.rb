@@ -24,7 +24,7 @@ class Numeric
 
   # 20-90
   NAMES_MEDIUM = [
-    "twenty", "thirty", "fourty", "fifty", "sixty", "seventy", "eighty", "ninety"
+    "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"
   ]
 
   # >= 100
