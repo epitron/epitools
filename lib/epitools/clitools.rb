@@ -251,7 +251,7 @@ end
 def cached_curl(url)
   cache = "/tmp/curl-#{url.sha1}.cache"
   if File.exist?(cache)
-    puts "cached! => #{cache}"
+    $stderr.puts "cached! => #{cache}"
   else
     File.write(cache, curl(url))
   end
