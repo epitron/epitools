@@ -98,8 +98,11 @@ autoreq  :Mechanize,    'mechanize'
 autoreq  :HTTP,         'http'
 
 autoreq  :Nokogiri,     'nokogiri'
-autoreq  :Oga,          'oga'
 autoreq  :Ox,           'ox'
+autoreq  :Oga do
+  require 'oga'
+  require 'epitools/gem_ext/oga'
+end
 
 autoreq  :ANSI,         'ansi'
 
