@@ -11,6 +11,9 @@ class Object
     Hash[ vars.zip(vals) ]
   end
 
+  def write_to(file)
+    open(file, "wb") { |f| f.write self.to_s }
+  end
 
   #
   # Gives you a copy of the object with its attributes changed to whatever was
