@@ -57,6 +57,13 @@ end
 
 
 #
+# Colorized puts (see: `String#colorize`)
+#
+def cputs(*args)
+  puts args.join("\n").colorize
+end
+
+#
 # Execute a `system()` command using SQL-style escaped arguments.
 #
 # Example:

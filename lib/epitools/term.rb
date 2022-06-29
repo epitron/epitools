@@ -104,8 +104,21 @@ module Term
 
     attr_accessor :border, :columns, :padding, :strip_color, :indent, :width, :height
 
-    def self.[](data)
-      self.new(data)
+    def self.print(thing, opts={})
+      raise "Can't tablize a #{thing.class}" unless thing.class < Enumerable
+      puts new(thing, opts).display
+    end
+
+    def self.hprint(thing)
+      puts new(thing).in_rows
+    end
+
+    def self.vprint(thing)
+      puts new(thing).in_columns
+    end
+
+    def self.[](data, opts={})
+      new(data, opts)
     end
 
     def initialize(data, **options)

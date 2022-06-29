@@ -151,7 +151,7 @@ class Browser
       if use_cache and page = cache.get(url)
         puts "  |_ cached (#{page.content_type})"
       else
-        page = agent.get(url)
+        page = agent.get(url, [], options[:referer])
         @last_get = Time.now
         cache_put(page, url) if use_cache
       end
