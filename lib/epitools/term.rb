@@ -29,7 +29,7 @@ module Term
   # Return the [width,height] of the terminal.
   #
   def size
-    $stdout.winsize.reverse
+    $stdout.winsize.reverse rescue [80,25]
   end
 
   def width;  size[0]; end
