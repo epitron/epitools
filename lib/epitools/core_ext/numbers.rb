@@ -284,6 +284,16 @@ class Integer
   alias_method :bits, :to_bits
 
   #
+  # Convert this number to a Ruby-style string of platform-endian binary digits (eg: "0b011010101").
+  # Note: The `min_length` argument tells how long the string should be (padding the missing digits with 0's); defaults to 8.
+  #
+  def binary(min_length=8)
+    width = (log(2).ceil / min_length.to_f).ceil * min_length
+    "0b%0.#{width}b" % self
+  end
+  alias_method :bin, :binary
+
+  #
   # Cached constants for encoding numbers into bases up to 64
   #
   BASE_DIGITS       = [*'0'..'9', *'A'..'Z', *'a'..'z', '_', '-']
