@@ -404,6 +404,15 @@ describe String do
     ]
   end
 
+  it "parses units" do
+    "50%".parse_units.should == 0.5
+    "1b".parse_units.should == 1.billion
+    "1gb".parse_units.should == 2**30
+
+    lambda { "whee".parse_units }.should raise_error
+    lambda { "57 butts".parse_units }.should raise_error
+  end
+
 end
 
 

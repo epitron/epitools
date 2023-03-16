@@ -36,6 +36,14 @@ class String
   end
 
   #
+  # Do what a browser would do when you type something into the address bar
+  #
+  def urlescape
+    @@uri_parser ||= URI::RFC2396_Parser.new
+    @@uri_parser.escape(self)
+  end
+
+  #
   # Remove redundant whitespaces (not including newlines).
   #
   def tighten
@@ -277,17 +285,25 @@ class String
   end
 
   #
+  # Cache an `URI::RFC2396_Parser` instance, because it's slowwww to initialize
+  #
+  def _rfc2396_parser
+    @@rfc2396_parser ||= URI::RFC2396_Parser.new
+  end
+
+  #
   # Convert non-URI characters into %XXes.
   #
   def urlencode
-    URI.escape(self)
+    #URI.escape(self)
+    _rfc2396_parser.escape(self)
   end
 
   #
   # Convert an URI's %XXes into regular characters.
   #
   def urldecode
-    URI.unescape(self)
+    _rfc2396_parser.unescape(self)
   end
 
   #
@@ -512,6 +528,68 @@ class String
     nums_and_units = nums.reverse.zip %w[seconds minutes hours days]
     nums_and_units.map { |num, units| num.send(units) }.sum
   end
+
+
+  #
+  # Translate numbers with units (like 25k, 150GB, 15%, 5 hours) into their expanded numeric value
+  #
+  def parse_units
+    # extract the unit suffix
+    if self =~ /(\d[\d_]*(?:\.\d+)?)\s*([a-zA-Z]+\b|%(?= \s|$))/
+      units = $2.downcase
+      num   = $1 #.to_f
+      num   = num["."] ? num.to_f : num.to_i
+
+      case units
+      when "%"
+        # 0.01
+        num / 100.0
+      when "k"
+        # 10**3
+        num.thousand
+      when "m", "mm"
+        # 10**6
+        num.million
+      when "b", "bn"
+        # 10**9
+        num.billion
+      when "gib", "gb", "g"
+        num * 2**30
+      when "mib", "mb"
+        num * 2**20
+      when "kib", "kb"
+        num * 2**10
+      when "t", "tb"
+        # 10**12
+        num.trillion
+      when "q"
+        # 10**15
+        num.quadrillion
+      when "Q"
+        # 10**18
+        num.quintillion
+      when "min"
+        # 1.minute
+        num.minutes
+      when "hours", "h", "hr", "hrs"
+        # 1.hour
+        num.hours
+      when "d", "days", "dy"
+        num.days
+      else
+        raise "Invalid units: #{units.inspect}, in: #{self.inspect}"
+      end
+    else
+      raise "Couldn't find any units to parse! (expecting: '<a number><some letters>')"
+    end
+  end
+
+  alias_method :from_units,   :parse_units
+  alias_method :from_human,   :parse_units
+  alias_method :from_size,    :parse_units
+  alias_method :from_percent, :parse_units
+  alias_method :from_time,    :parse_units
+
 
   #
   # Print a hexdump of the string to STDOUT (coloured, if the terminal supports it)
