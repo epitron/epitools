@@ -275,12 +275,11 @@ end
 
 ####################################################################################
 #
-# Path("/some/path") is an alias for Path["/some/path"]
+# Path("/some/path") is a wrapper for Path["/some/path"]
 #
 def Path(arg)
   Path[arg]
 end
-
 
 ####################################################################
 require 'epitools/autoloads'
