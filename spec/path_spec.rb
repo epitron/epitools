@@ -147,7 +147,9 @@ describe Path do
     data = "<h1>The best webpage in the universe.</h1>"
     html = Path.tmpfile
     html.write data
-    html.read_html.at("h1").to_s.should == data
+
+    # html.read_html.at("h1").to_s.should == data
+    html.read_html.at_css("h1").to_s.should == data
 
   ensure
     yaml.rm
@@ -243,7 +245,7 @@ describe Path do
 
     old_name = path.to_s
 
-    dest = path.rename(:ext=>".dat")
+    dest = path.rename(path.with(ext: ".dat"))
 
     dest.to_s.should == old_name+".dat"
     path.to_s.should == old_name
@@ -253,10 +255,10 @@ describe Path do
     path.exists?.should == false
 
     path.touch
-    lambda { path.rename(:ext=>".dat") }.should raise_error(RuntimeError)
+    lambda { path.rename(path.with(ext: ".dat")) }.should raise_error(RuntimeError)
 
     dest.rm
-    path.rename!(:ext=>".dat")
+    path.rename!(path.with(ext: ".dat"))
     path.to_s.should_not == old_name
     path.exists?.should == true
 
@@ -413,6 +415,14 @@ describe Path do
 
     # system("gzip -c < #{tmpjson} > #{tmpjson}.gz")
 
+    # class method version
+    Path.zopen("#{tmpjson}.gz", "w") { |io| io.write(JSON.dump(hash)) }
+    tmpgzip = Path["#{tmpjson}.gz"]
+    tmpgzip.exists?.should == true
+    tmpgzip.size.should be > 0
+    tmpgzip&.rm
+
+    # instance method version
     tmpgzip = Path["#{tmpjson}.gz"]
     tmpgzip.zopen("w") { |io| io.write(JSON.dump(hash)) }
     tmpgzip.exists?.should == true

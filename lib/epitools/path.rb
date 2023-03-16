@@ -157,7 +157,7 @@ class Path
   end
 
   def self.glob(str, **hints)
-    Dir[str].map { |entry| new(entry, hints) }
+    Dir[str].map { |entry| new(entry, **hints) }
   end
 
   def self.[](path)
@@ -817,7 +817,7 @@ class Path
   #    zopen("otherfile.gz", "w") #=> #<Zlib::GzipWriter:0x7fe30448>>
   #    zopen("test.txt.gz") { |f| f.read } # read the contents of the .gz file, then close the file handle automatically.
   #
-  def zopen(mode="rb", &block)
+  def zopen(mode="rb", **opts, &block)
     # if ext == "gz"
     #   io = open(mode)
     #   case mode
@@ -830,7 +830,7 @@ class Path
     #     raise "Unknown mode: #{mode.inspect}. zopen only supports 'r' and 'w'."
     #   end
     # elsif bin = COMPRESSORS[ext]
-    if bin = COMPRESSORS[ext]
+    if bin = (opts[:format] || COMPRESSORS[ext])
       if which(bin)
         case mode
         when "w", "wb"
@@ -869,18 +869,25 @@ class Path
 
   end
 
+  def self.zopen(filename, mode, &block)
+    Path.new(filename).zopen(mode, &block)
+  end
+
   ###############################################################################
   # Parsing files
   ###############################################################################
 
   #
   # Parse the file based on the file extension.
-  # (Handles json, html, yaml, xml, csv, marshal, and bson.)
+  # (Handles json, html, yaml, xml, csv, tsv, marshal, and bson.)
   #
-  def parse(io=self.io, forced_ext=nil, **opts)
-    case (forced_ext or ext.downcase)
+  # The "format" option lets you specify the file format (eg: `Path["something.conf"].parse(format: "yaml")`)
+  # You can also pass CSV parsing options (eg: `Path["thing.csv"].parse(col_sep: "\t")`)
+  #
+  def parse(io=self.io, **opts)
+    case (opts[:format] || ext.downcase)
     when 'gz', 'bz2', 'xz'
-      parse(zopen, exts[-2])
+      parse(zopen, format: exts[-2])
     when 'json'
       read_json(io)
     when 'html', 'htm'
@@ -890,7 +897,10 @@ class Path
     when 'xml', 'rdf', 'rss'
       read_xml(io)
     when 'csv'
-      read_csv(io, opts)
+      read_csv(io, **opts)
+    when 'tsv'
+      opts[:col_sep] ||= "\t"
+      read_csv(io, **opts)
     when 'marshal'
       read_marshal(io)
     when 'bson'
@@ -921,7 +931,8 @@ class Path
 
 
   def read_html(io=self.io)
-    Nokogiri::HTML(io)
+    #Nokogiri::HTML(io)
+    Oga.parse_html(io)
   end
   alias_method :from_html, :read_html
 
@@ -946,7 +957,8 @@ class Path
 
   # Parse the file as XML
   def read_xml(io=self.io)
-    Nokogiri::XML(io)
+    # Nokogiri::XML(io)
+    Oga.parse_xml(io)
   end
 
   # Parse the file as a Ruby Marshal dump
@@ -1025,6 +1037,7 @@ class Path
     dest
   end
   alias_method :ren, :rename
+  alias_method :rename_to, :rename
 
   #
   # Works the same as "rename", but the destination can be on another disk.
@@ -1503,7 +1516,8 @@ class Path
   # TODO: Remove the tempfile when the Path object is garbage collected or freed.
   #
   def self.tmpfile(prefix="tmp")
-    path = Path.new(Tempfile.new(prefix).path, unlink_when_garbage_collected: true)
+    # path = Path.new(Tempfile.new(prefix).path, unlink_when_garbage_collected: true)
+    path = Path.new(Tempfile.new(prefix).path)
     yield path if block_given?
     path
   end
