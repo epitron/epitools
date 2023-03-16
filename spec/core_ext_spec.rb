@@ -491,11 +491,26 @@ describe Float do
     end
   end
 
-  it "percent" do
+  it "percents" do
     f = 0.716237
-    f.percent.should == "72%"
+    f.percent.should == "71.6%"
+    f.percent(0).should == "72%"
+    f.percent(1).should == "71.6%"
     f.percent(2).should == "71.62%"
     f.percent(3).should == "71.624%"
+  end
+
+end
+
+describe Rational do
+
+  it "makes em" do
+    lambda { Rational[1,2] }.should_not raise_error
+  end
+
+  it "percents" do
+    Rational(1,2).percent.should == "50.0%"
+    Rational(1,3).percent(3).should == "33.333%"
   end
 
 end
