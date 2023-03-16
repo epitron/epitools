@@ -186,11 +186,11 @@ end
 def geoip(addr, city_data='/usr/share/GeoIP/GeoIPCity.dat', country_data='/usr/share/GeoIP/GeoIP.dat')
   (
     $geoip ||= begin
-      if city_data and File.exists? city_data
+      if city_data and File.exist? city_data
         geo = GeoIP.new city_data
         proc { |addr| geo.city(addr) }
 
-      elsif country_data and File.exists? country_data
+      elsif country_data and File.exist? country_data
         geo = GeoIP.new country_data
         proc { |addr| geo.country(addr) }
 
@@ -209,7 +209,7 @@ def which(*bins)
   bins.flatten.each do |bin|
     ENV["PATH"].split(":").each do |dir|
       full_path = File.join(dir, bin)
-      return full_path if File.exists? full_path
+      return full_path if File.exist? full_path
     end
   end
   nil

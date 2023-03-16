@@ -85,7 +85,7 @@ class Browser
   end
 
   def load_cookies!
-    if File.exists? @cookie_file
+    if File.exist? @cookie_file
       agent.cookie_jar.load @cookie_file
       true
     else
