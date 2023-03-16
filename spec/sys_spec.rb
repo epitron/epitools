@@ -30,6 +30,11 @@ describe Sys::ProcessInfo do
       if p2 = p2s[p1.pid]
         matches += 1
         p1.command.should == p2.command
+
+        # FIXME: this behaves weirdly with kernel processes, eg:
+        # expected: "[kworker/u8:1-phy5]"
+        #      got: "[kworker/u8:1-events_unbound]" (using ==)
+
       end
     end
 

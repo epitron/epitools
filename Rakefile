@@ -17,13 +17,11 @@ task :pry do
 end
 
 task :spec do
-  cmd = %w[rspec -fd -c spec]
+  cmd = %w[rspec --format documentation --force-color --pattern spec/*_spec.rb]
+  cmd.unshift "rescue" if system *%w[which rescue]
 
-  if system *%w[which rescue]
-    system *(["rescue"]+cmd)
-  else
-    system *cmd
-  end
+  p cmd
+  system *cmd
 end
 
 task :default => :spec
