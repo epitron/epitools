@@ -453,15 +453,35 @@ end
 class Float
 
   #
-  # Convert the float to a rounded percentage string (eg: "42%").
+  # Convert the float to a rounded percentage string (eg: "42.5%").
   # Its argument lets you specify how many decimals to display
   #
   # eg:
-  #    > 0.32786243.percent # => "33%"
+  #    > 0.32786243.percent # => "33.8%"
   #    > 0.32786243.percent(2) # => "32.79%"
   #
-  def percent(decimals=0)
+  def percent(decimals=1)
     "%0.#{decimals}f%%" % (self * 100)
+  end
+
+end
+
+
+class Rational
+
+  #
+  # Convert the float to a rounded percentage string (eg: "42.5%")
+  # (see: Float#percent)
+  #
+  def percent(decimals=1)
+    to_f.percent(decimals)
+  end
+
+  #
+  # Alternate initializer (`Rational[1,2]`)
+  #
+  def self.[](*args)
+    Rational(*args)
   end
 
 end
@@ -495,3 +515,4 @@ end
 def primes
   Prime.instance
 end
+
