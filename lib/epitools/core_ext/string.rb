@@ -278,10 +278,27 @@ class String
   enumerable :each_slice
 
   #
-  # The Infamous Caesar-Cipher. Unbreakable to this day.
+  # Implements the Infamous Caesar-Cipher. Unbreakable to this day.
   #
   def rot13
     tr('n-za-mN-ZA-M', 'a-zA-Z')
+  end
+
+  #
+  # Implements the unfamous non-Caesar ciphers. Want to `rot` your string more or less than 13? You've come to the right place!
+  # (NOTE: Currently only works on American letters. No fancy accents or cyrillic letters please!)
+  #
+  def rot(amount=1)
+    chars.map do |c|
+      case c
+      when ?a..?z
+        (((c.ord - ?a.ord + amount) % 26) + ?a.ord).chr
+      when ?A..?Z
+        (((c.ord - ?A.ord + amount) % 26) + ?A.ord).chr
+      else
+        c
+      end
+    end.join
   end
 
   #

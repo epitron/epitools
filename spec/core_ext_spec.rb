@@ -238,9 +238,17 @@ describe String do
     message.rot13.should_not   == message
     message.rot13.rot13.should == message
   end
+ 
+  it "rotNs" do
+    "hi".rot(6).should      == "no"
+    "IBM".rot(-1).should    == "HAL"
+    "moz".rot(20).should    == "git"
+    "ohggf".rot(13).should  == "butts"
+    "secret".rot(13).should == "secret".rot13
+  end
 
   it "tightens" do
-    " hi   there".tighten.should == "hi there"
+    " hi   \tthere   \n".tighten.should == "hi there"
   end
 
   it "dewhitespaces" do
