@@ -27,6 +27,14 @@ class IO
     end
   end
 
+  #
+  # Unmarshal the IO (transform it into Ruby datatypes).
+  #
+  def unmarshal
+    Marshal.load self
+  end
+  alias_method :from_marshal, :unmarshal
+
 end
 
 

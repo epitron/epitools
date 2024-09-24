@@ -507,7 +507,7 @@ class String
   # Unmarshal the string (transform it into Ruby datatypes).
   #
   def unmarshal
-    Marshal.restore self
+    Marshal.load self
   end
   alias_method :from_marshal, :unmarshal
 
