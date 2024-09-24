@@ -172,6 +172,11 @@ class DateTime
   def to_f; to_time.to_f; end
 end
 
+class Date
+  def inspect
+    strftime("#<Date: %Y-%m-%d (%a %b %d, %Y)>")
+  end
+end
 
 class NilClass
 
