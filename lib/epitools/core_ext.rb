@@ -15,7 +15,9 @@ require 'epitools/core_ext/hash'
 require 'epitools/core_ext/numbers'
 require 'epitools/core_ext/truthiness'
 require 'epitools/core_ext/range'
+
 require 'epitools/core_ext/time'
+require 'epitools/core_ext/date'
 
 require 'epitools/core_ext/argv'
 require 'epitools/core_ext/file'

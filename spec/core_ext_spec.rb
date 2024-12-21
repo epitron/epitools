@@ -1095,6 +1095,20 @@ describe Range do
 end
 
 
+describe Date do
+
+  it "finds" do
+    d = Date.parse("2001-01-01")
+    prev_wed = Date.parse("2000-12-27")
+    next_wed = Date.parse("2001-01-03")
+    d.find_backwards { wednesday? }.first == prev_wed
+    d.find_forwards  { wednesday? }.first == next_wed
+    d.find_bidirectional { wednesday? }.take(2) == [prev_wed, next_wed]
+  end
+
+end
+
+
 describe ObjectSpace do
 
   it "is Enumerable" do
