@@ -423,6 +423,14 @@ class String
   end
    
   #
+  # CRC32 the string
+  #
+  def crc32
+    Zlib.crc32(self).to_hex
+  end
+  alias_method :crc, :crc32
+
+  #
   # MD5 the string
   #
   def md5
@@ -442,6 +450,8 @@ class String
   def sha256
     Digest::SHA256.hexdigest self
   end
+
+
 
   #
   # gzip the string
