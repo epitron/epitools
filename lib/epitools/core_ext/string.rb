@@ -29,6 +29,27 @@ class String
   end
 
   #
+  # Convert the string from one encoding into another (eg: convert_encoding('cp437', 'utf-8'))
+  #
+  def convert_encoding(from, to)
+    force_encoding(from).encode(to)
+  end
+
+  #
+  # Convert the string to utf-8, forcing another encoding
+  #
+  def to_utf8(from="cp437")
+    convert_encoding(from, "utf-8")
+  end
+
+  #
+  # Convert a string from cp437 into utf-8
+  #
+  def from_cp437
+    to_utf8
+  end
+
+  #
   # Escape shell characters (globs, quotes, parens, etc.)
   #
   def shellescape
