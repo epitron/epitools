@@ -390,6 +390,13 @@ class String
   end
 
   #
+  # Convert the bytes of this string to hexadecimcal digits
+  #
+  def to_hex
+    unpack("H*").first
+  end
+
+  #
   # Cached constants for base conversion.
   #
   BASE_DIGITS = Integer::BASE_DIGITS.map.with_index.to_h

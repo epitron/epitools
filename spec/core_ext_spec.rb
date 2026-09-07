@@ -421,6 +421,10 @@ describe String do
     lambda { "57 butts".parse_units }.should raise_error
   end
 
+  it "to_hexes" do
+    "\0\a".to_hex.should == "0007"
+  end
+
 end
 
 
