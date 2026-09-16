@@ -33,17 +33,28 @@ class Numeric
   #    12.clamp(0..100)             #=> 12
   #    -38817112.clamp(0..100)      #=> 0
   #
-  def clamp(range)
-    if self < range.first
-      range.first
-    elsif self >= range.last
-      if range.exclude_end?
-        range.last - 1
-      else
-        range.last
+  unless method_defined? :clamp
+    def clamp(*args)
+      case args.size 
+      when 0
+        raise "Error: clamp takes either a Range object or 2 arguments"
+      when 1
+        range = args.first
+      when 2
+        range = (args.first..args.second)
       end
-    else
-      self
+
+      if self < range.first
+        range.first
+      elsif self >= range.last
+        if range.exclude_end?
+          range.last - 1
+        else
+          range.last
+        end
+      else
+        self
+      end
     end
   end
 
